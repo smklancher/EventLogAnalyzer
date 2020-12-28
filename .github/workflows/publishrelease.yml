@@ -1,0 +1,113 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Upload Release Asset
+
+env:
+  PROJECT_NAME: EventLogAnalyzer
+
+jobs:
+  build:
+    name: Upload Release Asset
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+          
+      # Add  MsBuild to the PATH: https://github.com/microsoft/setup-msbuild
+      #- name: Setup MSBuild.exe
+      #  uses: microsoft/setup-msbuild@v1.0.2
+        
+      - name: Install 7Zip PowerShell Module
+        shell: powershell
+        run: Install-Module 7Zip4PowerShell -Force -Verbose
+        
+        
+      - name: Dump env context
+        env:
+          ENV_ALL: ${{ toJson(env) }}
+        run: echo "$ENV_ALL"
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+        
+        
+      - name: Publish win
+        working-directory: .\${{ env.PROJECT_NAME }}
+        run: dotnet publish ${{ env.PROJECT_NAME }} -r win-x64 -c Release -p:PublishSingleFile=true --no-self-contained -o:.\FrameworkDependentSingleFile\win
+        
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ env.PROJECT_NAME }} ${{ github.ref }}
+          draft: false
+          prerelease: false
+          
+          
+      - name: List files
+        run: ls
+      - name: List files in project directory
+        working-directory: .\${{ env.PROJECT_NAME }}
+        run: ls
+      - name: List files in project directory second level
+        working-directory: .\${{ env.PROJECT_NAME }}\${{ env.PROJECT_NAME }}
+        run: ls
+        
+        
+      - name: Delete pdb
+        shell: cmd
+        run: del .\EventLogAnalyzer\FrameworkDependentSingleFile\win\*.pdb
+        
+      - name: Copy release included files
+        shell: cmd
+        run: copy /Y .\EventLogAnalyzer\IncludeInRelease\* .\EventLogAnalyzer\FrameworkDependentSingleFile\win\
+        
+      - name: Zip Build
+        shell: powershell
+        working-directory: .\${{ env.PROJECT_NAME }}
+        run: Compress-7Zip -Path .\FrameworkDependentSingleFile\win\ -ArchiveFileName ${{ env.PROJECT_NAME }}.zip -Format Zip
+        
+        
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: .\${{ env.PROJECT_NAME }}\${{ env.PROJECT_NAME }}.zip
+          asset_name: ${{ env.PROJECT_NAME }}.zip
+          asset_content_type: application/zip
