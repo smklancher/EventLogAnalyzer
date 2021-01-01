@@ -369,7 +369,7 @@ namespace EventLogAnalyzer
             this.Name = "EventLogAnalyzer";
             this.Text = "Universal Log Parser";
             this.Load += new System.EventHandler(this.EventLogAnalyzer_Load);
-            this.Shown += new System.EventHandler(this.EventLogAnalyzer_Shown);
+            this.Shown += new System.EventHandler(this.EventLogAnalyzer_ShownAsync);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.EventLogAnalyzer_DragDrop);
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.EventLogAnalyzer_DragEnter);
             this.SplitFilesAndRest.Panel1.ResumeLayout(false);

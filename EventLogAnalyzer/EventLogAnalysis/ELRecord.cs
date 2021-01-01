@@ -34,6 +34,7 @@ namespace EventLogAnalysis
         public string Message { get; private set; } = string.Empty;
 
         public bool MessageIsLoaded { get; private set; }
+        public Exception? MessageLoadExeption { get; private set; }
         public ELog ParentLog { get; }
         public string ProviderName => Record.ProviderName;
         public EventRecord Record { get; init; }
@@ -63,7 +64,15 @@ namespace EventLogAnalysis
         {
             if (!MessageIsLoaded)
             {
-                Message = Record.FormatDescription();
+                try
+                {
+                    Message = Record.FormatDescription();
+                }
+                catch (Exception ex)
+                {
+                    MessageLoadExeption = ex;
+                }
+
                 if (string.IsNullOrEmpty(Message))
                 {
                     if (Record.Properties.Count > 0)

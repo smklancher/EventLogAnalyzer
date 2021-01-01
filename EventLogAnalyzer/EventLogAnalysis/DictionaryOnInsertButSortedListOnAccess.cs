@@ -39,7 +39,7 @@ namespace EventLogAnalysis
         ///     ''' <remarks></remarks>
         private bool mListIsDirty = true;
 
-        private bool mNeedsSort = true;
+        //private bool mNeedsSort = true;
 
         public int Count
         {

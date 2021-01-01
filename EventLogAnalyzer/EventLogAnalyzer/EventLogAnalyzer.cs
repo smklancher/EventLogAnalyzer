@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EventLogAnalysis;
@@ -14,12 +15,19 @@ namespace EventLogAnalyzer
 {
     public partial class EventLogAnalyzer : Form
     {
+        private CancellationTokenSource cts = new();
         private GenericLogCollectionDisplay LCD = new GenericLogCollectionDisplay();
         private EventLogCollection Logs = new();
+        private Progress<string> progressHandler;
 
         public EventLogAnalyzer()
         {
             InitializeComponent();
+
+            progressHandler = new Progress<string>(value =>
+            {
+                LCD.StatusBar.Text = value;
+            });
         }
 
         public static string UNCPath(string path)
@@ -37,7 +45,7 @@ namespace EventLogAnalyzer
             return path;
         }
 
-        private void EventLogAnalyzer_DragDrop(object sender, DragEventArgs e)
+        private async void EventLogAnalyzer_DragDrop(object sender, DragEventArgs e)
         {
             LCD.StartProgressBar();
 
@@ -49,7 +57,7 @@ namespace EventLogAnalyzer
                 foreach (string File in MyFiles)
                     Logs.AddByFile(File);
 
-                LoadAndAnalyze();
+                await LoadAndAnalyzeAsync();
             }
         }
 
@@ -80,21 +88,27 @@ namespace EventLogAnalyzer
             //LCD.DisplayInternalLog();
         }
 
-        private void EventLogAnalyzer_Shown(object sender, EventArgs e)
+        private async void EventLogAnalyzer_ShownAsync(object sender, EventArgs e)
         {
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
                 Logs.AddByFile(UNCPath(args[1]));
-                LoadAndAnalyze();
+                await LoadAndAnalyzeAsync();
             }
         }
 
-        private void LoadAndAnalyze()
+        private async Task LoadAndAnalyzeAsync()
         {
             Logs.SimpleLoadMessages();
             //Logs.SimpleGroupSimilarLines();
-            Logs.SimpleAnalyzeLogs();
+            //Logs.SimpleAnalyzeLogs();
+            LCD.Refresh();
+
+            LCD.StartProgressBar();
+            await Task.Run(() => Logs.AnalyzeLogs(cts.Token, progressHandler));
+            LCD.StopProgressBar();
+            LCD.Refresh();
         }
     }
 }

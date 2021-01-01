@@ -1,9 +1,11 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UtilityCommon;
 
 namespace EventLogAnalysis
@@ -79,10 +81,22 @@ namespace EventLogAnalysis
             }
         }
 
-        public void AnalyzeLog(ELog log, CancellationToken cancelToken)
+        public void AnalyzeLog(ELog log, CancellationToken cancelToken, IProgress<string> progress)
         {
             log.LoadIndicies(cancelToken);
             SeparateIndexCollections.Add(log.IndexCollection);
+        }
+
+        public void AnalyzeLogs(CancellationToken token, IProgress<string> progress)
+        {
+            foreach (var l in Logs)
+            {
+                AnalyzeLog(l, token, progress);
+            }
+
+            MergeLogAnalysis();
+
+            //LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
         }
 
         public void Filter(string xpath)
@@ -119,14 +133,15 @@ namespace EventLogAnalysis
         public void SimpleAnalyzeLogs()
         {
             var cancelToken = new CancellationTokenSource();
+            var progress = new Progress<string>();
             foreach (var l in Logs)
             {
-                AnalyzeLog(l, cancelToken.Token);
+                AnalyzeLog(l, cancelToken.Token, progress);
             }
 
             MergeLogAnalysis();
 
-            LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
+            //LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
         }
 
         /// <summary>
@@ -153,6 +168,8 @@ namespace EventLogAnalysis
             {
                 log.LoadMessages(cancelToken.Token);
             }
+
+            LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
         }
 
         /// <summary>
