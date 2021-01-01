@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Serilog;
 using UtilityCommon;
 
 namespace EventLogAnalysis
@@ -97,6 +98,7 @@ namespace EventLogAnalysis
             MergeLogAnalysis();
 
             //LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
+            Log.Logger.Information($"Finished analysis of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}");
         }
 
         public void Filter(string xpath)
@@ -170,6 +172,7 @@ namespace EventLogAnalysis
             }
 
             LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
+            Log.Logger.Information($"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}");
         }
 
         /// <summary>

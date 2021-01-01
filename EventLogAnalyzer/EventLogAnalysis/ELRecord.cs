@@ -3,7 +3,7 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace EventLogAnalysis
 {
-    public class ELRecord : IComparable<ELRecord>, IEquatable<ELRecord>
+    public class ELRecord : IComparable<ELRecord>, IEquatable<ELRecord>, ILogLineDisplay
     {
         public ELRecord(EventRecord eventRecord, ELog log)
         {
@@ -26,6 +26,7 @@ namespace EventLogAnalysis
         public ProviderEventIdPair GroupKey { get; init; }
         public double GroupSimilarity { get; set; }
         public string Level { get; }
+        string ILogLineDisplay.LevelString => Level;
         public string LogFileName => ParentLog.FileName;
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace EventLogAnalysis
         public EventRecord Record { get; init; }
         public long RecordId { get; private set; }
         public DateTime? Timestamp => Record.TimeCreated;
+        string ILogLineDisplay.TimestampString => Timestamp.ToString() ?? string.Empty;
         public string UniqueId { get; }
 
         public int CompareTo(ELRecord? other)
@@ -70,6 +72,8 @@ namespace EventLogAnalysis
                 }
                 catch (Exception ex)
                 {
+                    // TODO: check how different kind of exceptions should be handled, eg ERROR_EVT_INVALID_PUBLISHER_NAME
+                    //  https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-erref/18d8fbe8-a967-4f1c-ae50-99ca8e491d2d
                     MessageLoadExeption = ex;
                 }
 
