@@ -23,6 +23,9 @@ namespace EventLogAnalysis
 
             UpdateProvidersFromEvents(AllProviders, AllEvents);
             FilteredProviders = new(AllProviders);
+
+            // remove in future
+            CreateLogBasedTraitProducers();
         }
 
         public EventCollection AllEvents { get; private set; } = new();
@@ -33,9 +36,10 @@ namespace EventLogAnalysis
         public long FilteredEventCount => currentFilterEventIndexes.Count;
         public EventCollection FilteredEvents { get; private set; } = new();
         public Dictionary<string, int> FilteredProviders { get; private set; } = new();
-        public IndexCollection IndexCollection { get; private set; } = new();
         public Guid LogGuid { get; }
         public long TotalEventCount { get; private set; }
+        public List<LogBasedTraitProducer> TraitProducers { get; } = new();
+        public TraitTypeCollection Traits { get; private set; } = new();
         private List<long> currentFilterEventIndexes { get; set; } = new();
         private FileInfo fileInfo { get; init; }
 
@@ -63,39 +67,17 @@ namespace EventLogAnalysis
             return groups;
         }
 
+        public void CreateLogBasedTraitProducers()
+        {
+            // do this via plugin or whatever in the future
+            TraitProducers.Add(new LogBasedTraitProducer());
+        }
+
         public void Filter(string xpath)
         {
             var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
             LoadEvents(eq);
             UpdateProvidersFromEvents(FilteredProviders, FilteredEvents);
-        }
-
-        public void LoadIndicies(CancellationToken cancelToken)
-        {
-            IndexCollection = new();
-
-            foreach (var r in FilteredEvents)
-            {
-                //if (cancelToken.IsCancellationRequested)
-                //{
-                //    return;
-                //}
-
-                // Provider trait
-                IndexCollection.AddLine("Provider", r.ProviderName, r);
-            }
-
-            // create index for similar lines, ideally standardize index approach
-            EventIdGroups = CreateEventIdGroups(this);
-            GroupSimilarLines(EventIdGroups);
-
-            foreach (var idGroup in EventIdGroups.Values)
-            {
-                foreach (var simGroup in idGroup.SubGroups)
-                {
-                    IndexCollection.AddCollection(simGroup);
-                }
-            }
         }
 
         public void LoadMessages(CancellationToken cancelToken)
@@ -119,6 +101,25 @@ namespace EventLogAnalysis
             Thread.CurrentThread.CurrentCulture = OriginalCulture;
         }
 
+        public void LoadTraits(CancellationToken cancelToken)
+        {
+            Traits = new();
+
+            LoadTraitsPerLine();
+
+            // create index for similar lines, ideally standardize index approach
+            EventIdGroups = CreateEventIdGroups(this);
+            GroupSimilarLines(EventIdGroups);
+
+            foreach (var idGroup in EventIdGroups.Values)
+            {
+                foreach (var simGroup in idGroup.SubGroups)
+                {
+                    Traits.AddCollection(simGroup);
+                }
+            }
+        }
+
         /// <summary>
         /// Need to change to parallel with cancelation
         /// Groups similar lines within the EventIdGroups
@@ -131,6 +132,10 @@ namespace EventLogAnalysis
             {
                 g.GroupSimilarLines();
             }
+        }
+
+        private void LoadComplexTraits(CancellationToken cancelToken)
+        {
         }
 
         /// <summary>
@@ -158,6 +163,21 @@ namespace EventLogAnalysis
                     FilteredEvents.Add(elr);
 
                     currentFilterEventIndexes.Add(elr.RecordId);
+                }
+            }
+        }
+
+        private void LoadTraitsPerLine()
+        {
+            // to be plugin based etc at some point
+            List<LineBasedTraitProducer> producers = new();
+            producers.Add(new LineBasedTraitProducer());
+
+            foreach (var r in FilteredEvents)
+            {
+                foreach (var p in producers)
+                {
+                    p.AddTraitsFromLine(Traits, r);
                 }
             }
         }

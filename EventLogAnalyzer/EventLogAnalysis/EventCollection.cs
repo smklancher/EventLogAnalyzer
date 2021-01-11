@@ -16,27 +16,27 @@ namespace EventLogAnalysis
     public class EventCollection : DictionaryOnInsertButSortedListOnAccess<ELRecord>, IComparable<EventCollection>
     {
         /// <summary>
-        ///     ''' Returns the date of the first event in the collection... currently this causes a sort (costly))
-        ///     ''' </summary>
-        ///     ''' <value></value>
-        ///     ''' <returns></returns>
-        ///     ''' <remarks></remarks>
+        /// Returns the date of the first event in the collection... currently this causes a sort (costly))
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public DateTime FirstEvent => Lines.LastOrDefault()?.Timestamp ?? DateTime.MinValue;
 
         /// <summary>
-        ///     ''' Returns the date of the last event in the collection... currently this causes a sort (costly))
-        ///     ''' </summary>
-        ///     ''' <value></value>
-        ///     ''' <returns></returns>
-        ///     ''' <remarks></remarks>
+        /// Returns the date of the last event in the collection... currently this causes a sort (costly))
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public DateTime LastEvent => Lines.LastOrDefault()?.Timestamp ?? DateTime.MaxValue;
 
         /// <summary>
-        ///     ''' This is the same as accessing the object directly.  This just makes the relationship more clear, especially on the class diagram.
-        ///     ''' </summary>
-        ///     ''' <value></value>
-        ///     ''' <returns></returns>
-        ///     ''' <remarks></remarks>
+        /// This is the same as accessing the object directly.  This just makes the relationship more clear, especially on the class diagram.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         public EventCollection Lines
         {
             get
@@ -57,7 +57,9 @@ namespace EventLogAnalysis
         public int CompareTo(EventCollection? other)
         {
             if (other == null)
+            {
                 return 1;
+            }
 
             // purposely using the dictionary so this doesn't need to generate the list
             return Count.CompareTo(other.Count);
@@ -67,20 +69,25 @@ namespace EventLogAnalysis
         {
             EventCollection lc = new EventCollection();
             foreach (var l in Lines.Where(x => x.Message.ToLower().Contains(FilterText.ToLower())))
+            {
                 lc.Add(l);
+            }
+
             lc.Lock();
             return lc;
         }
 
         /// <summary>
-        ///     ''' Merges another LineCollection into this one
-        ///     ''' </summary>
-        ///     ''' <param name="CollectionToMerge"></param>
-        ///     ''' <remarks></remarks>
+        /// Merges another LineCollection into this one
+        /// </summary>
+        /// <param name="CollectionToMerge"></param>
+        /// <remarks></remarks>
         public void Merge(EventCollection CollectionToMerge)
         {
             foreach (var LineToMerge in CollectionToMerge)
+            {
                 Add(LineToMerge);
+            }
         }
 
         public void SaveToFile(string FileName)

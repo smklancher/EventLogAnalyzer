@@ -15,7 +15,10 @@ namespace EventLogAnalyzer
 {
     public partial class EventLogAnalyzer : Form
     {
+        // cts cannot be reset, so need to create new tokens per operation:
+        // https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads?redirectedfrom=MSDN#operation-cancellation-versus-object-cancellation
         private CancellationTokenSource cts = new();
+
         private GenericLogCollectionDisplay LCD = new GenericLogCollectionDisplay();
         private EventLogCollection Logs = new();
         private Progress<string> progressHandler;
@@ -55,7 +58,9 @@ namespace EventLogAnalyzer
                 MyFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
 
                 foreach (string File in MyFiles)
+                {
                     Logs.AddByFile(File);
+                }
 
                 await LoadAndAnalyzeAsync();
             }
@@ -64,9 +69,13 @@ namespace EventLogAnalyzer
         private void EventLogAnalyzer_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
                 e.Effect = DragDropEffects.Copy;
+            }
             else
+            {
                 e.Effect = DragDropEffects.None;
+            }
         }
 
         private void EventLogAnalyzer_Load(object sender, EventArgs e)

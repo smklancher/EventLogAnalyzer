@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventLogAnalysis
 {
-    public class SimilarLineGroup : TraitBasedEventCollection
+    public class SimilarLineGroup : SingleTraitValueEventCollection
     {
         public SimilarLineGroup(ELRecord record)
         {

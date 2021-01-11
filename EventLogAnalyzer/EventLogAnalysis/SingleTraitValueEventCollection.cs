@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventLogAnalysis
 {
-    public class TraitBasedEventCollection : EventCollection
+    public class SingleTraitValueEventCollection : EventCollection
     {
         public string TraitName { get; set; } = string.Empty;
         public string TraitValue { get; set; } = string.Empty;

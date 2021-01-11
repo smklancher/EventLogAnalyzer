@@ -14,29 +14,29 @@ namespace EventLogAnalysis
         // IDictionary(Of TKey, TValue) Interface - Represents a generic collection of key/value pairs.
 
         /// <summary>
-        ///     ''' For speed of insertion, the underlying collection is a dictionary
-        ///     ''' </summary>
-        ///     ''' <remarks></remarks>
+        /// For speed of insertion, the underlying collection is a dictionary
+        /// </summary>
+        /// <remarks></remarks>
         private ConcurrentDictionary<string, T> mDictionary = new ConcurrentDictionary<string, T>();
 
         // Private mDictionary As New Dictionary(Of String, T)
 
         /// <summary>
-        ///     ''' Whether it is locked, after which the dictionary is cleared and no further updates are allowed.
-        ///     ''' </summary>
-        ///     ''' <remarks></remarks>
+        /// Whether it is locked, after which the dictionary is cleared and no further updates are allowed.
+        /// </summary>
+        /// <remarks></remarks>
         private bool mIsLocked = false;
 
         /// <summary>
-        ///     ''' When the items are accessed they will be sorted into a list
-        ///     ''' </summary>
-        ///     ''' <remarks></remarks>
+        /// When the items are accessed they will be sorted into a list
+        /// </summary>
+        /// <remarks></remarks>
         private List<T> mList = new();
 
         /// <summary>
-        ///     ''' When items are inserted into the dictionary this marks the list as dirty which means it will need to be recreated
-        ///     ''' </summary>
-        ///     ''' <remarks></remarks>
+        /// When items are inserted into the dictionary this marks the list as dirty which means it will need to be recreated
+        /// </summary>
+        /// <remarks></remarks>
         private bool mListIsDirty = true;
 
         //private bool mNeedsSort = true;
@@ -46,9 +46,13 @@ namespace EventLogAnalysis
             get
             {
                 if (IsLocked)
+                {
                     return mSortedList.Count;
+                }
                 else
+                {
                     return mDictionary.Count;
+                }
             }
         }
 
@@ -69,11 +73,11 @@ namespace EventLogAnalysis
         }
 
         /// <summary>
-        ///     ''' Return items in this itemCollection.  Sorting performed if needed.
-        ///     ''' </summary>
-        ///     ''' <value></value>
-        ///     ''' <returns></returns>
-        ///     ''' <remarks></remarks>
+        /// Return items in this itemCollection.  Sorting performed if needed.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
         private List<T> mSortedList
         {
             get
@@ -113,10 +117,10 @@ namespace EventLogAnalysis
         }
 
         /// <summary>
-        ///     ''' Adds a item (using ToString as the key, which may not be desired)
-        ///     ''' </summary>
-        ///     ''' <param name="item"></param>
-        ///     ''' <remarks></remarks>
+        /// Adds a item (using ToString as the key, which may not be desired)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <remarks></remarks>
         //[Obsolete("Not recommended.  Use Add(item, key) or override this to call Add(item, key) instead.")]
         public virtual void Add(T item)
         {
@@ -124,10 +128,10 @@ namespace EventLogAnalysis
         }
 
         /// <summary>
-        ///     ''' Adds a item (dupicate IDs ignored)
-        ///     ''' </summary>
-        ///     ''' <param name="item"></param>
-        ///     ''' <remarks></remarks>
+        /// Adds a item (dupicate IDs ignored)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <remarks></remarks>
         public void Add(T item, string key)
         {
             if (!IsLocked)
@@ -142,7 +146,9 @@ namespace EventLogAnalysis
                 }
             }
             else
+            {
                 throw new InvalidOperationException("Cannot add after list is locked.");
+            }
         }
 
         public void Clear()
@@ -216,7 +222,9 @@ namespace EventLogAnalysis
                 return mDictionary.TryRemove(Key, out RemovedValue);
             }
             else
+            {
                 throw new InvalidOperationException("Cannot remove after list is locked.");
+            }
         }
     }
 }

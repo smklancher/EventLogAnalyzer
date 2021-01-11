@@ -17,188 +17,21 @@ using Serilog.Sinks.ListOfString;
 
 namespace EventLogAnalyzer
 {
-    public class GenericLogCollectionDisplay
+    public partial class GenericLogCollectionDisplay
     {
         public List<string> InternalLog = new();
         private const string InternalLogName = "InternalLog";
         private string LastSearchText = "";
-        private List<LogIndex.IndexSummaryLine> mCurrentIndex = new();
+        private List<TraitValuesCollection.TraitValueSummaryLine> mCurrentIndex = new();
         private EventCollection mCurrentLines = new();
-        private PropertyGrid mDebugProperties = new();
-        private TextBox mDetailText = new();
-        private ListView mFileList = new();
-        private ListView mIndexList = new();
-        private ListView mIndexTypeList = new();
-        private ListView mLinesList = new();
         private EventLogCollection mLogs = new();
-        private ToolStripProgressBar mProgressBar = new();
-        private TextBox mSearchBox = new();
         private string mSelectedIndex = "";
         private string mSelectedIndexType = "";
-        private Timer mTypingTimer = new();
 
         public GenericLogCollectionDisplay()
         {
             Log.Logger = InternalLog.AsSeriLogger();
         }
-
-        public PropertyGrid DebugProperties
-        {
-            get
-            {
-                return mDebugProperties;
-            }
-            set
-            {
-                value.ToolbarVisible = false;
-                mDebugProperties = value;
-            }
-        }
-
-        public TextBox DetailText { get; set; } = new();
-
-        public ListView FileList
-        {
-            set
-            {
-                if (mFileList is not null)
-                {
-                    mFileList.SelectedIndexChanged -= mFileList_SelectedIndexChanged;
-                }
-
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("Filename");
-                value.Columns.Add("Type");
-                mFileList = value;
-
-                mFileList.SelectedIndexChanged += mFileList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mFileList;
-            }
-        }
-
-        public ListView IndexList
-        {
-            set
-            {
-                if (mIndexList is not null)
-                {
-                    mIndexList.RetrieveVirtualItem -= mIndexList_RetrieveVirtualItem;
-                    mIndexList.SelectedIndexChanged -= mIndexList_SelectedIndexChanged;
-                }
-
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("#");
-                value.Columns.Add("Indicies");
-                value.Columns.Add("First");
-                value.Columns.Add("Last");
-                value.VirtualMode = true;
-                value.VirtualListSize = 0;
-                mIndexList = value;
-
-                mIndexList.RetrieveVirtualItem += mIndexList_RetrieveVirtualItem;
-                mIndexList.SelectedIndexChanged += mIndexList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mIndexList;
-            }
-        }
-
-        public ListView IndexTypeList
-        {
-            set
-            {
-                if (mIndexTypeList is not null)
-                {
-                    mIndexTypeList.SelectedIndexChanged -= mIndexTypeList_SelectedIndexChanged;
-                }
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("#");
-                value.Columns.Add("Index Types");
-                mIndexTypeList = value;
-                IndexTypeList.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
-
-                mIndexTypeList.SelectedIndexChanged += mIndexTypeList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mIndexTypeList;
-            }
-        }
-
-        public ListView LinesList
-        {
-            set
-            {
-                if (mLinesList is not null)
-                {
-                    mLinesList.RetrieveVirtualItem -= mLinesList_RetrieveVirtualItem;
-                    mLinesList.SelectedIndexChanged -= mLinesList_SelectedIndexChanged;
-                }
-
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("Timestamp");
-                value.Columns.Add("Level");
-                value.Columns.Add("Message");
-                value.VirtualMode = true;
-                value.VirtualListSize = 0;
-                mLinesList = value;
-
-                mLinesList.RetrieveVirtualItem += mLinesList_RetrieveVirtualItem;
-                mLinesList.SelectedIndexChanged += mLinesList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mLinesList;
-            }
-        }
-
-        public EventLogCollection Logs
-        {
-            get
-            {
-                if (mLogs == null)
-                    mLogs = new EventLogCollection();
-                return mLogs;
-            }
-            set
-            {
-                if (mLogs is not null)
-                {
-                    mLogs.LogsFinishedLoading -= mLogs_LogsFinishedLoading;
-                }
-
-                mCurrentIndex = new();
-                mLogs = value;
-
-                mLogs.LogsFinishedLoading += mLogs_LogsFinishedLoading;
-            }
-        }
-
-        public ToolStripProgressBar ProgressBar
-        {
-            get
-            {
-                return mProgressBar;
-            }
-            set
-            {
-                value.Style = ProgressBarStyle.Marquee;
-                value.MarqueeAnimationSpeed = 0;
-                mProgressBar = value;
-            }
-        }
-
-        public TextBox SearchBox { get; set; } = new();
-
-        public ToolStripStatusLabel StatusBar { set; get; } = new();
 
         public void DisplayFiles()
         {
@@ -222,7 +55,7 @@ namespace EventLogAnalyzer
         {
             IndexTypeList.Items.Clear();
 
-            var typesAndCounts = Logs.IndexCollection.IndexTypesAndCounts();
+            var typesAndCounts = Logs.TraitTypes.TraitTypesAndCounts();
 
             foreach (var IdxAndCount in typesAndCounts)
             {
@@ -244,12 +77,12 @@ namespace EventLogAnalyzer
             }
             else
             {
-                mCurrentIndex = Logs.IndexCollection.IndexValues(IndexType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
+                mCurrentIndex = Logs.TraitTypes.TraitValueSummaries(IndexType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
                 DebugProperties.SelectedObject = mCurrentIndex;
 
                 if (mCurrentIndex.Count > 0)
                 {
-                    mSelectedIndex = mCurrentIndex[0].IndexValue;
+                    mSelectedIndex = mCurrentIndex[0].TraitValue;
                 }
 
                 IndexList.VirtualListSize = mCurrentIndex?.Count ?? 0;
@@ -264,14 +97,17 @@ namespace EventLogAnalyzer
             mIndexList.VirtualListSize = 0;
 
             if (mCurrentLines != null)
+            {
                 DebugProperties.SelectedObject = InternalLog;
+            }
+
             LinesList.VirtualListSize = InternalLog.Count;
             LinesList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         public void DisplayLines(string IndexType, string IndexValue)
         {
-            mCurrentLines = Logs.IndexCollection.Lines(IndexType, IndexValue);
+            mCurrentLines = Logs.TraitTypes.Lines(IndexType, IndexValue);
             if (mCurrentLines != null)
             {
                 DebugProperties.SelectedObject = mCurrentLines;
@@ -282,7 +118,7 @@ namespace EventLogAnalyzer
 
         public void Filter(string SearchText)
         {
-            mCurrentLines = Logs.IndexCollection.Lines(mSelectedIndexType, mSelectedIndex);
+            mCurrentLines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
             mCurrentLines = mCurrentLines.FilteredCopy(SearchText);
             DebugProperties.SelectedObject = mCurrentLines;
             LinesList.VirtualListSize = mCurrentLines.Count;
@@ -299,10 +135,10 @@ namespace EventLogAnalyzer
         }
 
         /// <summary>
-        ///     ''' Set status msg... would probably be better to have the display subscribe to events
-        ///     ''' </summary>
-        ///     ''' <param name="Msg"></param>
-        ///     ''' <remarks></remarks>
+        /// Set status msg... would probably be better to have the display subscribe to events
+        /// </summary>
+        /// <param name="Msg"></param>
+        /// <remarks></remarks>
         public void SetStatus(string Msg)
         {
             StatusBar.Text = Msg;
@@ -318,10 +154,10 @@ namespace EventLogAnalyzer
         //}
 
         /// <summary>
-        ///     ''' Save the current list of lines to a text file.
-        ///     ''' </summary>
-        ///     ''' <param name="FileName"></param>
-        ///     ''' <remarks></remarks>
+        /// Save the current list of lines to a text file.
+        /// </summary>
+        /// <param name="FileName"></param>
+        /// <remarks></remarks>
         //public void SaveCurrentLines(string FileName)
         //{
         //    FileInfo ExePath = new FileInfo(Assembly.GetExecutingAssembly().Location);
@@ -330,10 +166,10 @@ namespace EventLogAnalyzer
         //}
 
         ///// <summary>
-        /////     ''' Save the list of indicies and their counts to a text file.
-        /////     ''' </summary>
-        /////     ''' <param name="FileName"></param>
-        /////     ''' <remarks></remarks>
+        ///// Save the list of indicies and their counts to a text file.
+        ///// </summary>
+        ///// <param name="FileName"></param>
+        ///// <remarks></remarks>
         //public void SaveCurrentIndicies(string FileName)
         //{
         //    FileInfo ExePath = new FileInfo(Assembly.GetExecutingAssembly().Location);
@@ -369,7 +205,9 @@ namespace EventLogAnalyzer
             var timer = sender as Timer;
 
             if (timer == null)
+            {
                 return;
+            }
 
             string SearchText = timer.Tag.ToString() ?? string.Empty;
             Filter(SearchText);
@@ -379,11 +217,16 @@ namespace EventLogAnalyzer
         private void mFileList_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (mFileList.SelectedIndices.Count < 1)
+            {
                 return;
+            }
 
             mCurrentLines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
             if (mCurrentLines != null)
+            {
                 DebugProperties.SelectedObject = Logs.Logs[mFileList.SelectedIndices[0]];
+            }
+
             LinesList.VirtualListSize = mCurrentLines?.Count ?? 0;
             LinesList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
@@ -400,7 +243,7 @@ namespace EventLogAnalyzer
 
             case 1:
                 {
-                    mCurrentIndex = mCurrentIndex.OrderBy(x => x.IndexValue).ToList();
+                    mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
                     break;
                 }
 
@@ -425,7 +268,7 @@ namespace EventLogAnalyzer
             var IndexValue = mCurrentIndex[e.ItemIndex];
             e.Item = new ListViewItem(new string[] {
             IndexValue.Count.ToString(),
-            IndexValue.IndexValue,
+            IndexValue.TraitValue,
             IndexValue.First.ToString()?? string.Empty,
             IndexValue.Last.ToString() ?? string.Empty
             });
@@ -434,10 +277,12 @@ namespace EventLogAnalyzer
         private void mIndexList_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (IndexList.SelectedIndices.Count < 1)
+            {
                 return;
+            }
 
             var IndexValue = mCurrentIndex[mIndexList.SelectedIndices[0]];
-            string IndexSelected = IndexValue.IndexValue;
+            string IndexSelected = IndexValue.TraitValue;
 
             // only do anything if we are changing the active indextype
             if (IndexSelected != mSelectedIndex)
@@ -446,19 +291,23 @@ namespace EventLogAnalyzer
                 // display the new lines
                 DisplayLines(mSelectedIndexType, mSelectedIndex);
 
-                DebugProperties.SelectedObject = Logs.IndexCollection[mSelectedIndexType][mSelectedIndex];
+                DebugProperties.SelectedObject = Logs.TraitTypes[mSelectedIndexType][mSelectedIndex];
 
                 // select the first line
                 mLinesList.SelectedIndices.Clear();
                 if (mLinesList.VirtualListSize > 0)
+                {
                     LinesList.SelectedIndices.Add(0);
+                }
             }
         }
 
         private void mIndexTypeList_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (IndexTypeList.SelectedItems.Count < 1)
+            {
                 return;
+            }
 
             string IndexType = IndexTypeList.SelectedItems[0].SubItems[1].Text;
 
@@ -489,7 +338,9 @@ namespace EventLogAnalyzer
         private void mLinesList_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (mLinesList.SelectedIndices.Count < 1)
+            {
                 return;
+            }
 
             var Line = mCurrentLines[mLinesList.SelectedIndices[0]] as ILogLineDisplay;
             DebugProperties.SelectedObject = Line;
@@ -507,7 +358,7 @@ namespace EventLogAnalyzer
             SetStatus($"Total events loaded: {Logs.TotalEventCount}.  Current filter events: {Logs.FilteredEventCount}");
         }
 
-        private void mSearchBox_TextChanged(object sender, EventArgs e)
+        private void mSearchBox_TextChanged(object? sender, EventArgs e)
         {
             if (mTypingTimer == null)
             {

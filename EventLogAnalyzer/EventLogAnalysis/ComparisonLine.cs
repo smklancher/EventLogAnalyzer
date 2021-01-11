@@ -55,6 +55,11 @@ namespace EventLogAnalysis
             return false;
         }
 
+        public bool SimilarEnough(ComparisonLine other)
+        {
+            return SimilarEnough(other.ComparisonRecord);
+        }
+
         private double LevPercent(string compare)
         {
             return Math.Abs(1 - (double)Lev.DistanceFrom(compare) / (double)Math.Max(Lev.StoredLength, compare.Length));
