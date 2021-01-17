@@ -83,6 +83,7 @@ namespace EventLogAnalyzer
                 if (mCurrentIndex.Count > 0)
                 {
                     mSelectedIndex = mCurrentIndex[0].TraitValue;
+                    DisplayLines(IndexType, mSelectedIndex);
                 }
 
                 IndexList.VirtualListSize = mCurrentIndex?.Count ?? 0;
@@ -107,6 +108,7 @@ namespace EventLogAnalyzer
 
         public void DisplayLines(string IndexType, string IndexValue)
         {
+            mSelectedIndex = IndexValue;
             mCurrentLines = Logs.TraitTypes.Lines(IndexType, IndexValue);
             if (mCurrentLines != null)
             {
@@ -342,9 +344,18 @@ namespace EventLogAnalyzer
                 return;
             }
 
-            var Line = mCurrentLines[mLinesList.SelectedIndices[0]] as ILogLineDisplay;
-            DebugProperties.SelectedObject = Line;
-            DetailText.Text = Line.Message;
+            if (mSelectedIndexType == InternalLogName)
+            {
+                var line = InternalLog[mLinesList.SelectedIndices[0]];
+                DetailText.Text = line ?? string.Empty;
+                DebugProperties.SelectedObject = null;
+            }
+            else
+            {
+                var Line = mCurrentLines[mLinesList.SelectedIndices[0]] as ILogLineDisplay;
+                DebugProperties.SelectedObject = Line;
+                DetailText.Text = Line.Message;
+            }
         }
 
         private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)

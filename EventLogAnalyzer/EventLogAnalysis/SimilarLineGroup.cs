@@ -21,9 +21,9 @@ namespace EventLogAnalysis
 
         public ComparisonLine ComparisonLine { get; init; }
 
-        public bool AddIfSimilar(ELRecord record)
+        public bool AddIfSimilar(ELRecord record, out double similarityPercentage)
         {
-            if (ComparisonLine.SimilarEnough(record))
+            if (ComparisonLine.SimilarEnough(record, out similarityPercentage))
             {
                 Lines.Add(record);
                 return true;

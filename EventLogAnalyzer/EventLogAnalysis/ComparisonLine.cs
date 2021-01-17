@@ -37,27 +37,29 @@ namespace EventLogAnalysis
 
         public string TraitValue { get; }
 
-        public bool SimilarEnough(ELRecord record)
+        public bool SimilarEnough(ELRecord record, out double similarityPercentage)
         {
-            if (CheckForExactMatch && ComparisonRecord.GetMessage() == record.GetMessage())
+            var bothBlank = string.IsNullOrWhiteSpace(record.Message) && string.IsNullOrWhiteSpace(record.Message);
+            if (bothBlank || (CheckForExactMatch && ComparisonRecord.Message == record.Message))
             {
                 record.GroupSimilarity = 1;
+                similarityPercentage = 1.0;
                 return true;
             }
 
-            var sim = LevPercent(record.GetMessage());
-            if (sim > Threshold)
+            similarityPercentage = LevPercent(record.Message);
+            if (similarityPercentage > Threshold)
             {
-                record.GroupSimilarity = sim;
+                record.GroupSimilarity = similarityPercentage;
                 return true;
             }
 
             return false;
         }
 
-        public bool SimilarEnough(ComparisonLine other)
+        public bool SimilarEnough(ComparisonLine other, out double similarityPercentage)
         {
-            return SimilarEnough(other.ComparisonRecord);
+            return SimilarEnough(other.ComparisonRecord, out similarityPercentage);
         }
 
         private double LevPercent(string compare)

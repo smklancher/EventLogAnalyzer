@@ -100,23 +100,23 @@ namespace EventLogAnalysis
             // for each index in the other colection
             foreach (var OtherIndex in Other)
             {
-                // see if it exists in this one
-                if (TraitTypes.TryGetValue(OtherIndex.Key, out var ThisIdx))
+                // need to generalize the ability of a trait provider to influence a merge of its trait, but for the moment just skip SimilarLines here
+                if (OtherIndex.Key == "SimilarLines")
                 {
-                    // need to generalize the ability of a trait provider to influence a merge of its trait, but for the moment just skip SimilarLines here
-                    if (OtherIndex.Key == "SimilarLines")
-                    {
-                    }
-                    else
+                }
+                else
+                {
+                    // see if it exists in this one
+                    if (TraitTypes.TryGetValue(OtherIndex.Key, out var ThisIdx))
                     {
                         // if it does, merge them
                         ThisIdx.Merge(OtherIndex.Value);
                     }
-                }
-                else
-                {
-                    // if it does not, then just add the index from the other to this one
-                    TraitTypes.Add(OtherIndex.Key, OtherIndex.Value);
+                    else
+                    {
+                        // if it does not, then just add the index from the other to this one
+                        TraitTypes.Add(OtherIndex.Key, OtherIndex.Value);
+                    }
                 }
             }
         }

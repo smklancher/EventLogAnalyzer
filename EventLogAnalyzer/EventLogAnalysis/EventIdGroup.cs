@@ -29,7 +29,7 @@ namespace EventLogAnalysis
 
                 foreach (var s in SubGroups)
                 {
-                    if (s.AddIfSimilar(r))
+                    if (s.AddIfSimilar(r, out _))
                     {
                         addedToGroup = true;
                         break;

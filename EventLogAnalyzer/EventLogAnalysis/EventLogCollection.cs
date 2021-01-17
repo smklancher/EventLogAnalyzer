@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
+using Serilog.Core;
 using UtilityCommon;
 
 namespace EventLogAnalysis
@@ -113,40 +114,59 @@ namespace EventLogAnalysis
                 // if any comparison meets threshold, then merge
                 // if not then just add new
 
+                //The SimilarLines trait won't exist initially, so the first log will just add its SimilarLines trait to the merged collection
+
+                bool curLogGroupAlreadyMerged = false;
+
                 //get the trait from the current log
                 if (log.Traits.TryGetValue("SimilarLines", out var CurLogSimLinesCollection))
                 {
-                    // see if it exists in this one (the merged results)
-                    if (TraitTypes.TryGetValue("SimilarLines", out var MergedSimLinesCollection))
+                    // Check if the merged colleciton already contains a SimilarLines trait
+                    if (!TraitTypes.TryGetValue("SimilarLines", out var MergedSimLinesCollection))
                     {
-                        // if it does, merge them
-                        //MergedSimLinesCollection.Merge(CurLogSimLinesCollection.Value);
-
+                        //The SimilarLines trait won't exist initially, so the first log will just add its SimilarLines trait to the merged collection
+                        TraitTypes.Add("SimilarLines", CurLogSimLinesCollection);
+                    }
+                    else
+                    {
                         foreach (var curLogTraitValueCollection in CurLogSimLinesCollection.Values)
                         {
                             var curLogSimLinesGroup = curLogTraitValueCollection as SimilarLineGroup;
                             if (curLogSimLinesGroup is not null)
                             {
+                                curLogGroupAlreadyMerged = false;
+
                                 foreach (var mergedTraitValueCollection in MergedSimLinesCollection.Values)
                                 {
                                     var mergedSimLinesGroup = mergedTraitValueCollection as SimilarLineGroup;
-                                    if (mergedSimLinesGroup is not null)
+                                    if (mergedSimLinesGroup is not null && !curLogGroupAlreadyMerged)
                                     {
-                                        if (curLogSimLinesGroup.ComparisonLine.SimilarEnough(mergedSimLinesGroup.ComparisonLine))
+                                        if (curLogSimLinesGroup.ComparisonLine.SimilarEnough(mergedSimLinesGroup.ComparisonLine, out var similarityPercentage))
                                         {
                                             // now actually merge
+                                            Log.Information($"Before merge count: {mergedSimLinesGroup.Count}");
                                             mergedSimLinesGroup.Merge(curLogSimLinesGroup);
+                                            Log.Information($"Merged SimilarLines groups between logs, {similarityPercentage:P} resulting count: {mergedSimLinesGroup.Count}\r\n\r\n" +
+                                                $"Merged group comparison line: \r\n{mergedSimLinesGroup.TraitValue}\r\n\r\n" +
+                                                $"Current log group comparison line: \r\n{curLogSimLinesGroup.TraitValue}");
+                                            curLogGroupAlreadyMerged = true;
+                                        }
+                                        else
+                                        {
+                                            Log.Verbose($"SimilarLines groups NOT merged, {similarityPercentage:P}\r\n\r\n" +
+                                                $"Merged group comparison line: \r\n{mergedSimLinesGroup.TraitValue}\r\n\r\n" +
+                                                $"Current log group comparison line: \r\n{curLogSimLinesGroup.TraitValue}");
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    else
-                    {
-                        // if it does not, then just add the index from the other to this one
-                        TraitTypes.Add("SimilarLines", CurLogSimLinesCollection);
-                    }
+                }
+                else
+                {
+                    //Currently this shouldn't happen... if later log types could not implment SimilarLines for some reason, then this might be ok
+                    Log.Warning($"Log is missing SimilarLines trait: {log.FileName}");
                 }
             }
         }
