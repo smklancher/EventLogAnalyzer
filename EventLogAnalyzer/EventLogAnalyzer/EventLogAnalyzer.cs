@@ -21,16 +21,13 @@ namespace EventLogAnalyzer
 
         private GenericLogCollectionDisplay LCD = new GenericLogCollectionDisplay();
         private EventLogCollection Logs = new();
-        private Progress<string> progressHandler;
+        private Progress<ProgressUpdate> progressHandler;
 
         public EventLogAnalyzer()
         {
             InitializeComponent();
 
-            progressHandler = new Progress<string>(value =>
-            {
-                LCD.StatusBar.Text = value;
-            });
+            progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
         }
 
         public static string UNCPath(string path)
@@ -109,15 +106,26 @@ namespace EventLogAnalyzer
 
         private async Task LoadAndAnalyzeAsync()
         {
-            Logs.SimpleLoadMessages();
-            //Logs.SimpleGroupSimilarLines();
-            //Logs.SimpleAnalyzeLogs();
+            await Task.Run(() => Logs.LoadMessages(cts.Token, progressHandler));
             LCD.Refresh();
 
             LCD.StartProgressBar();
             await Task.Run(() => Logs.AnalyzeLogs(cts.Token, progressHandler));
             LCD.StopProgressBar();
             LCD.Refresh();
+        }
+
+        private void ProgressChanged(ProgressUpdate value)
+        {
+            if (!string.IsNullOrWhiteSpace(value.StatusBarText))
+            {
+                LCD.StatusBar.Text = value.StatusBarText;
+            }
+
+            if (value.RefreshUI)
+            {
+                LCD.Refresh();
+            }
         }
     }
 }

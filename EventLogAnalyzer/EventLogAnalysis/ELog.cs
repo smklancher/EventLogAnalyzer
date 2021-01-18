@@ -5,6 +5,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Serilog;
 using UtilityCommon;
 
 namespace EventLogAnalysis
@@ -80,8 +81,10 @@ namespace EventLogAnalysis
             UpdateProvidersFromEvents(FilteredProviders, FilteredEvents);
         }
 
-        public void LoadMessages(CancellationToken cancelToken)
+        public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             //Workaround: http://stackoverflow.com/questions/7531557/why-does-eventrecord-formatdescription-return-null
             var OriginalCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -97,6 +100,9 @@ namespace EventLogAnalysis
 
                 e.GetMessage();
             }
+
+            Log.Information($"Finished loading messages of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
+            progress.Report(new ProgressUpdate(true, string.Empty));
 
             Thread.CurrentThread.CurrentCulture = OriginalCulture;
         }

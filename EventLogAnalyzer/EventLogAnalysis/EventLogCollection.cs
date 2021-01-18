@@ -58,23 +58,27 @@ namespace EventLogAnalysis
             }
         }
 
-        public void AnalyzeLog(ELog log, CancellationToken cancelToken, IProgress<string> progress)
+        public void AnalyzeLog(ELog log, CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
+            var stopwatch = Stopwatch.StartNew();
             log.LoadTraits(cancelToken);
-            //SeparateTraitTypeCollections.Add(log.Traits);
+            Log.Information($"Finished analysis of log ({stopwatch.ElapsedMilliseconds:n0} ms): {log.FileName}");
         }
 
-        public void AnalyzeLogs(CancellationToken token, IProgress<string> progress)
+        public void AnalyzeLogs(CancellationToken token, IProgress<ProgressUpdate> progress)
         {
-            foreach (var l in Logs)
-            {
-                AnalyzeLog(l, token, progress);
-            }
+            var stopwatch = Stopwatch.StartNew();
+            Parallel.ForEach(Logs, x => AnalyzeLog(x, token, progress));
+            Log.Information($"Finished analysis of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
+            stopwatch.Restart();
             MergeLogAnalysis();
+            Log.Information($"Finished merge of log analysis ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
-            //LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
-            Log.Logger.Information($"Finished analysis of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}");
+            string msg = $"Finished merged analysis of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}";
+            Log.Logger.Information(msg);
+
+            progress.Report(new ProgressUpdate(true, msg));
         }
 
         public void Filter(string xpath)
@@ -95,6 +99,18 @@ namespace EventLogAnalysis
               .ToDictionary(x => x.Key, x => x.Value);
 
             return providers;
+        }
+
+        /// <summary>
+        /// Need to change to parallel with cancelation
+        /// </summary>
+        public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            Parallel.ForEach(Logs, x => x.LoadMessages(cancelToken, progress));
+            Log.Information($"Finished loading messages of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
+
+            progress.Report(new ProgressUpdate(true, $"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}"));
         }
 
         public void MergeLogAnalysis()
@@ -170,66 +186,6 @@ namespace EventLogAnalysis
                 }
             }
         }
-
-        /// <summary>
-        /// Need to change to parallel with cancelation
-        /// </summary>
-        public void SimpleAnalyzeLogs()
-        {
-            var cancelToken = new CancellationTokenSource();
-            var progress = new Progress<string>();
-            foreach (var l in Logs)
-            {
-                AnalyzeLog(l, cancelToken.Token, progress);
-            }
-
-            MergeLogAnalysis();
-
-            //LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
-        }
-
-        /// <summary>
-        /// Need to change to parallel with cancelation
-        /// Populates EventIdGroups, and groups similar lines within
-        /// </summary>
-        //public void SimpleGroupSimilarLines()
-        //{
-        //    EventIdGroups = CreateEventIdGroups(Logs);
-        //    GroupSimilarLines(EventIdGroups);
-
-        //    /// need to decide if this stuff is happening:
-        //    /// per log - better for simple parallel performance, but less exacting - and then indexes merged with custom merge comparing applicable groups
-        //    /// at the log collection level - more exact (can still paralellize per log?) - after indexes merge
-        //}
-
-        /// <summary>
-        /// Need to change to parallel with cancelation
-        /// </summary>
-        public void SimpleLoadMessages()
-        {
-            var cancelToken = new CancellationTokenSource();
-            foreach (var log in Logs)
-            {
-                log.LoadMessages(cancelToken.Token);
-            }
-
-            LogsFinishedLoading?.Invoke(this, new RunWorkerCompletedEventArgs(null, null, false));
-            Log.Logger.Information($"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}");
-        }
-
-        /// <summary>
-        /// Need to change to parallel with cancelation
-        /// Groups similar lines within the EventIdGroups
-        /// </summary>
-        /// <param name="LineGroupings"></param>
-        //private static void GroupSimilarLines(Dictionary<ProviderEventIdPair, EventIdGroup> LineGroupings)
-        //{
-        //    using var dt = new DisposableTrace();
-        //    foreach (var g in LineGroupings.Values)
-        //    {
-        //        g.GroupSimilarLines();
-        //    }
-        //}
     }
 
     public record ProviderEventIdPair(string Provider, int EventId);
