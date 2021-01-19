@@ -120,7 +120,18 @@ namespace EventLogAnalyzer
 
         public void Filter(string SearchText)
         {
-            mCurrentLines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
+            //messy, but this class should be refactored in general
+            if (string.IsNullOrEmpty(mSelectedIndex) && string.IsNullOrEmpty(mSelectedIndexType) && mFileList.SelectedIndices.Count > 0)
+            {
+                // whole file
+                mCurrentLines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+            }
+            else
+            {
+                // specific trait
+                mCurrentLines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
+            }
+
             mCurrentLines = mCurrentLines.FilteredCopy(SearchText);
             DebugProperties.SelectedObject = mCurrentLines;
             LinesList.VirtualListSize = mCurrentLines.Count;
@@ -146,43 +157,6 @@ namespace EventLogAnalyzer
             StatusBar.Text = Msg;
         }
 
-        //private string StripInvalidFileCharacters(string stringWithInvalidChars)
-        //{
-        //    char[] invalidChars = System.IO.Path.GetInvalidFileNameChars();
-
-        //    var invalidCharsRemoved = stringWithInvalidChars.Where(x => !invalidChars.Contains(x)).ToArray();
-
-        //    return invalidCharsRemoved;
-        //}
-
-        /// <summary>
-        /// Save the current list of lines to a text file.
-        /// </summary>
-        /// <param name="FileName"></param>
-        /// <remarks></remarks>
-        //public void SaveCurrentLines(string FileName)
-        //{
-        //    FileInfo ExePath = new FileInfo(Assembly.GetExecutingAssembly().Location);
-
-        //    mCurrentLines.SaveToFile(ExePath.Directory.FullName + @"\" + StripInvalidFileCharacters(mSelectedIndexType + " - " + mSelectedIndex) + ".txt");
-        //}
-
-        ///// <summary>
-        ///// Save the list of indicies and their counts to a text file.
-        ///// </summary>
-        ///// <param name="FileName"></param>
-        ///// <remarks></remarks>
-        //public void SaveCurrentIndicies(string FileName)
-        //{
-        //    FileInfo ExePath = new FileInfo(Assembly.GetExecutingAssembly().Location);
-        //    string MsgIndent = "".PadLeft(8) + Constants.vbTab + "".PadLeft(22) + Constants.vbTab + "".PadLeft(22) + Constants.vbTab;
-        //    StringBuilder msg = new StringBuilder();
-        //    foreach (Index.IndexDisplayLine idl in mCurrentIndex)
-        //        msg.AppendLine(idl.Count.ToString().PadLeft(8) + Constants.vbTab + idl.First.ToString().PadLeft(22) + Constants.vbTab + idl.Last.ToString().PadLeft(22) + Constants.vbTab + idl.IndexValue.Replace(Constants.vbNewLine, Constants.vbNewLine + MsgIndent));
-
-        //    My.Computer.FileSystem.WriteAllText(ExePath.Directory.FullName + @"\" + StripInvalidFileCharacters(mSelectedIndexType) + ".txt", msg.ToString(), false);
-        //}
-
         public void StartProgressBar()
         {
             if (ProgressBar != null)
@@ -206,14 +180,12 @@ namespace EventLogAnalyzer
         {
             var timer = sender as Timer;
 
-            if (timer == null)
+            if (timer is not null)
             {
-                return;
+                string SearchText = timer.Tag.ToString() ?? string.Empty;
+                Filter(SearchText);
+                timer.Stop();
             }
-
-            string SearchText = timer.Tag.ToString() ?? string.Empty;
-            Filter(SearchText);
-            timer.Stop();
         }
 
         private void mFileList_SelectedIndexChanged(object? sender, EventArgs e)

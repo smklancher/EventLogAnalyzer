@@ -17,7 +17,8 @@ namespace EventLogAnalyzer
         private ListView mLinesList = new();
         private ToolStripProgressBar mProgressBar = new();
         private TextBox mSearchBox = new();
-        private Timer mTypingTimer = new();
+        private ToolStripStatusLabel mStatusBar = new();
+        private Timer? mTypingTimer;
 
         public PropertyGrid DebugProperties
         {
@@ -191,6 +192,17 @@ namespace EventLogAnalyzer
             }
         }
 
-        public ToolStripStatusLabel StatusBar { set; get; } = new();
+        public ToolStripStatusLabel StatusBar
+        {
+            get => mStatusBar;
+
+            set
+            {
+                mStatusBar = value;
+                mStatusBar.Alignment = ToolStripItemAlignment.Left;
+                mStatusBar.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+                mStatusBar.Spring = true;
+            }
+        }
     }
 }

@@ -59,6 +59,8 @@ namespace EventLogAnalyzer
                     Logs.AddByFile(File);
                 }
 
+                LCD.DisplayFiles();
+
                 await LoadAndAnalyzeAsync();
             }
         }
@@ -100,6 +102,7 @@ namespace EventLogAnalyzer
             if (args.Length > 1)
             {
                 Logs.AddByFile(UNCPath(args[1]));
+                LCD.DisplayFiles();
                 await LoadAndAnalyzeAsync();
             }
         }

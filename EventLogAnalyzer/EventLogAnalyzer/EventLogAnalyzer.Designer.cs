@@ -322,9 +322,11 @@ namespace EventLogAnalyzer
             // 
             // ToolStripStatusLabel1
             // 
+            this.ToolStripStatusLabel1.BackColor = System.Drawing.SystemColors.Control;
             this.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1";
             this.ToolStripStatusLabel1.Size = new System.Drawing.Size(639, 19);
             this.ToolStripStatusLabel1.Spring = true;
+            this.ToolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // ToolStripProgressBar1
             // 
