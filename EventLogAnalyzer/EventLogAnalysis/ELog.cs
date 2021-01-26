@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Serilog;
+using Similarity;
 using UtilityCommon;
 
 namespace EventLogAnalysis
@@ -38,6 +39,7 @@ namespace EventLogAnalysis
         public EventCollection FilteredEvents { get; private set; } = new();
         public Dictionary<string, int> FilteredProviders { get; private set; } = new();
         public Guid LogGuid { get; }
+        public WorkingSetGroup<ELRecord>? SimilarityGroups { get; private set; }
         public long TotalEventCount { get; private set; }
         public List<LogBasedTraitProducer> TraitProducers { get; } = new();
         public TraitTypeCollection Traits { get; private set; } = new();
@@ -112,6 +114,9 @@ namespace EventLogAnalysis
             Traits = new();
 
             LoadTraitsPerLine();
+
+            // To be used after other work to integrate the results
+            //SimilarityGroups = Processing.Process(FilteredEvents, 200, x => x.Message);
 
             // create index for similar lines, ideally standardize index approach
             EventIdGroups = CreateEventIdGroups(this);

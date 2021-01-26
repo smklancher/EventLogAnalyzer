@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
@@ -7,12 +7,8 @@
 
   <ItemGroup>
     <PackageReference Include="Fastenshtein" Version="1.0.0.5" />
+    <PackageReference Include="morelinq" Version="3.3.2" />
     <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="System.Diagnostics.EventLog" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Similarity\Similarity.csproj" />
   </ItemGroup>
 
 </Project>
