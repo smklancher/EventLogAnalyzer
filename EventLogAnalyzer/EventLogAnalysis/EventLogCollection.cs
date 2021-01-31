@@ -123,6 +123,21 @@ namespace EventLogAnalysis
                 TraitTypes.Merge(log.Traits);
             }
 
+            if (Options.Instance.UseNewSimilarity)
+            {
+                var similarityGroups = Logs.Select(x => x.SimilarityGroups);
+                var mergedSimilarityGroup = Similarity.Processing.MergeWorkingSets(similarityGroups!);
+                var tvc = Converter.FromWorkingSetGroupToTraitValuesCollection(mergedSimilarityGroup);
+                TraitTypes.AddTraitType(tvc);
+            }
+            else
+            {
+                MergeSimilarLines();
+            }
+        }
+
+        private void MergeSimilarLines()
+        {
             //now merge "Similarlines" since it was skipped above
             foreach (var log in Logs)
             {

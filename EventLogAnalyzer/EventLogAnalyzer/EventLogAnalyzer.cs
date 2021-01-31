@@ -28,6 +28,7 @@ namespace EventLogAnalyzer
             InitializeComponent();
 
             progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
+            OptionsMenuItem.Click += OptionsMenuItem_Click;
         }
 
         public static string UNCPath(string path)
@@ -116,6 +117,11 @@ namespace EventLogAnalyzer
             await Task.Run(() => Logs.AnalyzeLogs(cts.Token, progressHandler));
             LCD.StopProgressBar();
             LCD.Refresh();
+        }
+
+        private void OptionsMenuItem_Click(object? sender, EventArgs e)
+        {
+            OptionsDialog.ShowOptions(Options.Instance, this);
         }
 
         private void ProgressChanged(ProgressUpdate value)

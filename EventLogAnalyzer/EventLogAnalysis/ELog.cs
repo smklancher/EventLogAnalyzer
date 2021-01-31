@@ -115,18 +115,33 @@ namespace EventLogAnalysis
 
             LoadTraitsPerLine();
 
-            // To be used after other work to integrate the results
-            //SimilarityGroups = Processing.Process(FilteredEvents, 200, x => x.Message);
-
-            // create index for similar lines, ideally standardize index approach
-            EventIdGroups = CreateEventIdGroups(this);
-            GroupSimilarLines(EventIdGroups);
-
-            foreach (var idGroup in EventIdGroups.Values)
+            if (Options.Instance.UseNewSimilarity)
             {
-                foreach (var simGroup in idGroup.SubGroups)
+                SimilarityGroups = Processing.Process(FilteredEvents, Options.Instance.LinesPerSimilarityGroupChunk, x => x.Message);
+
+                // WorkingGroupSet to Traits (SingleTraitValueEventCollections)
+                // does this even need to happen at log level if we are ok already using the working sets when merging logs?
+                //foreach (var slg in SimilarityGroups.SubGroups)
+                //{
+                //    var stv = Converter.FromSimilarLineGroupToSingleTraitValue(slg);
+                //    Traits.AddSingleTraitValue(stv);
+                //}
+
+                //var tvc = Converter.FromWorkingSetGroupToTraitValuesCollection(SimilarityGroups);
+                //Traits.AddTraitType(tvc);
+            }
+            else
+            {
+                // create index for similar lines, ideally standardize index approach
+                EventIdGroups = CreateEventIdGroups(this);
+                GroupSimilarLines(EventIdGroups);
+
+                foreach (var idGroup in EventIdGroups.Values)
                 {
-                    Traits.AddCollection(simGroup);
+                    foreach (var simGroup in idGroup.SubGroups)
+                    {
+                        Traits.AddSingleTraitValue(simGroup);
+                    }
                 }
             }
         }

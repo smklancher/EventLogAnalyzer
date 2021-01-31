@@ -40,15 +40,6 @@ namespace EventLogAnalysis
         /// <remarks></remarks>
         public TraitTypeCollection TraitTypes => this;
 
-        public void AddCollection(SingleTraitValueEventCollection col)
-        {
-            var existsInCollection = TraitTypes.TryGetValue(col.TraitName, out var i);
-            i ??= new TraitValuesCollection(col.TraitName);
-            i.AddCollection(col);
-
-            if (!existsInCollection) { TraitTypes.Add(col.TraitName, i); }
-        }
-
         /// <summary>
         /// Add a LogLine creating/updating Index as needed
         /// </summary>
@@ -63,6 +54,27 @@ namespace EventLogAnalysis
             i.AddLine(TraitValue, Line);
 
             if (!existsInCollection) { TraitTypes.Add(TraitName, i); }
+        }
+
+        public void AddSingleTraitValue(SingleTraitValueEventCollection col)
+        {
+            var existsInCollection = TraitTypes.TryGetValue(col.TraitName, out var i);
+            i ??= new TraitValuesCollection(col.TraitName);
+            i.AddCollection(col);
+
+            if (!existsInCollection) { TraitTypes.Add(col.TraitName, i); }
+        }
+
+        public void AddTraitType(TraitValuesCollection tvc)
+        {
+            if (TraitTypes.TryGetValue(tvc.Name, out var i))
+            {
+                i.Merge(tvc);
+            }
+            else
+            {
+                TraitTypes.Add(tvc.Name, tvc);
+            }
         }
 
         /// <summary>

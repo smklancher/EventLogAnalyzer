@@ -34,6 +34,7 @@ namespace EventLogAnalysis
         /// </summary>
         public string Message { get; private set; } = string.Empty;
 
+        public long MessageCharacterCount => Message.Length;
         public bool MessageIsLoaded { get; private set; }
         public Exception? MessageLoadExeption { get; private set; }
         public ELog ParentLog { get; }

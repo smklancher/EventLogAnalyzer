@@ -56,6 +56,7 @@ namespace EventLogAnalyzer
             this.ToolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.cmdRefresh = new System.Windows.Forms.Button();
             this.MessageSearchTextBox = new System.Windows.Forms.TextBox();
+            this.OptionsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -283,6 +284,7 @@ namespace EventLogAnalyzer
             // 
             // DumpToCombinedCSVToolStripMenuItem
             // 
+            this.DumpToCombinedCSVToolStripMenuItem.Enabled = false;
             this.DumpToCombinedCSVToolStripMenuItem.Name = "DumpToCombinedCSVToolStripMenuItem";
             this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.DumpToCombinedCSVToolStripMenuItem.Text = "Combined to CSV";
@@ -291,19 +293,22 @@ namespace EventLogAnalyzer
             // 
             this.ViewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SaveCurrentLinesToolStripMenuItem,
-            this.SaveCurrentIndiciesToolStripMenuItem});
+            this.SaveCurrentIndiciesToolStripMenuItem,
+            this.OptionsMenuItem});
             this.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem";
             this.ViewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.ViewToolStripMenuItem.Text = "View";
             // 
             // SaveCurrentLinesToolStripMenuItem
             // 
+            this.SaveCurrentLinesToolStripMenuItem.Enabled = false;
             this.SaveCurrentLinesToolStripMenuItem.Name = "SaveCurrentLinesToolStripMenuItem";
             this.SaveCurrentLinesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.SaveCurrentLinesToolStripMenuItem.Text = "Save Current Lines";
             // 
             // SaveCurrentIndiciesToolStripMenuItem
             // 
+            this.SaveCurrentIndiciesToolStripMenuItem.Enabled = false;
             this.SaveCurrentIndiciesToolStripMenuItem.Name = "SaveCurrentIndiciesToolStripMenuItem";
             this.SaveCurrentIndiciesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.SaveCurrentIndiciesToolStripMenuItem.Text = "Save Current Indicies";
@@ -354,6 +359,12 @@ namespace EventLogAnalyzer
             this.MessageSearchTextBox.Name = "MessageSearchTextBox";
             this.MessageSearchTextBox.Size = new System.Drawing.Size(212, 23);
             this.MessageSearchTextBox.TabIndex = 12;
+            // 
+            // OptionsMenuItem
+            // 
+            this.OptionsMenuItem.Name = "OptionsMenuItem";
+            this.OptionsMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.OptionsMenuItem.Text = "Options";
             // 
             // EventLogAnalyzer
             // 
@@ -429,5 +440,7 @@ namespace EventLogAnalyzer
         internal TextBox MessageSearchTextBox;
 
         #endregion
+
+        private ToolStripMenuItem OptionsMenuItem;
     }
 }
