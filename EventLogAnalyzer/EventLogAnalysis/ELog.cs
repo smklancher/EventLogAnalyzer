@@ -117,7 +117,7 @@ namespace EventLogAnalysis
 
             if (Options.Instance.UseNewSimilarity)
             {
-                SimilarityGroups = Processing.Process(FilteredEvents, Options.Instance.LinesPerSimilarityGroupChunk, x => x.Message);
+                SimilarityGroups = Processing.Process(FilteredEvents, Options.Instance.SimilarityOptions.LinesPerSimilarityGroupChunk, x => x.Message);
 
                 // WorkingGroupSet to Traits (SingleTraitValueEventCollections)
                 // does this even need to happen at log level if we are ok already using the working sets when merging logs?

@@ -21,7 +21,7 @@ namespace EventLogAnalysis
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public DateTime FirstEvent => Lines.LastOrDefault()?.Timestamp ?? DateTime.MinValue;
+        public DateTime FirstEvent => Lines.FirstOrDefault()?.Timestamp ?? DateTime.MinValue;
 
         /// <summary>
         /// Returns the date of the last event in the collection... currently this causes a sort (costly))

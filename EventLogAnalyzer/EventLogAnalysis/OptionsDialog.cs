@@ -38,6 +38,7 @@ namespace EventLogAnalysis
 
         private void OptionsDialog_Load(object sender, EventArgs e)
         {
+            propertyGrid.ExpandAllGridItems();
         }
     }
 }

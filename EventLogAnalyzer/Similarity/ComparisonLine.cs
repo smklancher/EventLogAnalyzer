@@ -37,20 +37,33 @@ namespace Similarity
         public Levenshtein Lev { get; init; }
         public Func<T, string> ThingToString { get; }
 
+        public double LengthPercentageDifference(string one, string two)
+        {
+            var diff = Math.Abs(one.Length - two.Length);
+            var per = (1 - diff / (double)one.Length) * 100;
+            return per;
+        }
+
         public bool SimilarEnough(string record, out double similarityPercentage)
         {
             var bothBlank = string.IsNullOrWhiteSpace(ComparisonString) && string.IsNullOrWhiteSpace(record);
             if (bothBlank || (CheckForExactMatch && ComparisonString == record))
             {
-                //record.GroupSimilarity = 1;
                 similarityPercentage = 1.0;
                 return true;
+            }
+
+            var lengthPercentageDifference = LengthPercentageDifference(ComparisonString, record);
+
+            if (lengthPercentageDifference < SimilarityOptions.Instance.MaxPercentLengthDifferenceToCompare)
+            {
+                similarityPercentage = 0.0;
+                return false;
             }
 
             similarityPercentage = LevPercent(record ?? string.Empty);
             if (similarityPercentage > Threshold)
             {
-                //record.GroupSimilarity = similarityPercentage;
                 return true;
             }
 

@@ -80,7 +80,13 @@ namespace EventLogAnalysis
 
                 if (string.IsNullOrEmpty(Message))
                 {
-                    if (Record.Properties.Count > 0)
+                    if (Record.Properties.Count > 1)
+                    {
+                        Message = Record.Properties[0].Value.ToString() ?? string.Empty;
+                        var second = Record.Properties[1].Value.ToString() ?? string.Empty;
+                        AltMessage = true;
+                    }
+                    else if (Record.Properties.Count > 0)
                     {
                         Message = Record.Properties[0].Value.ToString() ?? string.Empty;
                         AltMessage = true;

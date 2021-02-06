@@ -153,13 +153,13 @@ namespace EventLogAnalyzer
             {
                 if (mLogs is not null)
                 {
-                    mLogs.LogsFinishedLoading -= mLogs_LogsFinishedLoading;
+                    //mLogs.LogsFinishedLoading -= mLogs_LogsFinishedLoading;
                 }
 
                 mCurrentIndex = new();
                 mLogs = value;
 
-                mLogs.LogsFinishedLoading += mLogs_LogsFinishedLoading;
+                // mLogs.LogsFinishedLoading += mLogs_LogsFinishedLoading;
             }
         }
 

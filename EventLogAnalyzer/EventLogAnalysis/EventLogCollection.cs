@@ -21,7 +21,7 @@ namespace EventLogAnalysis
 
         public delegate void LogsFinishedLoadingEventHandler(object sender, RunWorkerCompletedEventArgs e);
 
-        public event LogsFinishedLoadingEventHandler? LogsFinishedLoading;
+        //public event LogsFinishedLoadingEventHandler? LogsFinishedLoading;
 
         public Dictionary<ProviderEventIdPair, EventIdGroup> EventIdGroups { get; private set; } = new();
 

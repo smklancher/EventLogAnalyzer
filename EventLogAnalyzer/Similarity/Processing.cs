@@ -47,15 +47,20 @@ namespace Similarity
             return ProcessWorkingSets(chunks);
         }
 
-        public static WorkingSetGroup<T> ProcessWorkingSets<T>(IEnumerable<WorkingSetGroup<T>> workingSets) where T : notnull
+        private static WorkingSetGroup<T> ProcessWorkingSets<T>(IEnumerable<WorkingSetGroup<T>> workingSets) where T : notnull
         {
             // might be interesting to try using threading channels for this:
             // https://devblogs.microsoft.com/dotnet/an-introduction-to-system-threading-channels/
 
             var stopwatch = Stopwatch.StartNew();
+            var opts = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = Environment.ProcessorCount - 1, // give the system a little bit of room for other things
+                //TODO: cancelation
+            };
 
             // for now simply run the work in parallel
-            Parallel.ForEach(workingSets, x => x.GroupSimilarLines());
+            Parallel.ForEach(workingSets, opts, x => x.GroupSimilarLines());
             Log.Information($"Finished parallel processing of {workingSets.Count()} similarity groups ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
             stopwatch.Restart();
@@ -64,24 +69,6 @@ namespace Similarity
             var merged = MergeWorkingSets(workingSets);
 
             return merged;
-        }
-
-        public static List<string> TestList(int count)
-        {
-            var x = new List<string>(count);
-            for (var i = 0; i < count; i++)
-            {
-                if (i % 2 == 0)
-                {
-                    x.Add($"TotalAgility is one of the groups{i}");
-                }
-                else
-                {
-                    x.Add($"Kofax Capture is the other{i}");
-                }
-            }
-
-            return x;
         }
     }
 }

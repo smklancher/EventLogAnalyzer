@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Similarity;
 
 namespace EventLogAnalysis
 {
@@ -22,14 +23,11 @@ namespace EventLogAnalysis
         public static Options Instance => Lazy.Value;
 
         [Category(SimilarityCategory)]
-        public int LinesPerSimilarityGroupChunk { get; set; } = 200;
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
 
         [Category(TestingCategory)]
         public bool UseNewSimilarity { get; set; } = true;
-
-        //[Category(SystemsCategory)]
-        //[TypeConverter(typeof(ExpandableObjectConverter))]
-        //public SupportCaseDownloader CaseDownloaderSystem { get; set; }
 
         public void OnCloseOptionsForm()
         {
