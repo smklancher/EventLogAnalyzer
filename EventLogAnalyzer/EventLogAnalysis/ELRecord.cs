@@ -41,6 +41,7 @@ namespace EventLogAnalysis
         public string ProviderName => Record.ProviderName;
         public EventRecord Record { get; init; }
         public long RecordId { get; private set; }
+        public string ShortMessage { get; set; } = string.Empty;
         public DateTime? Timestamp => Record.TimeCreated;
         string ILogLineDisplay.TimestampString => Timestamp.ToString() ?? string.Empty;
         public string UniqueId { get; }

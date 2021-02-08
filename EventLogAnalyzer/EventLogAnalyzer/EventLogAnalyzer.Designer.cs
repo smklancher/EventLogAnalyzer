@@ -51,12 +51,12 @@ namespace EventLogAnalyzer
             this.ViewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveCurrentLinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveCurrentIndiciesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OptionsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.ToolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.cmdRefresh = new System.Windows.Forms.Button();
             this.MessageSearchTextBox = new System.Windows.Forms.TextBox();
-            this.OptionsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -313,6 +313,12 @@ namespace EventLogAnalyzer
             this.SaveCurrentIndiciesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.SaveCurrentIndiciesToolStripMenuItem.Text = "Save Current Indicies";
             // 
+            // OptionsMenuItem
+            // 
+            this.OptionsMenuItem.Name = "OptionsMenuItem";
+            this.OptionsMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.OptionsMenuItem.Text = "Options";
+            // 
             // StatusStrip1
             // 
             this.StatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -360,12 +366,6 @@ namespace EventLogAnalyzer
             this.MessageSearchTextBox.Size = new System.Drawing.Size(212, 23);
             this.MessageSearchTextBox.TabIndex = 12;
             // 
-            // OptionsMenuItem
-            // 
-            this.OptionsMenuItem.Name = "OptionsMenuItem";
-            this.OptionsMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.OptionsMenuItem.Text = "Options";
-            // 
             // EventLogAnalyzer
             // 
             this.AllowDrop = true;
@@ -380,7 +380,7 @@ namespace EventLogAnalyzer
             this.MainMenuStrip = this.MenuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.Name = "EventLogAnalyzer";
-            this.Text = "Universal Log Parser";
+            this.Text = "Event Log Analyzer";
             this.Load += new System.EventHandler(this.EventLogAnalyzer_Load);
             this.Shown += new System.EventHandler(this.EventLogAnalyzer_ShownAsync);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.EventLogAnalyzer_DragDrop);

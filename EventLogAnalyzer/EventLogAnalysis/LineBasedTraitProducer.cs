@@ -15,6 +15,17 @@ namespace EventLogAnalysis
             {
                 traits.AddLine("EventLogReadingException", r.MessageLoadExeption.Message, r);
             }
+
+            if (r.Message.Contains("App Domain:"))
+            {
+                var ellt = new EnterpriseLibraryLogText(r.Message);
+                r.ShortMessage = ellt.OuterException;
+
+                if (!string.IsNullOrWhiteSpace(ellt.InnerException))
+                {
+                    traits.AddLine("Inner Exception", ellt.InnerException, r);
+                }
+            }
         }
     }
 }

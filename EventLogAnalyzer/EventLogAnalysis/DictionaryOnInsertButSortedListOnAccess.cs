@@ -167,10 +167,9 @@ namespace EventLogAnalysis
             return mDictionary.ContainsKey(Key);
         }
 
-        [Obsolete("Not Implemented")]
         public void CopyTo(T[] array, int arrayIndex)
         {
-            throw new NotImplementedException();
+            mList.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
