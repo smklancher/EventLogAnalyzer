@@ -248,7 +248,6 @@ namespace EventLogAnalysis
                 }
                 catch (Exception)
                 {
-                    throw;
                 }
             }
 
