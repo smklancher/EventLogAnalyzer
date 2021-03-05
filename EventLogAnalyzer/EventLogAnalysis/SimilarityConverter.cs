@@ -7,7 +7,7 @@ using Similarity;
 
 namespace EventLogAnalysis
 {
-    public static class Converter
+    public static class SimilarityConverter
     {
         public const string SimilarLinesString = "SimilarLines";
 

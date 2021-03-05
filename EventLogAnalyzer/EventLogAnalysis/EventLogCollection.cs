@@ -127,7 +127,7 @@ namespace EventLogAnalysis
             {
                 var similarityGroups = Logs.Select(x => x.SimilarityGroups);
                 var mergedSimilarityGroup = Similarity.Processing.MergeWorkingSets(similarityGroups!);
-                var tvc = Converter.FromWorkingSetGroupToTraitValuesCollection(mergedSimilarityGroup);
+                var tvc = SimilarityConverter.FromWorkingSetGroupToTraitValuesCollection(mergedSimilarityGroup);
                 TraitTypes.AddTraitType(tvc);
             }
             else

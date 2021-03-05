@@ -22,6 +22,9 @@ namespace EventLogAnalysis
 
         public static Options Instance => Lazy.Value;
 
+        [Category(TestingCategory)]
+        public bool RenameMtaDuringLoad { get; set; } = true;
+
         [Category(SimilarityCategory)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;

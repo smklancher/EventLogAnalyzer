@@ -18,7 +18,9 @@ namespace EventLogAnalysis
             FileName = filename;
             LogGuid = new();
             fileInfo = new FileInfo(FileName);
+            MtaFilePath = GetMtaFilePath(fileInfo);
 
+            RenameMtaFileIfPossible(false);
             var eq = new EventLogQuery(FileName, PathType.FilePath);
             LoadEvents(eq);
             TotalEventCount = AllEvents.Count;
@@ -28,23 +30,41 @@ namespace EventLogAnalysis
 
             // remove in future
             CreateLogBasedTraitProducers();
+
+            RenameMtaFileIfPossible(true);
         }
 
         public EventCollection AllEvents { get; private set; } = new();
+
         public Dictionary<string, int> AllProviders { get; private set; } = new();
+
         public Dictionary<ProviderEventIdPair, EventIdGroup> EventIdGroups { get; private set; } = new();
+
         public int EventsWithMessagesLoaded => AllEvents.Where(x => x.MessageIsLoaded).Count();
+
         public string FileName { get; init; }
+
         public long FilteredEventCount => currentFilterEventIndexes.Count;
+
         public EventCollection FilteredEvents { get; private set; } = new();
+
         public Dictionary<string, int> FilteredProviders { get; private set; } = new();
+
         public Guid LogGuid { get; }
+
         public WorkingSetGroup<ELRecord>? SimilarityGroups { get; private set; }
+
         public long TotalEventCount { get; private set; }
+
         public List<LogBasedTraitProducer> TraitProducers { get; } = new();
+
         public TraitTypeCollection Traits { get; private set; } = new();
+
         private List<long> currentFilterEventIndexes { get; set; } = new();
+
         private FileInfo fileInfo { get; init; }
+
+        private string MtaFilePath { get; }
 
         /// <summary>
         /// Add all lines into groups for that event type
@@ -87,6 +107,8 @@ namespace EventLogAnalysis
         {
             var stopwatch = Stopwatch.StartNew();
 
+            RenameMtaFileIfPossible(false);
+
             //Workaround: http://stackoverflow.com/questions/7531557/why-does-eventrecord-formatdescription-return-null
             var OriginalCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
@@ -107,6 +129,7 @@ namespace EventLogAnalysis
             progress.Report(new ProgressUpdate(true, string.Empty));
 
             Thread.CurrentThread.CurrentCulture = OriginalCulture;
+            RenameMtaFileIfPossible(true);
         }
 
         public void LoadTraits(CancellationToken cancelToken)
@@ -160,6 +183,13 @@ namespace EventLogAnalysis
             }
         }
 
+        private string GetMtaFilePath(FileInfo evtx)
+        {
+            string folder = Path.Join(evtx.DirectoryName!, "LocaleMetaData");
+            string filename = Path.GetFileNameWithoutExtension(evtx.Name) + "_1033.MTA";
+            return Path.Join(folder, filename);
+        }
+
         private void LoadComplexTraits(CancellationToken cancelToken)
         {
         }
@@ -204,6 +234,33 @@ namespace EventLogAnalysis
                 foreach (var p in producers)
                 {
                     p.AddTraitsFromLine(Traits, r);
+                }
+            }
+        }
+
+        private void RenameMtaFileIfPossible(bool backToOriginal)
+        {
+            void RenameIfPossible(string from, string to)
+            {
+                try
+                {
+                    File.Move(from, to);
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+            }
+
+            if (Options.Instance.RenameMtaDuringLoad)
+            {
+                if (backToOriginal)
+                {
+                    RenameIfPossible($"{MtaFilePath}.tmp", MtaFilePath);
+                }
+                else
+                {
+                    RenameIfPossible(MtaFilePath, $"{MtaFilePath}.tmp");
                 }
             }
         }
