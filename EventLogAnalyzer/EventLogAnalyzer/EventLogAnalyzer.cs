@@ -110,10 +110,10 @@ namespace EventLogAnalyzer
 
         private async Task LoadAndAnalyzeAsync()
         {
+            LCD.StartProgressBar();
             await Task.Run(() => Logs.LoadMessages(cts.Token, progressHandler));
             LCD.Refresh();
 
-            LCD.StartProgressBar();
             await Task.Run(() => Logs.AnalyzeLogs(cts.Token, progressHandler));
             LCD.StopProgressBar();
             LCD.Refresh();
