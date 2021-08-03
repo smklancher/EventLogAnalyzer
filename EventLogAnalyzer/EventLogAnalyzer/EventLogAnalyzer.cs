@@ -80,6 +80,8 @@ namespace EventLogAnalyzer
 
         private void EventLogAnalyzer_Load(object sender, EventArgs e)
         {
+            SplitDetailAndProperties.Panel2Collapsed = true;
+
             // enable memory/cpu status
             AppDomain.MonitoringIsEnabled = true;
 
@@ -135,6 +137,11 @@ namespace EventLogAnalyzer
             {
                 LCD.Refresh();
             }
+        }
+
+        private void toggleLineToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SplitDetailAndProperties.Panel2Collapsed = !SplitDetailAndProperties.Panel2Collapsed;
         }
     }
 }

@@ -52,11 +52,12 @@ namespace EventLogAnalyzer
             this.SaveCurrentLinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.SaveCurrentIndiciesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OptionsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toggleLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.ToolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
-            this.cmdRefresh = new System.Windows.Forms.Button();
             this.MessageSearchTextBox = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -216,6 +217,7 @@ namespace EventLogAnalyzer
             // 
             // SplitDetailAndProperties
             // 
+            this.SplitDetailAndProperties.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.SplitDetailAndProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitDetailAndProperties.Location = new System.Drawing.Point(0, 0);
             this.SplitDetailAndProperties.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -229,7 +231,7 @@ namespace EventLogAnalyzer
             // 
             this.SplitDetailAndProperties.Panel2.Controls.Add(this.DebugProperties);
             this.SplitDetailAndProperties.Size = new System.Drawing.Size(494, 182);
-            this.SplitDetailAndProperties.SplitterDistance = 164;
+            this.SplitDetailAndProperties.SplitterDistance = 344;
             this.SplitDetailAndProperties.SplitterWidth = 5;
             this.SplitDetailAndProperties.TabIndex = 1;
             // 
@@ -241,7 +243,7 @@ namespace EventLogAnalyzer
             this.txtDetail.Multiline = true;
             this.txtDetail.Name = "txtDetail";
             this.txtDetail.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtDetail.Size = new System.Drawing.Size(164, 182);
+            this.txtDetail.Size = new System.Drawing.Size(344, 182);
             this.txtDetail.TabIndex = 0;
             // 
             // DebugProperties
@@ -251,7 +253,7 @@ namespace EventLogAnalyzer
             this.DebugProperties.Location = new System.Drawing.Point(0, 0);
             this.DebugProperties.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.DebugProperties.Name = "DebugProperties";
-            this.DebugProperties.Size = new System.Drawing.Size(325, 182);
+            this.DebugProperties.Size = new System.Drawing.Size(145, 182);
             this.DebugProperties.TabIndex = 0;
             // 
             // MenuStrip1
@@ -274,6 +276,7 @@ namespace EventLogAnalyzer
             this.LogsToolStripMenuItem.Name = "LogsToolStripMenuItem";
             this.LogsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.LogsToolStripMenuItem.Text = "Logs";
+            this.LogsToolStripMenuItem.Visible = false;
             // 
             // ClearToolStripMenuItem
             // 
@@ -294,7 +297,8 @@ namespace EventLogAnalyzer
             this.ViewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.SaveCurrentLinesToolStripMenuItem,
             this.SaveCurrentIndiciesToolStripMenuItem,
-            this.OptionsMenuItem});
+            this.OptionsMenuItem,
+            this.toggleLineToolStripMenuItem});
             this.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem";
             this.ViewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.ViewToolStripMenuItem.Text = "View";
@@ -303,21 +307,30 @@ namespace EventLogAnalyzer
             // 
             this.SaveCurrentLinesToolStripMenuItem.Enabled = false;
             this.SaveCurrentLinesToolStripMenuItem.Name = "SaveCurrentLinesToolStripMenuItem";
-            this.SaveCurrentLinesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.SaveCurrentLinesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.SaveCurrentLinesToolStripMenuItem.Text = "Save Current Lines";
+            this.SaveCurrentLinesToolStripMenuItem.Visible = false;
             // 
             // SaveCurrentIndiciesToolStripMenuItem
             // 
             this.SaveCurrentIndiciesToolStripMenuItem.Enabled = false;
             this.SaveCurrentIndiciesToolStripMenuItem.Name = "SaveCurrentIndiciesToolStripMenuItem";
-            this.SaveCurrentIndiciesToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.SaveCurrentIndiciesToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.SaveCurrentIndiciesToolStripMenuItem.Text = "Save Current Indicies";
+            this.SaveCurrentIndiciesToolStripMenuItem.Visible = false;
             // 
             // OptionsMenuItem
             // 
             this.OptionsMenuItem.Name = "OptionsMenuItem";
-            this.OptionsMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.OptionsMenuItem.Size = new System.Drawing.Size(210, 22);
             this.OptionsMenuItem.Text = "Options";
+            // 
+            // toggleLineToolStripMenuItem
+            // 
+            this.toggleLineToolStripMenuItem.Name = "toggleLineToolStripMenuItem";
+            this.toggleLineToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.toggleLineToolStripMenuItem.Text = "Toggle Line Property View";
+            this.toggleLineToolStripMenuItem.Click += new System.EventHandler(this.toggleLineToolStripMenuItem_Click);
             // 
             // StatusStrip1
             // 
@@ -346,25 +359,24 @@ namespace EventLogAnalyzer
             this.ToolStripProgressBar1.Size = new System.Drawing.Size(117, 18);
             this.ToolStripProgressBar1.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             // 
-            // cmdRefresh
-            // 
-            this.cmdRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdRefresh.Location = new System.Drawing.Point(673, 31);
-            this.cmdRefresh.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.cmdRefresh.Name = "cmdRefresh";
-            this.cmdRefresh.Size = new System.Drawing.Size(88, 27);
-            this.cmdRefresh.TabIndex = 11;
-            this.cmdRefresh.Text = "Refresh";
-            this.cmdRefresh.UseVisualStyleBackColor = true;
-            // 
             // MessageSearchTextBox
             // 
-            this.MessageSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.MessageSearchTextBox.Location = new System.Drawing.Point(454, 33);
+            this.MessageSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.MessageSearchTextBox.Location = new System.Drawing.Point(125, 33);
             this.MessageSearchTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MessageSearchTextBox.Name = "MessageSearchTextBox";
-            this.MessageSearchTextBox.Size = new System.Drawing.Size(212, 23);
+            this.MessageSearchTextBox.Size = new System.Drawing.Size(637, 23);
             this.MessageSearchTextBox.TabIndex = 12;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 37);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(104, 15);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Filter current lines:";
             // 
             // EventLogAnalyzer
             // 
@@ -372,8 +384,8 @@ namespace EventLogAnalyzer
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(775, 625);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.MessageSearchTextBox);
-            this.Controls.Add(this.cmdRefresh);
             this.Controls.Add(this.StatusStrip1);
             this.Controls.Add(this.SplitFilesAndRest);
             this.Controls.Add(this.MenuStrip1);
@@ -435,12 +447,13 @@ namespace EventLogAnalyzer
         internal System.Windows.Forms.StatusStrip StatusStrip1;
         internal System.Windows.Forms.ToolStripStatusLabel ToolStripStatusLabel1;
         internal System.Windows.Forms.ToolStripProgressBar ToolStripProgressBar1;
-        internal System.Windows.Forms.Button cmdRefresh;
         internal System.Windows.Forms.ToolStripMenuItem DumpToCombinedCSVToolStripMenuItem;
         internal TextBox MessageSearchTextBox;
 
         #endregion
 
         private ToolStripMenuItem OptionsMenuItem;
+        private Label label1;
+        private ToolStripMenuItem toggleLineToolStripMenuItem;
     }
 }

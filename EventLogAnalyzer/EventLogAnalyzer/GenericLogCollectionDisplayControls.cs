@@ -71,7 +71,7 @@ namespace EventLogAnalyzer
                 value.View = View.Details;
                 value.FullRowSelect = true;
                 value.Columns.Add("#");
-                value.Columns.Add("Indicies");
+                value.Columns.Add("Trait Value");
                 value.Columns.Add("First");
                 value.Columns.Add("Last");
                 value.VirtualMode = true;
@@ -98,7 +98,7 @@ namespace EventLogAnalyzer
                 value.View = View.Details;
                 value.FullRowSelect = true;
                 value.Columns.Add("#");
-                value.Columns.Add("Index Types");
+                value.Columns.Add("Trait Type");
                 mIndexTypeList = value;
                 IndexTypeList.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
 

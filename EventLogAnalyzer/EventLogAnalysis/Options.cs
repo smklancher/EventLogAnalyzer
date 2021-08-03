@@ -22,6 +22,7 @@ namespace EventLogAnalysis
 
         public static Options Instance => Lazy.Value;
 
+        [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
         [Category(TestingCategory)]
         public bool RenameMtaDuringLoad { get; set; } = true;
 
@@ -29,6 +30,7 @@ namespace EventLogAnalysis
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
 
+        [Description("Disable to use old non-paralel lev match with no shortcuts.  Old code is ntended to be removed.")]
         [Category(TestingCategory)]
         public bool UseNewSimilarity { get; set; } = true;
 

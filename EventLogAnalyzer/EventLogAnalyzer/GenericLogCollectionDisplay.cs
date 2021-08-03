@@ -71,6 +71,18 @@ namespace EventLogAnalyzer
         {
             mSelectedIndexType = IndexType;
 
+            if (string.IsNullOrEmpty(IndexType))
+            {
+                //unselect
+                IndexList.SelectedIndices.Clear();
+                mSelectedIndexType = string.Empty;
+                mSelectedIndex = string.Empty;
+                mCurrentIndex = new();
+                IndexList.VirtualListSize = 0;
+
+                return;
+            }
+
             if (mSelectedIndexType == InternalLogName)
             {
                 DisplayInternalLog();
@@ -195,6 +207,12 @@ namespace EventLogAnalyzer
                 return;
             }
 
+            //unset selected type and index
+            DisplayIndices(string.Empty);
+
+            //unset search text
+            SearchBox.Text = string.Empty;
+
             mCurrentLines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
             if (mCurrentLines != null)
             {
@@ -261,6 +279,9 @@ namespace EventLogAnalyzer
             // only do anything if we are changing the active indextype
             if (IndexSelected != mSelectedIndex)
             {
+                //unset search text
+                SearchBox.Text = string.Empty;
+
                 mSelectedIndex = IndexSelected;
                 // display the new lines
                 DisplayLines(mSelectedIndexType, mSelectedIndex);
@@ -284,6 +305,9 @@ namespace EventLogAnalyzer
             }
 
             string IndexType = IndexTypeList.SelectedItems[0].SubItems[1].Text;
+
+            //unset search text
+            SearchBox.Text = string.Empty;
 
             // selected index is no longer valid for the new type
             mSelectedIndexType = "";

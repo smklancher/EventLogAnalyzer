@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 
 namespace EventLogAnalysis
@@ -39,7 +40,10 @@ namespace EventLogAnalysis
         public Exception? MessageLoadExeption { get; private set; }
         public ELog ParentLog { get; }
         public string ProviderName => Record.ProviderName;
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         public EventRecord Record { get; init; }
+
         public long RecordId { get; private set; }
         public string ShortMessage { get; set; } = string.Empty;
         public DateTime? Timestamp => Record.TimeCreated;
