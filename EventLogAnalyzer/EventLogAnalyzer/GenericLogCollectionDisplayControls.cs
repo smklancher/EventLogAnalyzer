@@ -71,9 +71,10 @@ namespace EventLogAnalyzer
                 value.View = View.Details;
                 value.FullRowSelect = true;
                 value.Columns.Add("#");
-                value.Columns.Add("Trait Value");
+                if (!Options.Instance.TraitDatesBeforeTraitValue) { value.Columns.Add("Trait Value"); }
                 value.Columns.Add("First");
                 value.Columns.Add("Last");
+                if (Options.Instance.TraitDatesBeforeTraitValue) { value.Columns.Add("Trait Value"); }
                 value.VirtualMode = true;
                 value.VirtualListSize = 0;
                 mIndexList = value;
@@ -204,5 +205,7 @@ namespace EventLogAnalyzer
                 mStatusBar.Spring = true;
             }
         }
+
+        public bool TraitDatesBeforeTraitValue { get; set; } = true;
     }
 }

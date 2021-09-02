@@ -30,7 +30,11 @@ namespace EventLogAnalysis
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
 
-        [Description("Disable to use old non-paralel lev match with no shortcuts.  Old code is ntended to be removed.")]
+        [Description("Show columns for earliest and last date before actual value.  Not wired to be changed at runtime.")]
+        [Category(TestingCategory)]
+        public bool TraitDatesBeforeTraitValue { get; set; } = true;
+
+        [Description("Disable to use old non-paralel lev match with no shortcuts.  Old code is intended to be removed.")]
         [Category(TestingCategory)]
         public bool UseNewSimilarity { get; set; } = true;
 

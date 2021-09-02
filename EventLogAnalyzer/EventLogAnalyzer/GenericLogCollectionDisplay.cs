@@ -225,6 +225,8 @@ namespace EventLogAnalyzer
 
         private void mIndexList_ColumnClick(object sender, ColumnClickEventArgs e)
         {
+            // should change to a kind of strongly typed column concept (maybe via listview extension methods)
+
             switch (e.Column)
             {
             case 0:
@@ -235,19 +237,40 @@ namespace EventLogAnalyzer
 
             case 1:
                 {
-                    mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
+                    if (Options.Instance.TraitDatesBeforeTraitValue)
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.First).ToList();
+                    }
+                    else
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
+                    }
                     break;
                 }
 
             case 2:
                 {
-                    mCurrentIndex = mCurrentIndex.OrderBy(x => x.First).ToList();
+                    if (Options.Instance.TraitDatesBeforeTraitValue)
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.Last).ToList();
+                    }
+                    else
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.First).ToList();
+                    }
                     break;
                 }
 
             case 3:
                 {
-                    mCurrentIndex = mCurrentIndex.OrderBy(x => x.Last).ToList();
+                    if (Options.Instance.TraitDatesBeforeTraitValue)
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
+                    }
+                    else
+                    {
+                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.Last).ToList();
+                    }
                     break;
                 }
             }
@@ -258,12 +281,25 @@ namespace EventLogAnalyzer
         private void mIndexList_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
             var IndexValue = mCurrentIndex[e.ItemIndex];
-            e.Item = new ListViewItem(new string[] {
-            IndexValue.Count.ToString(),
-            IndexValue.TraitValue,
-            IndexValue.First.ToString()?? string.Empty,
-            IndexValue.Last.ToString() ?? string.Empty
-            });
+
+            if (Options.Instance.TraitDatesBeforeTraitValue)
+            {
+                e.Item = new ListViewItem(new string[] {
+                    IndexValue.Count.ToString(),
+                    IndexValue.First.ToString()?? string.Empty,
+                    IndexValue.Last.ToString() ?? string.Empty,
+                    IndexValue.TraitValue
+                });
+            }
+            else
+            {
+                e.Item = new ListViewItem(new string[] {
+                    IndexValue.Count.ToString(),
+                    IndexValue.TraitValue,
+                    IndexValue.First.ToString()?? string.Empty,
+                    IndexValue.Last.ToString() ?? string.Empty
+                });
+            }
         }
 
         private void mIndexList_SelectedIndexChanged(object? sender, EventArgs e)

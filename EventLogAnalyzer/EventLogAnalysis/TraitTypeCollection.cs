@@ -32,6 +32,12 @@ namespace EventLogAnalysis
     /// <remarks>Indicies keyed by the name of the index (name of index ("batch") -> index)</remarks>
     public class TraitTypeCollection : Dictionary<string, TraitValuesCollection>
     {
+        private TraitTypeCollection? filteredTraitTypes;
+
+        private DateTime? filterEnd;
+
+        private DateTime? filterStart;
+
         /// <summary>
         /// This is the same as accessing the object directly.  Also will ease likely refactor from inheriting from dictionary to just containing one.
         /// </summary>
