@@ -19,7 +19,7 @@ namespace EventLogAnalyzer
         // https://docs.microsoft.com/en-us/dotnet/standard/threading/cancellation-in-managed-threads?redirectedfrom=MSDN#operation-cancellation-versus-object-cancellation
         private CancellationTokenSource cts = new();
 
-        private GenericLogCollectionDisplay LCD = new GenericLogCollectionDisplay();
+        private GenericLogCollectionDisplay LCD;
         private EventLogCollection Logs = new();
         private Progress<ProgressUpdate> progressHandler;
 
@@ -29,6 +29,9 @@ namespace EventLogAnalyzer
 
             progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
             OptionsMenuItem.Click += OptionsMenuItem_Click;
+
+            var linesList = new LinesListView(lstLines, txtDetail, DebugProperties);
+            LCD = new GenericLogCollectionDisplay(linesList);
         }
 
         public static string UNCPath(string path)
@@ -84,10 +87,8 @@ namespace EventLogAnalyzer
 
             // enable memory/cpu status
             AppDomain.MonitoringIsEnabled = true;
-
             LCD.IndexTypeList = lstIndexType;
             LCD.IndexList = lstIndex;
-            LCD.LinesList = lstLines;
             LCD.FileList = lstFiles;
             LCD.DetailText = txtDetail;
             LCD.SearchBox = MessageSearchTextBox;

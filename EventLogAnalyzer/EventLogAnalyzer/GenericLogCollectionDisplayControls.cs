@@ -8,6 +8,8 @@ using EventLogAnalysis;
 
 namespace EventLogAnalyzer
 {
+   
+
     public partial class GenericLogCollectionDisplay
     {
         private PropertyGrid mDebugProperties = new();
@@ -111,33 +113,7 @@ namespace EventLogAnalyzer
             }
         }
 
-        public ListView LinesList
-        {
-            set
-            {
-                if (mLinesList is not null)
-                {
-                    mLinesList.RetrieveVirtualItem -= mLinesList_RetrieveVirtualItem;
-                    mLinesList.SelectedIndexChanged -= mLinesList_SelectedIndexChanged;
-                }
-
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("Timestamp");
-                value.Columns.Add("Level");
-                value.Columns.Add("Message");
-                value.VirtualMode = true;
-                value.VirtualListSize = 0;
-                mLinesList = value;
-
-                mLinesList.RetrieveVirtualItem += mLinesList_RetrieveVirtualItem;
-                mLinesList.SelectedIndexChanged += mLinesList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mLinesList;
-            }
-        }
+        public LinesListView LinesList { get; set; }
 
         public EventLogCollection Logs
         {

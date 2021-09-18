@@ -53,11 +53,16 @@ namespace EventLogAnalyzer
             this.SaveCurrentIndiciesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OptionsMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toggleLineToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.timestampAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.localTimeEventLogDefaultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uTCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.specificUTCOffsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.ToolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.MessageSearchTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.loadEventLogToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -272,7 +277,8 @@ namespace EventLogAnalyzer
             // 
             this.LogsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ClearToolStripMenuItem,
-            this.DumpToCombinedCSVToolStripMenuItem});
+            this.DumpToCombinedCSVToolStripMenuItem,
+            this.loadEventLogToolStripMenuItem});
             this.LogsToolStripMenuItem.Name = "LogsToolStripMenuItem";
             this.LogsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.LogsToolStripMenuItem.Text = "Logs";
@@ -282,14 +288,14 @@ namespace EventLogAnalyzer
             // 
             this.ClearToolStripMenuItem.Enabled = false;
             this.ClearToolStripMenuItem.Name = "ClearToolStripMenuItem";
-            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.ClearToolStripMenuItem.Text = "Clear";
             // 
             // DumpToCombinedCSVToolStripMenuItem
             // 
             this.DumpToCombinedCSVToolStripMenuItem.Enabled = false;
             this.DumpToCombinedCSVToolStripMenuItem.Name = "DumpToCombinedCSVToolStripMenuItem";
-            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.DumpToCombinedCSVToolStripMenuItem.Text = "Combined to CSV";
             // 
             // ViewToolStripMenuItem
@@ -298,7 +304,8 @@ namespace EventLogAnalyzer
             this.SaveCurrentLinesToolStripMenuItem,
             this.SaveCurrentIndiciesToolStripMenuItem,
             this.OptionsMenuItem,
-            this.toggleLineToolStripMenuItem});
+            this.toggleLineToolStripMenuItem,
+            this.timestampAsToolStripMenuItem});
             this.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem";
             this.ViewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.ViewToolStripMenuItem.Text = "View";
@@ -331,6 +338,39 @@ namespace EventLogAnalyzer
             this.toggleLineToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
             this.toggleLineToolStripMenuItem.Text = "Toggle Line Property View";
             this.toggleLineToolStripMenuItem.Click += new System.EventHandler(this.toggleLineToolStripMenuItem_Click);
+            // 
+            // timestampAsToolStripMenuItem
+            // 
+            this.timestampAsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.localTimeEventLogDefaultToolStripMenuItem,
+            this.uTCToolStripMenuItem,
+            this.specificUTCOffsetToolStripMenuItem});
+            this.timestampAsToolStripMenuItem.Name = "timestampAsToolStripMenuItem";
+            this.timestampAsToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.timestampAsToolStripMenuItem.Text = "Timestamp as...";
+            // 
+            // localTimeEventLogDefaultToolStripMenuItem
+            // 
+            this.localTimeEventLogDefaultToolStripMenuItem.Checked = true;
+            this.localTimeEventLogDefaultToolStripMenuItem.CheckOnClick = true;
+            this.localTimeEventLogDefaultToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.localTimeEventLogDefaultToolStripMenuItem.Name = "localTimeEventLogDefaultToolStripMenuItem";
+            this.localTimeEventLogDefaultToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.localTimeEventLogDefaultToolStripMenuItem.Text = "Local time (Event Log default)";
+            // 
+            // uTCToolStripMenuItem
+            // 
+            this.uTCToolStripMenuItem.CheckOnClick = true;
+            this.uTCToolStripMenuItem.Name = "uTCToolStripMenuItem";
+            this.uTCToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.uTCToolStripMenuItem.Text = "UTC";
+            // 
+            // specificUTCOffsetToolStripMenuItem
+            // 
+            this.specificUTCOffsetToolStripMenuItem.CheckOnClick = true;
+            this.specificUTCOffsetToolStripMenuItem.Name = "specificUTCOffsetToolStripMenuItem";
+            this.specificUTCOffsetToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.specificUTCOffsetToolStripMenuItem.Text = "Specific UTC offset...";
             // 
             // StatusStrip1
             // 
@@ -377,6 +417,12 @@ namespace EventLogAnalyzer
             this.label1.Size = new System.Drawing.Size(104, 15);
             this.label1.TabIndex = 13;
             this.label1.Text = "Filter current lines:";
+            // 
+            // loadEventLogToolStripMenuItem
+            // 
+            this.loadEventLogToolStripMenuItem.Name = "loadEventLogToolStripMenuItem";
+            this.loadEventLogToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadEventLogToolStripMenuItem.Text = "Load Event Log...";
             // 
             // EventLogAnalyzer
             // 
@@ -455,5 +501,10 @@ namespace EventLogAnalyzer
         private ToolStripMenuItem OptionsMenuItem;
         private Label label1;
         private ToolStripMenuItem toggleLineToolStripMenuItem;
+        private ToolStripMenuItem timestampAsToolStripMenuItem;
+        private ToolStripMenuItem localTimeEventLogDefaultToolStripMenuItem;
+        private ToolStripMenuItem uTCToolStripMenuItem;
+        private ToolStripMenuItem specificUTCOffsetToolStripMenuItem;
+        private ToolStripMenuItem loadEventLogToolStripMenuItem;
     }
 }

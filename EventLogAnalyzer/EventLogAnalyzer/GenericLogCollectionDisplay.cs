@@ -1,17 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using EventLogAnalysis;
-using Microsoft.VisualBasic;
 using Serilog;
 using Serilog.Sinks.ListOfString;
 
@@ -23,14 +14,17 @@ namespace EventLogAnalyzer
         private const string InternalLogName = "InternalLog";
         private string LastSearchText = "";
         private List<TraitValuesCollection.TraitValueSummaryLine> mCurrentIndex = new();
-        private EventCollection mCurrentLines = new();
+
+        //private EventCollection mCurrentLines = new();
         private EventLogCollection mLogs = new();
+
         private string mSelectedIndex = "";
         private string mSelectedIndexType = "";
 
-        public GenericLogCollectionDisplay()
+        public GenericLogCollectionDisplay(LinesListView llv)
         {
             Log.Logger = InternalLog.AsSeriLogger();
+            LinesList = llv;
         }
 
         public void DisplayFiles()
@@ -109,44 +103,36 @@ namespace EventLogAnalyzer
             mCurrentIndex = new();
             mIndexList.VirtualListSize = 0;
 
-            if (mCurrentLines != null)
-            {
-                DebugProperties.SelectedObject = InternalLog;
-            }
-
-            LinesList.VirtualListSize = InternalLog.Count;
-            LinesList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            LinesList.DisplayInternalLog(InternalLog);
         }
 
         public void DisplayLines(string IndexType, string IndexValue)
         {
             mSelectedIndex = IndexValue;
-            mCurrentLines = Logs.TraitTypes.Lines(IndexType, IndexValue);
-            if (mCurrentLines != null)
+            var newlines = Logs.TraitTypes.Lines(IndexType, IndexValue);
+            if (newlines != null)
             {
-                DebugProperties.SelectedObject = mCurrentLines;
-                LinesList.VirtualListSize = mCurrentLines.Count;
-                LinesList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                LinesList.UpdateLineSource(newlines);
             }
         }
 
         public void Filter(string SearchText)
         {
+            EventCollection newlines;
             //messy, but this class should be refactored in general
             if (string.IsNullOrEmpty(mSelectedIndex) && string.IsNullOrEmpty(mSelectedIndexType) && mFileList.SelectedIndices.Count > 0)
             {
                 // whole file
-                mCurrentLines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+                newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
             }
             else
             {
                 // specific trait
-                mCurrentLines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
+                newlines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
             }
 
-            mCurrentLines = mCurrentLines.FilteredCopy(SearchText);
-            DebugProperties.SelectedObject = mCurrentLines;
-            LinesList.VirtualListSize = mCurrentLines.Count;
+            newlines = newlines.FilteredCopy(SearchText);
+            LinesList.UpdateLineSource(newlines);
 
             LastSearchText = SearchText;
         }
@@ -213,14 +199,12 @@ namespace EventLogAnalyzer
             //unset search text
             SearchBox.Text = string.Empty;
 
-            mCurrentLines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
-            if (mCurrentLines != null)
+            var newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+            if (newlines != null)
             {
+                LinesList.UpdateLineSource(newlines);
                 DebugProperties.SelectedObject = Logs.Logs[mFileList.SelectedIndices[0]];
             }
-
-            LinesList.VirtualListSize = mCurrentLines?.Count ?? 0;
-            LinesList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         private void mIndexList_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -324,12 +308,7 @@ namespace EventLogAnalyzer
 
                 DebugProperties.SelectedObject = Logs.TraitTypes[mSelectedIndexType][mSelectedIndex];
 
-                // select the first line
-                mLinesList.SelectedIndices.Clear();
-                if (mLinesList.VirtualListSize > 0)
-                {
-                    LinesList.SelectedIndices.Add(0);
-                }
+                LinesList.SelectFirstLine();
             }
         }
 
@@ -350,44 +329,6 @@ namespace EventLogAnalyzer
 
             // display the new indicies
             DisplayIndices(IndexType);
-        }
-
-        private void mLinesList_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            string[] LineInfo;
-
-            if (mSelectedIndexType == InternalLogName)
-            {
-                LineInfo = new string[] { string.Empty, "Debug", InternalLog[e.ItemIndex] };
-            }
-            else
-            {
-                var Line = mCurrentLines[e.ItemIndex] as ILogLineDisplay;
-                LineInfo = new string[] { Line.TimestampString, Line.LevelString, Line.Message };
-            }
-
-            e.Item = new ListViewItem(LineInfo);
-        }
-
-        private void mLinesList_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (mLinesList.SelectedIndices.Count < 1)
-            {
-                return;
-            }
-
-            if (mSelectedIndexType == InternalLogName)
-            {
-                var line = InternalLog[mLinesList.SelectedIndices[0]];
-                DetailText.Text = line ?? string.Empty;
-                DebugProperties.SelectedObject = null;
-            }
-            else
-            {
-                var Line = mCurrentLines[mLinesList.SelectedIndices[0]] as ILogLineDisplay;
-                DebugProperties.SelectedObject = Line;
-                DetailText.Text = Line.Message;
-            }
         }
 
         private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
