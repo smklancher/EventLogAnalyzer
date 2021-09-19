@@ -8,15 +8,11 @@ using EventLogAnalysis;
 
 namespace EventLogAnalyzer
 {
-   
-
     public partial class GenericLogCollectionDisplay
     {
         private PropertyGrid mDebugProperties = new();
         private ListView mFileList = new();
-        private ListView mIndexList = new();
         private ListView mIndexTypeList = new();
-        private ListView mLinesList = new();
         private ToolStripProgressBar mProgressBar = new();
         private TextBox mSearchBox = new();
         private ToolStripStatusLabel mStatusBar = new();
@@ -57,36 +53,6 @@ namespace EventLogAnalyzer
             get
             {
                 return mFileList;
-            }
-        }
-
-        public ListView IndexList
-        {
-            set
-            {
-                if (mIndexList is not null)
-                {
-                    mIndexList.RetrieveVirtualItem -= mIndexList_RetrieveVirtualItem;
-                    mIndexList.SelectedIndexChanged -= mIndexList_SelectedIndexChanged;
-                }
-
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("#");
-                if (!Options.Instance.TraitDatesBeforeTraitValue) { value.Columns.Add("Trait Value"); }
-                value.Columns.Add("First");
-                value.Columns.Add("Last");
-                if (Options.Instance.TraitDatesBeforeTraitValue) { value.Columns.Add("Trait Value"); }
-                value.VirtualMode = true;
-                value.VirtualListSize = 0;
-                mIndexList = value;
-
-                mIndexList.RetrieveVirtualItem += mIndexList_RetrieveVirtualItem;
-                mIndexList.SelectedIndexChanged += mIndexList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mIndexList;
             }
         }
 
@@ -133,7 +99,6 @@ namespace EventLogAnalyzer
                     //mLogs.LogsFinishedLoading -= mLogs_LogsFinishedLoading;
                 }
 
-                mCurrentIndex = new();
                 mLogs = value;
 
                 // mLogs.LogsFinishedLoading += mLogs_LogsFinishedLoading;
@@ -182,6 +147,6 @@ namespace EventLogAnalyzer
             }
         }
 
-        public bool TraitDatesBeforeTraitValue { get; set; } = true;
+        public TraitValuesListView TraitValuesList { get; set; }
     }
 }

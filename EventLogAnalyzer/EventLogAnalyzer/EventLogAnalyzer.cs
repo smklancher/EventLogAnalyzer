@@ -31,7 +31,11 @@ namespace EventLogAnalyzer
             OptionsMenuItem.Click += OptionsMenuItem_Click;
 
             var linesList = new LinesListView(lstLines, txtDetail, DebugProperties);
-            LCD = new GenericLogCollectionDisplay(linesList);
+            var traitValuesList = new TraitValuesListView(lstIndex, linesList, DebugProperties);
+            LCD = new GenericLogCollectionDisplay(linesList, traitValuesList);
+
+            //this appraoch should be temorary
+            traitValuesList.LCD = LCD;
         }
 
         public static string UNCPath(string path)
@@ -88,7 +92,6 @@ namespace EventLogAnalyzer
             // enable memory/cpu status
             AppDomain.MonitoringIsEnabled = true;
             LCD.IndexTypeList = lstIndexType;
-            LCD.IndexList = lstIndex;
             LCD.FileList = lstFiles;
             LCD.DetailText = txtDetail;
             LCD.SearchBox = MessageSearchTextBox;

@@ -130,6 +130,29 @@ namespace EventLogAnalysis
             return this.Select(x => new TraitValueSummaryLine(x.Key, x.Value.Count, x.Value.FirstEvent, x.Value.LastEvent)).ToList();
         }
 
-        public record TraitValueSummaryLine(string TraitValue, long Count, DateTime? First, DateTime? Last);
+        public record TraitValueSummaryLine(string TraitValue, long Count, DateTime? First, DateTime? Last)
+        {
+            public string[] AsArray(bool datesBeforeValue)
+            {
+                if (datesBeforeValue)
+                {
+                    return new string[] {
+                         Count.ToString(),
+                         First.ToString()?? string.Empty,
+                         Last.ToString() ?? string.Empty,
+                         TraitValue
+                     };
+                }
+                else
+                {
+                    return new string[] {
+                         Count.ToString(),
+                         TraitValue,
+                         First.ToString()?? string.Empty,
+                         Last.ToString() ?? string.Empty
+                     };
+                }
+            }
+        }
     }
 }

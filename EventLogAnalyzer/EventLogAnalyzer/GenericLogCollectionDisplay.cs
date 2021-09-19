@@ -13,19 +13,16 @@ namespace EventLogAnalyzer
         public List<string> InternalLog = new();
         private const string InternalLogName = "InternalLog";
         private string LastSearchText = "";
-        private List<TraitValuesCollection.TraitValueSummaryLine> mCurrentIndex = new();
-
-        //private EventCollection mCurrentLines = new();
         private EventLogCollection mLogs = new();
 
-        private string mSelectedIndex = "";
-        private string mSelectedIndexType = "";
-
-        public GenericLogCollectionDisplay(LinesListView llv)
+        public GenericLogCollectionDisplay(LinesListView llv, TraitValuesListView tvlv)
         {
             Log.Logger = InternalLog.AsSeriLogger();
             LinesList = llv;
+            TraitValuesList = tvlv;
         }
+
+        public string SelectedTraitType { get; private set; } = string.Empty;
 
         public void DisplayFiles()
         {
@@ -63,52 +60,27 @@ namespace EventLogAnalyzer
 
         public void DisplayIndices(string IndexType)
         {
-            mSelectedIndexType = IndexType;
+            SelectedTraitType = IndexType;
 
-            if (string.IsNullOrEmpty(IndexType))
-            {
-                //unselect
-                IndexList.SelectedIndices.Clear();
-                mSelectedIndexType = string.Empty;
-                mSelectedIndex = string.Empty;
-                mCurrentIndex = new();
-                IndexList.VirtualListSize = 0;
-
-                return;
-            }
-
-            if (mSelectedIndexType == InternalLogName)
+            if (SelectedTraitType == InternalLogName)
             {
                 DisplayInternalLog();
             }
             else
             {
-                mCurrentIndex = Logs.TraitTypes.TraitValueSummaries(IndexType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
-                DebugProperties.SelectedObject = mCurrentIndex;
-
-                if (mCurrentIndex.Count > 0)
-                {
-                    mSelectedIndex = mCurrentIndex[0].TraitValue;
-                    DisplayLines(IndexType, mSelectedIndex);
-                }
-
-                IndexList.VirtualListSize = mCurrentIndex?.Count ?? 0;
-                IndexList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+                var summaries = Logs.TraitTypes.TraitValueSummaries(IndexType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
+                TraitValuesList.UpdateTraitValueSummarySource(summaries);
             }
         }
 
         public void DisplayInternalLog()
         {
-            mSelectedIndex = "";
-            mCurrentIndex = new();
-            mIndexList.VirtualListSize = 0;
-
+            TraitValuesList.DisplayInternalLog();
             LinesList.DisplayInternalLog(InternalLog);
         }
 
         public void DisplayLines(string IndexType, string IndexValue)
         {
-            mSelectedIndex = IndexValue;
             var newlines = Logs.TraitTypes.Lines(IndexType, IndexValue);
             if (newlines != null)
             {
@@ -116,33 +88,42 @@ namespace EventLogAnalyzer
             }
         }
 
-        public void Filter(string SearchText)
+        public void Filter(string searchText)
         {
-            EventCollection newlines;
-            //messy, but this class should be refactored in general
-            if (string.IsNullOrEmpty(mSelectedIndex) && string.IsNullOrEmpty(mSelectedIndexType) && mFileList.SelectedIndices.Count > 0)
+            if (searchText.Length > LastSearchText.Length && searchText.StartsWith(LastSearchText))
             {
-                // whole file
-                newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+                //if just adding to the last search (continuing to type) then can filter from what is already showing
+                LinesList.UpdateLineSource(LinesList.CurrentLines.FilteredCopy(searchText));
             }
             else
             {
-                // specific trait
-                newlines = Logs.TraitTypes.Lines(mSelectedIndexType, mSelectedIndex);
+                //...otherwise need to get content from the source
+
+                EventCollection newlines;
+                //messy, but this class should be refactored in general
+                if (string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(SelectedTraitType) && mFileList.SelectedIndices.Count > 0)
+                {
+                    // whole file
+                    newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+                }
+                else
+                {
+                    // specific trait
+                    newlines = Logs.TraitTypes.Lines(SelectedTraitType, TraitValuesList.ActiveTraitValue);
+                }
+
+                newlines = newlines.FilteredCopy(searchText);
+                LinesList.UpdateLineSource(newlines);
             }
-
-            newlines = newlines.FilteredCopy(SearchText);
-            LinesList.UpdateLineSource(newlines);
-
-            LastSearchText = SearchText;
+            LastSearchText = searchText;
         }
 
         public void Refresh()
         {
             DisplayFiles();
             DisplayIndexTypes();
-            DisplayIndices(mSelectedIndexType);
-            DisplayLines(mSelectedIndexType, mSelectedIndex);
+            DisplayIndices(SelectedTraitType);
+            DisplayLines(SelectedTraitType, TraitValuesList.ActiveTraitValue);
         }
 
         /// <summary>
@@ -207,111 +188,6 @@ namespace EventLogAnalyzer
             }
         }
 
-        private void mIndexList_ColumnClick(object sender, ColumnClickEventArgs e)
-        {
-            // should change to a kind of strongly typed column concept (maybe via listview extension methods)
-
-            switch (e.Column)
-            {
-            case 0:
-                {
-                    mCurrentIndex = mCurrentIndex.OrderByDescending(x => x.Count.ToString("000000000")).ToList();
-                    break;
-                }
-
-            case 1:
-                {
-                    if (Options.Instance.TraitDatesBeforeTraitValue)
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.First).ToList();
-                    }
-                    else
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
-                    }
-                    break;
-                }
-
-            case 2:
-                {
-                    if (Options.Instance.TraitDatesBeforeTraitValue)
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.Last).ToList();
-                    }
-                    else
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.First).ToList();
-                    }
-                    break;
-                }
-
-            case 3:
-                {
-                    if (Options.Instance.TraitDatesBeforeTraitValue)
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.TraitValue).ToList();
-                    }
-                    else
-                    {
-                        mCurrentIndex = mCurrentIndex.OrderBy(x => x.Last).ToList();
-                    }
-                    break;
-                }
-            }
-
-            mIndexList.Invalidate();
-        }
-
-        private void mIndexList_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            var IndexValue = mCurrentIndex[e.ItemIndex];
-
-            if (Options.Instance.TraitDatesBeforeTraitValue)
-            {
-                e.Item = new ListViewItem(new string[] {
-                    IndexValue.Count.ToString(),
-                    IndexValue.First.ToString()?? string.Empty,
-                    IndexValue.Last.ToString() ?? string.Empty,
-                    IndexValue.TraitValue
-                });
-            }
-            else
-            {
-                e.Item = new ListViewItem(new string[] {
-                    IndexValue.Count.ToString(),
-                    IndexValue.TraitValue,
-                    IndexValue.First.ToString()?? string.Empty,
-                    IndexValue.Last.ToString() ?? string.Empty
-                });
-            }
-        }
-
-        private void mIndexList_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (IndexList.SelectedIndices.Count < 1)
-            {
-                return;
-            }
-
-            var IndexValue = mCurrentIndex[mIndexList.SelectedIndices[0]];
-            string IndexSelected = IndexValue.TraitValue;
-
-            // only do anything if we are changing the active indextype
-            if (IndexSelected != mSelectedIndex)
-            {
-                //unset search text
-                SearchBox.Text = string.Empty;
-
-                mSelectedIndex = IndexSelected;
-                // display the new lines
-                DisplayLines(mSelectedIndexType, mSelectedIndex);
-
-                DebugProperties.SelectedObject = Logs.TraitTypes[mSelectedIndexType][mSelectedIndex];
-
-                LinesList.SelectFirstLine();
-            }
-        }
-
         private void mIndexTypeList_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (IndexTypeList.SelectedItems.Count < 1)
@@ -325,7 +201,7 @@ namespace EventLogAnalyzer
             SearchBox.Text = string.Empty;
 
             // selected index is no longer valid for the new type
-            mSelectedIndexType = "";
+            SelectedTraitType = "";
 
             // display the new indicies
             DisplayIndices(IndexType);
