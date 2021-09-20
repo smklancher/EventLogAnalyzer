@@ -66,29 +66,29 @@ namespace EventLogAnalysis
 
         private string MtaFilePath { get; }
 
-        /// <summary>
-        /// Add all lines into groups for that event type
-        /// </summary>
-        /// <param name="log"></param>
-        /// <returns></returns>
-        public static Dictionary<ProviderEventIdPair, EventIdGroup> CreateEventIdGroups(ELog log)
-        {
-            using var dt = new DisposableTrace();
+        ///// <summary>
+        ///// Add all lines into groups for that event type
+        ///// </summary>
+        ///// <param name="log"></param>
+        ///// <returns></returns>
+        //public static Dictionary<ProviderEventIdPair, EventIdGroup> CreateEventIdGroups(ELog log)
+        //{
+        //    using var dt = new DisposableTrace();
 
-            Dictionary<ProviderEventIdPair, EventIdGroup> groups = new();
-            foreach (var line in log.FilteredEvents)
-            {
-                if (!groups.ContainsKey(line.GroupKey))
-                {
-                    // first of this kind of event, so create a new line group
-                    var group = new EventIdGroup(line.GroupKey);
-                    groups.Add(group.GroupKey, group);
-                }
+        //    Dictionary<ProviderEventIdPair, EventIdGroup> groups = new();
+        //    foreach (var line in log.FilteredEvents)
+        //    {
+        //        if (!groups.ContainsKey(line.GroupKey))
+        //        {
+        //            // first of this kind of event, so create a new line group
+        //            var group = new EventIdGroup(line.GroupKey);
+        //            groups.Add(group.GroupKey, group);
+        //        }
 
-                groups[line.GroupKey].Records.Add(line);
-            }
-            return groups;
-        }
+        //        groups[line.GroupKey].Records.Add(line);
+        //    }
+        //    return groups;
+        //}
 
         public void CreateLogBasedTraitProducers()
         {
@@ -138,50 +138,26 @@ namespace EventLogAnalysis
 
             LoadTraitsPerLine();
 
-            if (Options.Instance.UseNewSimilarity)
-            {
-                SimilarityGroups = Processing.Process(FilteredEvents, Options.Instance.SimilarityOptions.LinesPerSimilarityGroupChunk, x => string.IsNullOrWhiteSpace(x.ShortMessage) ? x.Message : x.ShortMessage);
-
-                // WorkingGroupSet to Traits (SingleTraitValueEventCollections)
-                // does this even need to happen at log level if we are ok already using the working sets when merging logs?
-                //foreach (var slg in SimilarityGroups.SubGroups)
-                //{
-                //    var stv = Converter.FromSimilarLineGroupToSingleTraitValue(slg);
-                //    Traits.AddSingleTraitValue(stv);
-                //}
-
-                //var tvc = Converter.FromWorkingSetGroupToTraitValuesCollection(SimilarityGroups);
-                //Traits.AddTraitType(tvc);
-            }
-            else
-            {
-                // create index for similar lines, ideally standardize index approach
-                EventIdGroups = CreateEventIdGroups(this);
-                GroupSimilarLines(EventIdGroups);
-
-                foreach (var idGroup in EventIdGroups.Values)
-                {
-                    foreach (var simGroup in idGroup.SubGroups)
-                    {
-                        Traits.AddSingleTraitValue(simGroup);
-                    }
-                }
-            }
+            // create index for similar lines, ideally standardize index approach
+            SimilarityGroups = Processing.Process(
+                FilteredEvents,
+                Options.Instance.SimilarityOptions.LinesPerSimilarityGroupChunk,
+                x => string.IsNullOrWhiteSpace(x.ShortMessage) ? x.Message : x.ShortMessage);
         }
 
-        /// <summary>
-        /// Need to change to parallel with cancelation
-        /// Groups similar lines within the EventIdGroups
-        /// </summary>
-        /// <param name="LineGroupings"></param>
-        private static void GroupSimilarLines(Dictionary<ProviderEventIdPair, EventIdGroup> LineGroupings)
-        {
-            using var dt = new DisposableTrace();
-            foreach (var g in LineGroupings.Values)
-            {
-                g.GroupSimilarLines();
-            }
-        }
+        ///// <summary>
+        ///// Need to change to parallel with cancelation
+        ///// Groups similar lines within the EventIdGroups
+        ///// </summary>
+        ///// <param name="LineGroupings"></param>
+        //private static void GroupSimilarLines(Dictionary<ProviderEventIdPair, EventIdGroup> LineGroupings)
+        //{
+        //    using var dt = new DisposableTrace();
+        //    foreach (var g in LineGroupings.Values)
+        //    {
+        //        g.GroupSimilarLines();
+        //    }
+        //}
 
         private string GetMtaFilePath(FileInfo evtx)
         {

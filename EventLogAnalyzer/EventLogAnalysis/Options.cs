@@ -34,10 +34,6 @@ namespace EventLogAnalysis
         [Category(TestingCategory)]
         public bool TraitDatesBeforeTraitValue { get; set; } = true;
 
-        [Description("Disable to use old non-paralel lev match with no shortcuts.  Old code is intended to be removed.")]
-        [Category(TestingCategory)]
-        public bool UseNewSimilarity { get; set; } = true;
-
         public void OnCloseOptionsForm()
         {
         }
