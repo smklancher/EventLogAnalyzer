@@ -38,8 +38,6 @@ namespace EventLogAnalysis
 
         public Dictionary<string, int> AllProviders { get; private set; } = new();
 
-        public Dictionary<ProviderEventIdPair, EventIdGroup> EventIdGroups { get; private set; } = new();
-
         public int EventsWithMessagesLoaded => AllEvents.Where(x => x.MessageIsLoaded).Count();
 
         public string FileName { get; init; }

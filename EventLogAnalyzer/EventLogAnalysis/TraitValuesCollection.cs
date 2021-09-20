@@ -138,8 +138,8 @@ namespace EventLogAnalysis
                 {
                     return new string[] {
                          Count.ToString(),
-                         First.ToString()?? string.Empty,
-                         Last.ToString() ?? string.Empty,
+                         TimestampOptions.ConvertToString(First),
+                         TimestampOptions.ConvertToString(Last),
                          TraitValue
                      };
                 }
@@ -148,8 +148,8 @@ namespace EventLogAnalysis
                     return new string[] {
                          Count.ToString(),
                          TraitValue,
-                         First.ToString()?? string.Empty,
-                         Last.ToString() ?? string.Empty
+                         TimestampOptions.ConvertToString(First),
+                         TimestampOptions.ConvertToString(Last),
                      };
                 }
             }

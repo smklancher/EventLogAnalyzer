@@ -28,7 +28,6 @@ namespace EventLogAnalyzer
             InitializeComponent();
 
             progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
-            OptionsMenuItem.Click += OptionsMenuItem_Click;
 
             var linesList = new LinesListView(lstLines, txtDetail, DebugProperties);
             var traitValuesList = new TraitValuesListView(lstIndex, linesList, DebugProperties);
@@ -125,6 +124,12 @@ namespace EventLogAnalyzer
             LCD.Refresh();
         }
 
+        private void localTimeEventLogDefaultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options.Instance.TimestampConversion = OffsetOption.ConvertToLocal;
+            UpdateCheckedTimeOptions();
+        }
+
         private void OptionsMenuItem_Click(object? sender, EventArgs e)
         {
             OptionsDialog.ShowOptions(Options.Instance, this);
@@ -143,9 +148,62 @@ namespace EventLogAnalyzer
             }
         }
 
+        private void specificLocalOffsetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options.Instance.TimestampConversion = OffsetOption.OffsetFromLocal;
+            UpdateCheckedTimeOptions();
+            OptionsDialog.ShowOptions(Options.Instance, this);
+        }
+
+        private void specificUTCOffsetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options.Instance.TimestampConversion = OffsetOption.OffsetFromUTC;
+            UpdateCheckedTimeOptions();
+            OptionsDialog.ShowOptions(Options.Instance, this);
+        }
+
         private void toggleLineToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SplitDetailAndProperties.Panel2Collapsed = !SplitDetailAndProperties.Panel2Collapsed;
+        }
+
+        private void UpdateCheckedTimeOptions()
+        {
+            specificLocalOffsetToolStripMenuItem.Checked = false;
+            uTCToolStripMenuItem.Checked = false;
+            specificUTCOffsetToolStripMenuItem.Checked = false;
+            localTimeEventLogDefaultToolStripMenuItem.Checked = false;
+
+            switch (Options.Instance.TimestampConversion)
+            {
+            case OffsetOption.ConvertToLocal:
+                localTimeEventLogDefaultToolStripMenuItem.Checked = true;
+                break;
+
+            case OffsetOption.UTC:
+                uTCToolStripMenuItem.Checked = true;
+                break;
+
+            case OffsetOption.OffsetFromLocal:
+                specificLocalOffsetToolStripMenuItem.Checked = true;
+                break;
+
+            case OffsetOption.OffsetFromUTC:
+                specificUTCOffsetToolStripMenuItem.Checked = true;
+                break;
+
+            default:
+                break;
+            }
+
+            // maybe just invalidate?
+            LCD.Refresh();
+        }
+
+        private void uTCToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options.Instance.TimestampConversion = OffsetOption.UTC;
+            UpdateCheckedTimeOptions();
         }
     }
 }

@@ -17,13 +17,8 @@ namespace EventLogAnalysis
         //convert evt to evtx: wevtutil epl application.evt application.evtx /lf:true
 
         //public delegate void LineParsedEventHandler(object sender, LineParsedEventArgs e);
-        //public event LineParsedEventHandler LineParsed;
 
         public delegate void LogsFinishedLoadingEventHandler(object sender, RunWorkerCompletedEventArgs e);
-
-        //public event LogsFinishedLoadingEventHandler? LogsFinishedLoading;
-
-        public Dictionary<ProviderEventIdPair, EventIdGroup> EventIdGroups { get; private set; } = new();
 
         public long FilteredEventCount => Logs.Sum(x => x.FilteredEventCount);
 

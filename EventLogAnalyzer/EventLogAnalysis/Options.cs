@@ -12,6 +12,7 @@ namespace EventLogAnalysis
     {
         private const string SimilarityCategory = "Similarity";
         private const string TestingCategory = "Testing";
+        private const string TimestampCategory = "Timestamp";
 
         private static readonly Lazy<Options> Lazy =
                                     new Lazy<Options>(() => new Options());
@@ -22,6 +23,9 @@ namespace EventLogAnalysis
 
         public static Options Instance => Lazy.Value;
 
+        [Category(TimestampCategory)]
+        public int HourOffset { get; set; } = 0;
+
         [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
         [Category(TestingCategory)]
         public bool RenameMtaDuringLoad { get; set; } = true;
@@ -29,6 +33,9 @@ namespace EventLogAnalysis
         [Category(SimilarityCategory)]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
+
+        [Category(TimestampCategory)]
+        public OffsetOption TimestampConversion { get; set; } = OffsetOption.ConvertToLocal;
 
         [Description("Show columns for earliest and last date before actual value.  Not wired to be changed at runtime.")]
         [Category(TestingCategory)]

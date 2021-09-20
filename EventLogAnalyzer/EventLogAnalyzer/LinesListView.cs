@@ -100,8 +100,8 @@ namespace EventLogAnalyzer
             }
             else
             {
-                var Line = CurrentLines[e.ItemIndex] as ILogLineDisplay;
-                LineInfo = new string[] { Line.TimestampString, Line.LevelString, Line.Message };
+                var Line = CurrentLines[e.ItemIndex];
+                LineInfo = new string[] { TimestampOptions.ConvertToString(Line.Timestamp), Line.Level, Line.Message };
             }
 
             e.Item = new ListViewItem(LineInfo);
@@ -122,7 +122,7 @@ namespace EventLogAnalyzer
             }
             else
             {
-                var Line = CurrentLines[list.SelectedIndices[0]] as ILogLineDisplay;
+                var Line = CurrentLines[list.SelectedIndices[0]];
                 DebugProperties.SelectedObject = Line;
                 DetailText.Text = Line.Message;
             }

@@ -4,7 +4,7 @@ using System.Diagnostics.Eventing.Reader;
 
 namespace EventLogAnalysis
 {
-    public class ELRecord : IComparable<ELRecord>, IEquatable<ELRecord>, ILogLineDisplay
+    public class ELRecord : IComparable<ELRecord>, IEquatable<ELRecord>
     {
         public ELRecord(EventRecord eventRecord, ELog log)
         {
@@ -27,7 +27,6 @@ namespace EventLogAnalysis
         public ProviderEventIdPair GroupKey { get; init; }
         public double GroupSimilarity { get; set; }
         public string Level { get; }
-        string ILogLineDisplay.LevelString => Level;
         public string LogFileName => ParentLog.FileName;
 
         /// <summary>
@@ -47,7 +46,6 @@ namespace EventLogAnalysis
         public long RecordId { get; private set; }
         public string ShortMessage { get; set; } = string.Empty;
         public DateTime? Timestamp => Record.TimeCreated;
-        string ILogLineDisplay.TimestampString => Timestamp.ToString() ?? string.Empty;
         public string UniqueId { get; }
 
         public int CompareTo(ELRecord? other)

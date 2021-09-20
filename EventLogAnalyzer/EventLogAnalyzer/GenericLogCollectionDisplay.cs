@@ -23,6 +23,9 @@ namespace EventLogAnalyzer
         }
 
         public string SelectedTraitType { get; private set; } = string.Empty;
+        public TimestampOptions TimestampConversion { get; } = new TimestampOptions();
+
+        private bool IsDisplayingFullFile => string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(SelectedTraitType) && mFileList.SelectedIndices.Count > 0;
 
         public void DisplayFiles()
         {
@@ -81,7 +84,18 @@ namespace EventLogAnalyzer
 
         public void DisplayLines(string IndexType, string IndexValue)
         {
-            var newlines = Logs.TraitTypes.Lines(IndexType, IndexValue);
+            EventCollection newlines;
+            if (IsDisplayingFullFile)
+            {
+                // whole file
+                newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
+            }
+            else
+            {
+                // specific trait
+                newlines = Logs.TraitTypes.Lines(IndexType, IndexValue);
+            }
+
             if (newlines != null)
             {
                 LinesList.UpdateLineSource(newlines);
@@ -100,8 +114,7 @@ namespace EventLogAnalyzer
                 //...otherwise need to get content from the source
 
                 EventCollection newlines;
-                //messy, but this class should be refactored in general
-                if (string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(SelectedTraitType) && mFileList.SelectedIndices.Count > 0)
+                if (IsDisplayingFullFile)
                 {
                     // whole file
                     newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
