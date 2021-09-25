@@ -149,6 +149,12 @@ namespace EventLogAnalysis
             return this.Select(x => new IndexTypeDisplay(x.Key, x.Value.Count)).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
         }
 
+        public TraitValuesCollection TraitValues(string TraitType)
+        {
+            TraitTypes.TryGetValue(TraitType, out var TraitValues);
+            return TraitValues ?? new TraitValuesCollection(TraitType);
+        }
+
         /// <summary>
         /// List of values for a given index type
         /// </summary>

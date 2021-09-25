@@ -61,21 +61,6 @@ namespace EventLogAnalyzer
             IndexTypeList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
-        public void DisplayIndices(string IndexType)
-        {
-            SelectedTraitType = IndexType;
-
-            if (SelectedTraitType == InternalLogName)
-            {
-                DisplayInternalLog();
-            }
-            else
-            {
-                var summaries = Logs.TraitTypes.TraitValueSummaries(IndexType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
-                TraitValuesList.UpdateTraitValueSummarySource(summaries);
-            }
-        }
-
         public void DisplayInternalLog()
         {
             TraitValuesList.DisplayInternalLog();
@@ -99,6 +84,24 @@ namespace EventLogAnalyzer
             if (newlines != null)
             {
                 LinesList.UpdateLineSource(newlines);
+            }
+        }
+
+        public void DisplayTraitValues(string TraitType)
+        {
+            SelectedTraitType = TraitType;
+
+            if (SelectedTraitType == InternalLogName)
+            {
+                DisplayInternalLog();
+            }
+            else
+            {
+                //var summaries = Logs.TraitTypes.TraitValueSummaries(TraitType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
+                //TraitValuesList.UpdateTraitValueSummarySource(summaries);
+
+                var values = Logs.TraitTypes.TraitValues(TraitType);
+                TraitValuesList.UpdateTraitValuesSource(values);
             }
         }
 
@@ -135,7 +138,7 @@ namespace EventLogAnalyzer
         {
             DisplayFiles();
             DisplayIndexTypes();
-            DisplayIndices(SelectedTraitType);
+            DisplayTraitValues(SelectedTraitType);
             DisplayLines(SelectedTraitType, TraitValuesList.ActiveTraitValue);
         }
 
@@ -188,7 +191,7 @@ namespace EventLogAnalyzer
             }
 
             //unset selected type and index
-            DisplayIndices(string.Empty);
+            DisplayTraitValues(string.Empty);
 
             //unset search text
             SearchBox.Text = string.Empty;
@@ -217,7 +220,7 @@ namespace EventLogAnalyzer
             SelectedTraitType = "";
 
             // display the new indicies
-            DisplayIndices(IndexType);
+            DisplayTraitValues(IndexType);
         }
 
         private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)

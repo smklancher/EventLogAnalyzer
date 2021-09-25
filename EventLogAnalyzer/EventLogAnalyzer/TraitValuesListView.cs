@@ -39,12 +39,12 @@ namespace EventLogAnalyzer
         /// </summary>
         public string ActiveTraitValue { get; private set; } = string.Empty;
 
+        public string CurrentTraitType => CurrentTraitValues.Name;
+        public TraitValuesCollection CurrentTraitValues { get; private set; } = new(string.Empty);
+
         public List<TraitValuesCollection.TraitValueSummaryLine> CurrentTraitValueSummaries { get; private set; } = new();
         public PropertyGrid DebugProperties { get; }
         public bool IsDisplayingInternalLog { get; private set; } = false;
-
-        // should plan to remove the need to call this object
-        public GenericLogCollectionDisplay? LCD { get; set; }
 
         public LinesListView LinesList { get; }
         private ListView list { get; }
@@ -77,20 +77,24 @@ namespace EventLogAnalyzer
             list.EndUpdate();
         }
 
-        public void UpdateTraitValueSummarySource(List<TraitValuesCollection.TraitValueSummaryLine> newsource)
+        public void UpdateTraitValuesSource(TraitValuesCollection newsource)
         {
             list.BeginUpdate();
             IsDisplayingInternalLog = false;
-            CurrentTraitValueSummaries = newsource;
-            list.VirtualListSize = CurrentTraitValueSummaries.Count;
+            CurrentTraitValues = newsource;
+            list.VirtualListSize = CurrentTraitValues.Count;
+
+            CurrentTraitValueSummaries = CurrentTraitValues.ValuesCounts().OrderByDescending(x => x.Count.ToString("000000000")).ToList();
 
             SelectFirstLine();
 
             list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             list.EndUpdate();
 
-            LCD?.DisplayLines(LCD.SelectedTraitType, SelectedTraitValue());
+            InternalDisplayLines();
         }
+
+        private void InternalDisplayLines() => LinesList.UpdateLineSource(CurrentTraitValues.LinesFromTraitValue(SelectedTraitValue()));
 
         private void List_ColumnClick(object? sender, ColumnClickEventArgs e)
         {
@@ -168,7 +172,7 @@ namespace EventLogAnalyzer
 
                 ActiveTraitValue = SelectedTraitValue();
                 // display the new lines
-                if (list.SelectedIndices.Count > 0) { LCD?.DisplayLines(LCD.SelectedTraitType, SelectedTraitValue()); }
+                InternalDisplayLines();
             }
         }
     }

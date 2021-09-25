@@ -32,9 +32,6 @@ namespace EventLogAnalyzer
             var linesList = new LinesListView(lstLines, txtDetail, DebugProperties);
             var traitValuesList = new TraitValuesListView(lstIndex, linesList, DebugProperties);
             LCD = new GenericLogCollectionDisplay(linesList, traitValuesList);
-
-            //this appraoch should be temorary
-            traitValuesList.LCD = LCD;
         }
 
         public static string UNCPath(string path)
