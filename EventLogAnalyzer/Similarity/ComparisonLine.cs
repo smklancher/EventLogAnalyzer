@@ -22,10 +22,11 @@ namespace Similarity
 
             ComparisonString = ThingToString(ComparisonRecord);
 
-            if (string.IsNullOrEmpty(ComparisonString))
-            {
-                Debug.WriteLine($"null lstring message");
-            }
+            // should 
+            //if (string.IsNullOrEmpty(ComparisonString))
+            //{
+            //    Debug.WriteLine($"null lstring message");
+            //}
 
             Lev = new(ComparisonString);
         }

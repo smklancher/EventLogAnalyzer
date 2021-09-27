@@ -10,8 +10,6 @@ namespace EventLogAnalyzer
 {
     public class LinesListView
     {
-        private List<string> internalLog = new();
-
         public LinesListView(ListView lv, TextBox detail, PropertyGrid propertyGrid)
         {
             list = lv;
@@ -33,25 +31,21 @@ namespace EventLogAnalyzer
         }
 
         public EventCollection CurrentLines { get; private set; } = new();
-
         public PropertyGrid DebugProperties { get; }
-
         public TextBox DetailText { get; }
-
+        public List<string> InternalLog { get; set; } = new();
         public bool IsDisplayingInternalLog { get; private set; } = false;
 
         private ListView list { get; }
 
-        public void DisplayInternalLog(List<string> internalLog)
+        public void DisplayInternalLog()
         {
-            if (internalLog is null) { return; }
-            DebugProperties.SelectedObject = this.internalLog;
+            if (InternalLog is null) { return; }
 
             list.BeginUpdate();
 
             IsDisplayingInternalLog = true;
-            this.internalLog = internalLog;
-            list.VirtualListSize = this.internalLog.Count;
+            list.VirtualListSize = InternalLog.Count;
 
             SelectLineLine();
 
@@ -96,7 +90,7 @@ namespace EventLogAnalyzer
 
             if (IsDisplayingInternalLog)
             {
-                LineInfo = new string[] { string.Empty, "Debug", internalLog[e.ItemIndex] };
+                LineInfo = new string[] { string.Empty, "Debug", InternalLog[e.ItemIndex] };
             }
             else
             {
@@ -116,7 +110,7 @@ namespace EventLogAnalyzer
 
             if (IsDisplayingInternalLog)
             {
-                var line = internalLog[list.SelectedIndices[0]];
+                var line = InternalLog[list.SelectedIndices[0]];
                 DetailText.Text = line ?? string.Empty;
                 DebugProperties.SelectedObject = null;
             }

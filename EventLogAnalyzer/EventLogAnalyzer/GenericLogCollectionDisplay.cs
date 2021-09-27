@@ -10,76 +10,47 @@ namespace EventLogAnalyzer
 {
     public partial class GenericLogCollectionDisplay
     {
-        public List<string> InternalLog = new();
+        //public List<string> InternalLog = new();
         private const string InternalLogName = "InternalLog";
-        private string LastSearchText = "";
-        private EventLogCollection mLogs = new();
 
-        public GenericLogCollectionDisplay(LinesListView llv, TraitValuesListView tvlv)
+        private string LastSearchText = "";
+
+        public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid)
         {
-            Log.Logger = InternalLog.AsSeriLogger();
-            LinesList = llv;
-            TraitValuesList = tvlv;
+            ;
+            DetailText = txtDetail;
+            DebugProperties = propertyGrid;
+
+            LinesList = new LinesListView(lstLines, DetailText, DebugProperties);
+            Log.Logger = LinesList.InternalLog.AsSeriLogger();
+            TraitValuesList = new TraitValuesListView(lstIndex, LinesList, DebugProperties);
+            TraitTypesList = new TraitTypesListView(lstIndexType, TraitValuesList);
+            FileList = new FileListView(lstFiles, LinesList);
         }
 
-        public string SelectedTraitType { get; private set; } = string.Empty;
         public TimestampOptions TimestampConversion { get; } = new TimestampOptions();
 
-        private bool IsDisplayingFullFile => string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(SelectedTraitType) && mFileList.SelectedIndices.Count > 0;
+        private bool IsDisplayingFullFile => string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(TraitTypesList.SelectedTraitType()) && FileList.IsLogSelected;
 
         public void DisplayFiles()
         {
-            if (Logs is not null && FileList is not null)
-            {
-                // clear old Files
-                FileList.Items.Clear();
-
-                foreach (var Log in Logs)
-                {
-                    string[] LineInfo = new[] { Log.FileName, "EventLog", string.Empty };
-                    ListViewItem ListLine = new ListViewItem(LineInfo);
-                    FileList.Items.Add(ListLine);
-                }
-
-                FileList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-            }
+            FileList.UpdateLogFilesSource(Logs);
         }
 
         public void DisplayIndexTypes()
         {
-            IndexTypeList.Items.Clear();
-
-            var typesAndCounts = Logs.TraitTypes.TraitTypesAndCounts();
-
-            foreach (var IdxAndCount in typesAndCounts)
-            {
-                IndexTypeList.Items.Add(new ListViewItem(new string[] { IdxAndCount.Count.ToString(), IdxAndCount.TypeName }));
-            }
-
-            IndexTypeList.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
-
-            IndexTypeList.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            TraitTypesList.UpdateTraitTypesSource(Logs.TraitTypes);
         }
 
         public void DisplayInternalLog()
         {
             TraitValuesList.DisplayInternalLog();
-            LinesList.DisplayInternalLog(InternalLog);
+            LinesList.DisplayInternalLog();
         }
 
-        public void DisplayLines(string IndexType, string IndexValue)
+        public void DisplayLines()
         {
-            EventCollection newlines;
-            if (IsDisplayingFullFile)
-            {
-                // whole file
-                newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
-            }
-            else
-            {
-                // specific trait
-                newlines = Logs.TraitTypes.Lines(IndexType, IndexValue);
-            }
+            var newlines = LinesFromFileOrTraitValue();
 
             if (newlines != null)
             {
@@ -87,11 +58,9 @@ namespace EventLogAnalyzer
             }
         }
 
-        public void DisplayTraitValues(string TraitType)
+        public void DisplayTraitValues()
         {
-            SelectedTraitType = TraitType;
-
-            if (SelectedTraitType == InternalLogName)
+            if (TraitTypesList.SelectedTraitType() == InternalLogName)
             {
                 DisplayInternalLog();
             }
@@ -100,7 +69,7 @@ namespace EventLogAnalyzer
                 //var summaries = Logs.TraitTypes.TraitValueSummaries(TraitType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
                 //TraitValuesList.UpdateTraitValueSummarySource(summaries);
 
-                var values = Logs.TraitTypes.TraitValues(TraitType);
+                var values = Logs.TraitTypes.TraitValues(TraitTypesList.SelectedTraitType());
                 TraitValuesList.UpdateTraitValuesSource(values);
             }
         }
@@ -115,19 +84,7 @@ namespace EventLogAnalyzer
             else
             {
                 //...otherwise need to get content from the source
-
-                EventCollection newlines;
-                if (IsDisplayingFullFile)
-                {
-                    // whole file
-                    newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
-                }
-                else
-                {
-                    // specific trait
-                    newlines = Logs.TraitTypes.Lines(SelectedTraitType, TraitValuesList.ActiveTraitValue);
-                }
-
+                var newlines = LinesFromFileOrTraitValue();
                 newlines = newlines.FilteredCopy(searchText);
                 LinesList.UpdateLineSource(newlines);
             }
@@ -138,8 +95,8 @@ namespace EventLogAnalyzer
         {
             DisplayFiles();
             DisplayIndexTypes();
-            DisplayTraitValues(SelectedTraitType);
-            DisplayLines(SelectedTraitType, TraitValuesList.ActiveTraitValue);
+            DisplayTraitValues();
+            DisplayLines();
         }
 
         /// <summary>
@@ -183,45 +140,8 @@ namespace EventLogAnalyzer
             }
         }
 
-        private void mFileList_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (mFileList.SelectedIndices.Count < 1)
-            {
-                return;
-            }
-
-            //unset selected type and index
-            DisplayTraitValues(string.Empty);
-
-            //unset search text
-            SearchBox.Text = string.Empty;
-
-            var newlines = Logs.Logs[mFileList.SelectedIndices[0]].FilteredEvents;
-            if (newlines != null)
-            {
-                LinesList.UpdateLineSource(newlines);
-                DebugProperties.SelectedObject = Logs.Logs[mFileList.SelectedIndices[0]];
-            }
-        }
-
-        private void mIndexTypeList_SelectedIndexChanged(object? sender, EventArgs e)
-        {
-            if (IndexTypeList.SelectedItems.Count < 1)
-            {
-                return;
-            }
-
-            string IndexType = IndexTypeList.SelectedItems[0].SubItems[1].Text;
-
-            //unset search text
-            SearchBox.Text = string.Empty;
-
-            // selected index is no longer valid for the new type
-            SelectedTraitType = "";
-
-            // display the new indicies
-            DisplayTraitValues(IndexType);
-        }
+        private EventCollection LinesFromFileOrTraitValue() =>
+            IsDisplayingFullFile ? FileList.SelectedLogEvents : Logs.TraitTypes.Lines(TraitTypesList.SelectedTraitType(), TraitValuesList.ActiveTraitValue);
 
         private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {

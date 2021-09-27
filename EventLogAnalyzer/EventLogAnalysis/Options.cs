@@ -34,6 +34,10 @@ namespace EventLogAnalysis
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
 
+        [Description("Just combine event properties instead of requesting formated event message")]
+        [Category(TestingCategory)]
+        public bool SkipFormattedMessage { get; set; } = false;
+
         [Category(TimestampCategory)]
         public OffsetOption TimestampConversion { get; set; } = OffsetOption.ConvertToLocal;
 

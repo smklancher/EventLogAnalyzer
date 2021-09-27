@@ -41,6 +41,8 @@ namespace EventLogAnalysis
 
         //private bool mNeedsSort = true;
 
+        private object sortLock = new object();
+
         public int Count
         {
             get
@@ -84,15 +86,21 @@ namespace EventLogAnalysis
             {
                 if (mListIsDirty)
                 {
-                    mListIsDirty = false;
-                    mList = mDictionary.Values.ToList();
-                    mList.Sort();
-
-                    // If it has been locked then clear the dictionary
-                    if (IsLocked & mDictionary != null)
+                    lock (sortLock)
                     {
-                        mDictionary.Clear();
-                        mDictionary = null;
+                        if (mListIsDirty)
+                        {
+                            mList = mDictionary.Values.ToList();
+                            mList.Sort();
+                            mListIsDirty = false;
+
+                            // If it has been locked then clear the dictionary
+                            if (IsLocked & mDictionary != null)
+                            {
+                                mDictionary.Clear();
+                                mDictionary = null;
+                            }
+                        }
                     }
                 }
 

@@ -11,9 +11,8 @@ namespace EventLogAnalyzer
     public partial class GenericLogCollectionDisplay
     {
         private PropertyGrid mDebugProperties = new();
-        private ListView mFileList = new();
-        private ListView mIndexTypeList = new();
         private ToolStripProgressBar mProgressBar = new();
+
         private TextBox mSearchBox = new();
         private ToolStripStatusLabel mStatusBar = new();
         private Timer? mTypingTimer;
@@ -31,79 +30,12 @@ namespace EventLogAnalyzer
             }
         }
 
-        public TextBox DetailText { get; set; } = new();
+        public TextBox DetailText { get; private set; } = new();
 
-        public ListView FileList
-        {
-            set
-            {
-                if (mFileList is not null)
-                {
-                    mFileList.SelectedIndexChanged -= mFileList_SelectedIndexChanged;
-                }
+        public FileListView FileList { get; private set; }
 
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("Filename");
-                value.Columns.Add("Type");
-                mFileList = value;
-
-                mFileList.SelectedIndexChanged += mFileList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mFileList;
-            }
-        }
-
-        public ListView IndexTypeList
-        {
-            set
-            {
-                if (mIndexTypeList is not null)
-                {
-                    mIndexTypeList.SelectedIndexChanged -= mIndexTypeList_SelectedIndexChanged;
-                }
-                value.View = View.Details;
-                value.FullRowSelect = true;
-                value.Columns.Add("#");
-                value.Columns.Add("Trait Type");
-                mIndexTypeList = value;
-                IndexTypeList.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
-
-                mIndexTypeList.SelectedIndexChanged += mIndexTypeList_SelectedIndexChanged;
-            }
-            get
-            {
-                return mIndexTypeList;
-            }
-        }
-
-        public LinesListView LinesList { get; set; }
-
-        public EventLogCollection Logs
-        {
-            get
-            {
-                if (mLogs == null)
-                {
-                    mLogs = new EventLogCollection();
-                }
-
-                return mLogs;
-            }
-            set
-            {
-                if (mLogs is not null)
-                {
-                    //mLogs.LogsFinishedLoading -= mLogs_LogsFinishedLoading;
-                }
-
-                mLogs = value;
-
-                // mLogs.LogsFinishedLoading += mLogs_LogsFinishedLoading;
-            }
-        }
+        public LinesListView LinesList { get; private set; }
+        public EventLogCollection Logs { get; private set; } = new();
 
         public ToolStripProgressBar ProgressBar
         {
@@ -147,6 +79,7 @@ namespace EventLogAnalyzer
             }
         }
 
-        public TraitValuesListView TraitValuesList { get; set; }
+        public TraitTypesListView TraitTypesList { get; private set; }
+        public TraitValuesListView TraitValuesList { get; private set; }
     }
 }

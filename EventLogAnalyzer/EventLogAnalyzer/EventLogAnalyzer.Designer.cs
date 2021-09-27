@@ -33,8 +33,8 @@ namespace EventLogAnalyzer
         {
             this.components = new System.ComponentModel.Container();
             this.Timer1 = new System.Windows.Forms.Timer(this.components);
-            this.lstIndexType = new System.Windows.Forms.ListView();
-            this.lstIndex = new System.Windows.Forms.ListView();
+            this.lstTraitTypes = new System.Windows.Forms.ListView();
+            this.lstTraitValues = new System.Windows.Forms.ListView();
             this.lstLines = new System.Windows.Forms.ListView();
             this.SplitFilesAndRest = new System.Windows.Forms.SplitContainer();
             this.lstFiles = new System.Windows.Forms.ListView();
@@ -95,27 +95,27 @@ namespace EventLogAnalyzer
             // 
             // lstIndexType
             // 
-            this.lstIndexType.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstIndexType.HideSelection = false;
-            this.lstIndexType.Location = new System.Drawing.Point(0, 0);
-            this.lstIndexType.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lstIndexType.Name = "lstIndexType";
-            this.lstIndexType.Size = new System.Drawing.Size(248, 121);
-            this.lstIndexType.TabIndex = 4;
-            this.lstIndexType.UseCompatibleStateImageBehavior = false;
-            this.lstIndexType.View = System.Windows.Forms.View.List;
+            this.lstTraitTypes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstTraitTypes.HideSelection = false;
+            this.lstTraitTypes.Location = new System.Drawing.Point(0, 0);
+            this.lstTraitTypes.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.lstTraitTypes.Name = "lstIndexType";
+            this.lstTraitTypes.Size = new System.Drawing.Size(248, 121);
+            this.lstTraitTypes.TabIndex = 4;
+            this.lstTraitTypes.UseCompatibleStateImageBehavior = false;
+            this.lstTraitTypes.View = System.Windows.Forms.View.List;
             // 
             // lstIndex
             // 
-            this.lstIndex.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstIndex.HideSelection = false;
-            this.lstIndex.Location = new System.Drawing.Point(0, 0);
-            this.lstIndex.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lstIndex.Name = "lstIndex";
-            this.lstIndex.Size = new System.Drawing.Size(248, 320);
-            this.lstIndex.TabIndex = 5;
-            this.lstIndex.UseCompatibleStateImageBehavior = false;
-            this.lstIndex.View = System.Windows.Forms.View.Details;
+            this.lstTraitValues.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lstTraitValues.HideSelection = false;
+            this.lstTraitValues.Location = new System.Drawing.Point(0, 0);
+            this.lstTraitValues.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
+            this.lstTraitValues.Name = "lstIndex";
+            this.lstTraitValues.Size = new System.Drawing.Size(248, 320);
+            this.lstTraitValues.TabIndex = 5;
+            this.lstTraitValues.UseCompatibleStateImageBehavior = false;
+            this.lstTraitValues.View = System.Windows.Forms.View.Details;
             // 
             // lstLines
             // 
@@ -191,11 +191,11 @@ namespace EventLogAnalyzer
             // 
             // SplitIndexTypesAndIndexValues.Panel1
             // 
-            this.SplitIndexTypesAndIndexValues.Panel1.Controls.Add(this.lstIndexType);
+            this.SplitIndexTypesAndIndexValues.Panel1.Controls.Add(this.lstTraitTypes);
             // 
             // SplitIndexTypesAndIndexValues.Panel2
             // 
-            this.SplitIndexTypesAndIndexValues.Panel2.Controls.Add(this.lstIndex);
+            this.SplitIndexTypesAndIndexValues.Panel2.Controls.Add(this.lstTraitValues);
             this.SplitIndexTypesAndIndexValues.Size = new System.Drawing.Size(248, 446);
             this.SplitIndexTypesAndIndexValues.SplitterDistance = 121;
             this.SplitIndexTypesAndIndexValues.SplitterWidth = 5;
@@ -485,8 +485,8 @@ namespace EventLogAnalyzer
 
         }
         internal System.Windows.Forms.Timer Timer1;
-        internal System.Windows.Forms.ListView lstIndexType;
-        internal System.Windows.Forms.ListView lstIndex;
+        internal System.Windows.Forms.ListView lstTraitTypes;
+        internal System.Windows.Forms.ListView lstTraitValues;
         internal System.Windows.Forms.ListView lstLines;
         internal System.Windows.Forms.SplitContainer SplitFilesAndRest;
         internal System.Windows.Forms.ListView lstFiles;

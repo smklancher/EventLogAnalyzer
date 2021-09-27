@@ -20,7 +20,6 @@ namespace EventLogAnalyzer
         private CancellationTokenSource cts = new();
 
         private GenericLogCollectionDisplay LCD;
-        private EventLogCollection Logs = new();
         private Progress<ProgressUpdate> progressHandler;
 
         public EventLogAnalyzer()
@@ -29,9 +28,7 @@ namespace EventLogAnalyzer
 
             progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
 
-            var linesList = new LinesListView(lstLines, txtDetail, DebugProperties);
-            var traitValuesList = new TraitValuesListView(lstIndex, linesList, DebugProperties);
-            LCD = new GenericLogCollectionDisplay(linesList, traitValuesList);
+            LCD = new GenericLogCollectionDisplay(lstLines, lstTraitValues, lstTraitTypes, lstFiles, txtDetail, DebugProperties);
         }
 
         public static string UNCPath(string path)
@@ -60,7 +57,7 @@ namespace EventLogAnalyzer
 
                 foreach (string File in MyFiles)
                 {
-                    Logs.AddByFile(File);
+                    LCD.Logs.AddByFile(File);
                 }
 
                 LCD.DisplayFiles();
@@ -87,14 +84,9 @@ namespace EventLogAnalyzer
 
             // enable memory/cpu status
             AppDomain.MonitoringIsEnabled = true;
-            LCD.IndexTypeList = lstIndexType;
-            LCD.FileList = lstFiles;
-            LCD.DetailText = txtDetail;
             LCD.SearchBox = MessageSearchTextBox;
-            LCD.DebugProperties = DebugProperties;
             LCD.ProgressBar = ToolStripProgressBar1;
             LCD.StatusBar = ToolStripStatusLabel1;
-            LCD.Logs = Logs;
 
             //LCD.DisplayInternalLog();
         }
@@ -104,7 +96,7 @@ namespace EventLogAnalyzer
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
-                Logs.AddByFile(UNCPath(args[1]));
+                LCD.Logs.AddByFile(UNCPath(args[1]));
                 LCD.DisplayFiles();
                 await LoadAndAnalyzeAsync();
             }
@@ -113,10 +105,10 @@ namespace EventLogAnalyzer
         private async Task LoadAndAnalyzeAsync()
         {
             LCD.StartProgressBar();
-            await Task.Run(() => Logs.LoadMessages(cts.Token, progressHandler));
+            await Task.Run(() => LCD.Logs.LoadMessages(cts.Token, progressHandler));
             LCD.Refresh();
 
-            await Task.Run(() => Logs.AnalyzeLogs(cts.Token, progressHandler));
+            await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, progressHandler));
             LCD.StopProgressBar();
             LCD.Refresh();
         }

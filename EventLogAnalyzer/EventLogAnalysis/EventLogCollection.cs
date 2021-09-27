@@ -102,6 +102,7 @@ namespace EventLogAnalysis
         public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
+            Parallel.ForEach(Logs, x => x.InitialLoad());
             Parallel.ForEach(Logs, x => x.LoadMessages(cancelToken, progress));
             Log.Information($"Finished loading messages of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
 

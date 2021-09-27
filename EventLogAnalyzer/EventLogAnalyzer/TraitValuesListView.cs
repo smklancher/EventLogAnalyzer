@@ -58,6 +58,8 @@ namespace EventLogAnalyzer
             list.VirtualListSize = 0;
             list.Invalidate();
             list.EndUpdate();
+
+            LinesList.DisplayInternalLog();
         }
 
         public string SelectedTraitValue()

@@ -5,6 +5,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Serilog;
 using Similarity;
 using UtilityCommon;
@@ -20,18 +21,9 @@ namespace EventLogAnalysis
             fileInfo = new FileInfo(FileName);
             MtaFilePath = GetMtaFilePath(fileInfo);
 
-            RenameMtaFileIfPossible(false);
-            var eq = new EventLogQuery(FileName, PathType.FilePath);
-            LoadEvents(eq);
-            TotalEventCount = AllEvents.Count;
-
-            UpdateProvidersFromEvents(AllProviders, AllEvents);
-            FilteredProviders = new(AllProviders);
-
-            // remove in future
-            CreateLogBasedTraitProducers();
-
-            RenameMtaFileIfPossible(true);
+            ProvidersNotToFormat.Add("KofaxTransformationServerService");
+            ProvidersNotToFormat.Add("TotalAgility");
+            ProvidersNotToFormat.Add("Total Agility");
         }
 
         public EventCollection AllEvents { get; private set; } = new();
@@ -50,6 +42,7 @@ namespace EventLogAnalysis
 
         public Guid LogGuid { get; }
 
+        public List<string> ProvidersNotToFormat { get; private set; } = new();
         public WorkingSetGroup<ELRecord>? SimilarityGroups { get; private set; }
 
         public long TotalEventCount { get; private set; }
@@ -64,14 +57,41 @@ namespace EventLogAnalysis
 
         private string MtaFilePath { get; }
 
-        ///// <summary>
-        ///// Add all lines into groups for that event type
-        ///// </summary>
-        ///// <param name="log"></param>
-        ///// <returns></returns>
-        //public static Dictionary<ProviderEventIdPair, EventIdGroup> CreateEventIdGroups(ELog log)
-        //{
-        //    using var dt = new DisposableTrace();
+        public void CreateLogBasedTraitProducers()
+        {
+            // do this via plugin or whatever in the future
+            TraitProducers.Add(new LogBasedTraitProducer());
+        }
+
+        //        groups[line.GroupKey].Records.Add(line);
+        //    }
+        //    return groups;
+        //}
+        public void Filter(string xpath)
+        {
+            var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
+            LoadEvents(eq);
+            UpdateProvidersFromEvents(FilteredProviders, FilteredEvents);
+        }
+
+        public void InitialLoad()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            RenameMtaFileIfPossible(false);
+            var eq = new EventLogQuery(FileName, PathType.FilePath);
+            //SaveCopy(eq);
+            LoadEvents(eq);
+            TotalEventCount = AllEvents.Count;
+
+            UpdateProvidersFromEvents(AllProviders, AllEvents);
+            FilteredProviders = new(AllProviders);
+
+            // remove in future
+            CreateLogBasedTraitProducers();
+
+            RenameMtaFileIfPossible(true);
+            Log.Information($"Finished loading events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
+        }
 
         //    Dictionary<ProviderEventIdPair, EventIdGroup> groups = new();
         //    foreach (var line in log.FilteredEvents)
@@ -82,28 +102,11 @@ namespace EventLogAnalysis
         //            var group = new EventIdGroup(line.GroupKey);
         //            groups.Add(group.GroupKey, group);
         //        }
-
-        //        groups[line.GroupKey].Records.Add(line);
-        //    }
-        //    return groups;
-        //}
-
-        public void CreateLogBasedTraitProducers()
-        {
-            // do this via plugin or whatever in the future
-            TraitProducers.Add(new LogBasedTraitProducer());
-        }
-
-        public void Filter(string xpath)
-        {
-            var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
-            LoadEvents(eq);
-            UpdateProvidersFromEvents(FilteredProviders, FilteredEvents);
-        }
-
         public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
+
+            if (TotalEventCount == 0) { InitialLoad(); }
 
             RenameMtaFileIfPossible(false);
 
@@ -123,6 +126,9 @@ namespace EventLogAnalysis
                 e.GetMessage();
             }
 
+            // Parallel message loading does not help... must be a lock in the whole log when getting a message.
+            //Parallel.ForEach(FilteredEvents, e => e.GetMessage());
+
             Log.Information($"Finished loading messages of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
             progress.Report(new ProgressUpdate(true, string.Empty));
 
@@ -130,6 +136,14 @@ namespace EventLogAnalysis
             RenameMtaFileIfPossible(true);
         }
 
+        ///// <summary>
+        ///// Add all lines into groups for that event type
+        ///// </summary>
+        ///// <param name="log"></param>
+        ///// <returns></returns>
+        //public static Dictionary<ProviderEventIdPair, EventIdGroup> CreateEventIdGroups(ELog log)
+        //{
+        //    using var dt = new DisposableTrace();
         public void LoadTraits(CancellationToken cancelToken)
         {
             Traits = new();
@@ -141,6 +155,13 @@ namespace EventLogAnalysis
                 FilteredEvents,
                 Options.Instance.SimilarityOptions.LinesPerSimilarityGroupChunk,
                 x => string.IsNullOrWhiteSpace(x.ShortMessage) ? x.Message : x.ShortMessage);
+        }
+
+        private string GetMtaFilePath(FileInfo evtx)
+        {
+            string folder = Path.Join(evtx.DirectoryName!, "LocaleMetaData");
+            string filename = Path.GetFileNameWithoutExtension(evtx.Name) + "_1033.MTA";
+            return Path.Join(folder, filename);
         }
 
         ///// <summary>
@@ -156,14 +177,6 @@ namespace EventLogAnalysis
         //        g.GroupSimilarLines();
         //    }
         //}
-
-        private string GetMtaFilePath(FileInfo evtx)
-        {
-            string folder = Path.Join(evtx.DirectoryName!, "LocaleMetaData");
-            string filename = Path.GetFileNameWithoutExtension(evtx.Name) + "_1033.MTA";
-            return Path.Join(folder, filename);
-        }
-
         private void LoadComplexTraits(CancellationToken cancelToken)
         {
         }
@@ -236,6 +249,15 @@ namespace EventLogAnalysis
                     RenameIfPossible(MtaFilePath, $"{MtaFilePath}.tmp");
                 }
             }
+        }
+
+        private void SaveCopy(EventLogQuery eq)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var newFile = $"{FileName}-tmp.evtx";
+
+            eq.Session.ExportLogAndMessages(FileName, PathType.FilePath, "", newFile);
+            Log.Information($"Finished saving events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {newFile}");
         }
 
         private void UpdateProvidersFromEvents(Dictionary<string, int> providers, EventCollection events)
