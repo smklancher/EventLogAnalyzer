@@ -9,11 +9,6 @@ namespace EventLogAnalysis
 {
     public class LineBasedTraitProducer
     {
-        // language=regex
-        private const string msgregex = "Timestamp:(?<timestamp>.+)Message:(?<message>.+)Category:(?<category>.+)Priority:(?<priority>.+)EventId:(?<eventid>.+)" +
-            "Severity:(?<severity>.+)Title:(?<title>.+)Machine:(?<machine>.+)App Domain:(?<appdomain>.+)ProcessId:(?<processid>.+)Process Name:(?<processname>.+)Thread Name:(?<threadname>.+)" +
-            "Win32 ThreadId:(?<threadid>.+)Extended Properties:(?<extentedproperties>.+)";
-
         public void AddTraitsFromLine(TraitTypeCollection traits, ELRecord r)
         {
             traits.AddLine("Provider", r.ProviderName, r);
@@ -25,11 +20,24 @@ namespace EventLogAnalysis
             if (r.Message.Contains("App Domain:"))
             {
                 var ellt = new EnterpriseLibraryLogText(r.Message);
-                r.ShortMessage = ellt.OuterException;
+
+                // for short message use inner exception or StackTraceTopFrame if available, preferring StackTraceTopFrame
 
                 if (!string.IsNullOrWhiteSpace(ellt.InnerException))
                 {
+                    r.ShortMessage = ellt.InnerException;
                     traits.AddLine("Inner Exception", ellt.InnerException, r);
+                }
+
+                if (!string.IsNullOrWhiteSpace(ellt.StackTraceTopFrame))
+                {
+                    r.ShortMessage = ellt.StackTraceTopFrame;
+                    traits.AddLine("StackTraceTopFrame", ellt.StackTraceTopFrame, r);
+                }
+
+                if (!string.IsNullOrWhiteSpace(ellt.StackTraceBottomFrame))
+                {
+                    traits.AddLine("StackTraceBottomFrame", ellt.StackTraceBottomFrame, r);
                 }
             }
 

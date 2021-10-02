@@ -15,6 +15,9 @@ namespace EventLogAnalysis
             "Win32 ThreadId:(?<threadid>.+)Extended Properties:(?<extentedproperties>.+)";
 
         // language=regex
+        private const string stackTraceRegex = @"((?=^|:)\s*\bat(?<line>.+?)\n)+";
+
+        // language=regex
         private const string submsgregex = @"\WMessage\s*:(?<msg>.+?)Source\s*:";
 
         // parse messages written with this formatter:
@@ -41,6 +44,10 @@ namespace EventLogAnalysis
         public string ProcessId { get; private set; } = string.Empty;
         public string ProcessName { get; private set; } = string.Empty;
 
+        public string StackTrace { get; private set; } = string.Empty;
+        public string StackTraceBottomFrame { get; private set; } = string.Empty;
+        public string StackTraceTopFrame { get; private set; } = string.Empty;
+
         public void ParseMessage()
         {
             // outer message
@@ -59,6 +66,14 @@ namespace EventLogAnalysis
                     var msg = ContentMatch.Groups["msg"].Value.Trim();
                     ExceptionMessages.Add(msg);
                     ContentMatch = ContentMatch.NextMatch();
+                }
+
+                ContentMatch = Regex.Match(Message, stackTraceRegex, RegexOptions.Multiline);
+                if (ContentMatch.Success)
+                {
+                    StackTraceTopFrame = ContentMatch.Groups["line"].Captures.FirstOrDefault()?.Value.Trim() ?? string.Empty;
+                    StackTraceBottomFrame = ContentMatch.Groups["line"].Captures.LastOrDefault()?.Value.Trim() ?? string.Empty;
+                    StackTrace = ContentMatch.Value.Trim();
                 }
             }
         }
