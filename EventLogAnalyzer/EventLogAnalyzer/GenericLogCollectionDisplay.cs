@@ -140,7 +140,7 @@ namespace EventLogAnalyzer
             }
         }
 
-        private EventCollection LinesFromFileOrTraitValue() =>
+        private ILogEntryCollection<LogEntry> LinesFromFileOrTraitValue() =>
             IsDisplayingFullFile ? FileList.SelectedLogEvents : Logs.TraitTypes.Lines(TraitTypesList.SelectedTraitType(), TraitValuesList.ActiveTraitValue);
 
         private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
@@ -151,7 +151,7 @@ namespace EventLogAnalyzer
             //if (Logs.PreviousLinesLoaded > 0)
             //    SetStatus("Lines loaded: " + Logs.LinesLoaded - Logs.PreviousLinesLoaded + " (" + Logs.LinesLoaded + " total)");
             //else
-            SetStatus($"Total events loaded: {Logs.TotalEventCount}.  Current filter events: {Logs.FilteredEventCount}");
+            //SetStatus($"Total events loaded: {Logs.TotalEventCount}.  Current filter events: {Logs.FilteredEventCount}");
         }
 
         private void mSearchBox_TextChanged(object? sender, EventArgs e)

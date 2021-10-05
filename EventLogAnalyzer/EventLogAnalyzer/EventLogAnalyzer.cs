@@ -57,7 +57,7 @@ namespace EventLogAnalyzer
 
                 foreach (string File in MyFiles)
                 {
-                    LCD.Logs.AddByFile(File);
+                    LCD.Logs.AddEventLogByFile(File);
                 }
 
                 LCD.DisplayFiles();
@@ -96,7 +96,7 @@ namespace EventLogAnalyzer
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
-                LCD.Logs.AddByFile(UNCPath(args[1]));
+                LCD.Logs.AddEventLogByFile(UNCPath(args[1]));
                 LCD.DisplayFiles();
                 await LoadAndAnalyzeAsync();
             }

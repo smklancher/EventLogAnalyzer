@@ -12,12 +12,13 @@ using UtilityCommon;
 
 namespace EventLogAnalysis
 {
-    public class ELog
+    public class ELog : LogBase<ELRecord>
     {
+        private LogEntryCollection<ELRecord> filteredEvents = new();
+
         public ELog(string filename)
         {
-            FileName = filename;
-            LogGuid = new();
+            SourceName = filename;
             fileInfo = new FileInfo(FileName);
             MtaFilePath = GetMtaFilePath(fileInfo);
 
@@ -26,33 +27,17 @@ namespace EventLogAnalysis
             ProvidersNotToFormat.Add("Total Agility");
         }
 
-        public EventCollection AllEvents { get; private set; } = new();
-
         public Dictionary<string, int> AllProviders { get; private set; } = new();
-
-        public int EventsWithMessagesLoaded => AllEvents.Where(x => x.MessageIsLoaded).Count();
-
-        public string FileName { get; init; }
-
+        public override LogEntryCollection<ELRecord> EntryCollection => filteredEvents;
+        public int EventsWithMessagesLoaded => UnfilteredEvents.Lines.Where(x => x.MessageIsLoaded).Count();
+        public string FileName => SourceName;
         public long FilteredEventCount => currentFilterEventIndexes.Count;
-
-        public EventCollection FilteredEvents { get; private set; } = new();
-
         public Dictionary<string, int> FilteredProviders { get; private set; } = new();
-
-        public Guid LogGuid { get; }
-
         public List<string> ProvidersNotToFormat { get; private set; } = new();
-        public WorkingSetGroup<ELRecord>? SimilarityGroups { get; private set; }
-
         public long TotalEventCount { get; private set; }
-
         public List<LogBasedTraitProducer> TraitProducers { get; } = new();
-
-        public TraitTypeCollection Traits { get; private set; } = new();
-
+        public LogEntryCollection<ELRecord> UnfilteredEvents { get; private set; } = new();
         private List<long> currentFilterEventIndexes { get; set; } = new();
-
         private FileInfo fileInfo { get; init; }
 
         private string MtaFilePath { get; }
@@ -63,27 +48,23 @@ namespace EventLogAnalysis
             TraitProducers.Add(new LogBasedTraitProducer());
         }
 
-        //        groups[line.GroupKey].Records.Add(line);
-        //    }
-        //    return groups;
-        //}
         public void Filter(string xpath)
         {
             var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
             LoadEvents(eq);
-            UpdateProvidersFromEvents(FilteredProviders, FilteredEvents);
+            UpdateProvidersFromEvents(FilteredProviders, EntryCollection);
         }
 
-        public void InitialLoad()
+        public override void InitialLoad()
         {
             var stopwatch = Stopwatch.StartNew();
             RenameMtaFileIfPossible(false);
             var eq = new EventLogQuery(FileName, PathType.FilePath);
             //SaveCopy(eq);
             LoadEvents(eq);
-            TotalEventCount = AllEvents.Count;
+            TotalEventCount = UnfilteredEvents.Lines.Count();
 
-            UpdateProvidersFromEvents(AllProviders, AllEvents);
+            UpdateProvidersFromEvents(AllProviders, UnfilteredEvents);
             FilteredProviders = new(AllProviders);
 
             // remove in future
@@ -93,16 +74,7 @@ namespace EventLogAnalysis
             Log.Information($"Finished loading events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
         }
 
-        //    Dictionary<ProviderEventIdPair, EventIdGroup> groups = new();
-        //    foreach (var line in log.FilteredEvents)
-        //    {
-        //        if (!groups.ContainsKey(line.GroupKey))
-        //        {
-        //            // first of this kind of event, so create a new line group
-        //            var group = new EventIdGroup(line.GroupKey);
-        //            groups.Add(group.GroupKey, group);
-        //        }
-        public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
+        public override void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
 
@@ -114,8 +86,8 @@ namespace EventLogAnalysis
             var OriginalCulture = Thread.CurrentThread.CurrentCulture;
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-            using var dt = new DisposableTrace(Label: $"{AllEvents.Count} messages from {fileInfo.Name}");
-            foreach (var e in FilteredEvents)
+            using var dt = new DisposableTrace(Label: $"{UnfilteredEvents.Lines.Count()} messages from {fileInfo.Name}");
+            foreach (var e in EntryCollection.Lines)
             {
                 if (cancelToken.IsCancellationRequested)
                 {
@@ -136,25 +108,11 @@ namespace EventLogAnalysis
             RenameMtaFileIfPossible(true);
         }
 
-        ///// <summary>
-        ///// Add all lines into groups for that event type
-        ///// </summary>
-        ///// <param name="log"></param>
-        ///// <returns></returns>
-        //public static Dictionary<ProviderEventIdPair, EventIdGroup> CreateEventIdGroups(ELog log)
-        //{
-        //    using var dt = new DisposableTrace();
-        public void LoadTraits(CancellationToken cancelToken)
+        public override void LoadTraits(CancellationToken cancelToken)
         {
             Traits = new();
 
             LoadTraitsPerLine();
-
-            // create index for similar lines, ideally standardize index approach
-            SimilarityGroups = Processing.Process(
-                FilteredEvents,
-                Options.Instance.SimilarityOptions.LinesPerSimilarityGroupChunk,
-                x => string.IsNullOrWhiteSpace(x.ShortMessage) ? x.Message : x.ShortMessage);
         }
 
         private string GetMtaFilePath(FileInfo evtx)
@@ -164,19 +122,6 @@ namespace EventLogAnalysis
             return Path.Join(folder, filename);
         }
 
-        ///// <summary>
-        ///// Need to change to parallel with cancelation
-        ///// Groups similar lines within the EventIdGroups
-        ///// </summary>
-        ///// <param name="LineGroupings"></param>
-        //private static void GroupSimilarLines(Dictionary<ProviderEventIdPair, EventIdGroup> LineGroupings)
-        //{
-        //    using var dt = new DisposableTrace();
-        //    foreach (var g in LineGroupings.Values)
-        //    {
-        //        g.GroupSimilarLines();
-        //    }
-        //}
         private void LoadComplexTraits(CancellationToken cancelToken)
         {
         }
@@ -190,7 +135,7 @@ namespace EventLogAnalysis
             using var dt = new DisposableTrace($"Loading events from {fileInfo.Name}");
 
             currentFilterEventIndexes.Clear();
-            FilteredEvents.Clear();
+            EntryCollection.Clear();
 
             using (EventLogReader reader = new EventLogReader(query))
             {
@@ -200,10 +145,10 @@ namespace EventLogAnalysis
                     var elr = new ELRecord(ev, this);
 
                     // after initial load these are ignored
-                    AllEvents.Add(elr);
+                    UnfilteredEvents.Add(elr);
 
                     // filtered events are cleared at start of each load events
-                    FilteredEvents.Add(elr);
+                    EntryCollection.Add(elr);
 
                     currentFilterEventIndexes.Add(elr.RecordId);
                 }
@@ -216,7 +161,7 @@ namespace EventLogAnalysis
             List<LineBasedTraitProducer> producers = new();
             producers.Add(new LineBasedTraitProducer());
 
-            foreach (var r in FilteredEvents)
+            foreach (var r in EntryCollection.Lines)
             {
                 foreach (var p in producers)
                 {
@@ -251,18 +196,18 @@ namespace EventLogAnalysis
             }
         }
 
-        private void SaveCopy(EventLogQuery eq)
-        {
-            var stopwatch = Stopwatch.StartNew();
-            var newFile = $"{FileName}-tmp.evtx";
+        //private void SaveCopy(EventLogQuery eq)
+        //{
+        //    var stopwatch = Stopwatch.StartNew();
+        //    var newFile = $"{FileName}-tmp.evtx";
 
-            eq.Session.ExportLogAndMessages(FileName, PathType.FilePath, "", newFile);
-            Log.Information($"Finished saving events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {newFile}");
-        }
+        //    eq.Session.ExportLogAndMessages(FileName, PathType.FilePath, "", newFile);
+        //    Log.Information($"Finished saving events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {newFile}");
+        //}
 
-        private void UpdateProvidersFromEvents(Dictionary<string, int> providers, EventCollection events)
+        private void UpdateProvidersFromEvents(Dictionary<string, int> providers, LogEntryCollection<ELRecord> events)
         {
-            foreach (var r in events)
+            foreach (var r in events.Entries)
             {
                 if (!providers.TryAdd(r.Record.ProviderName, 1))
                 {

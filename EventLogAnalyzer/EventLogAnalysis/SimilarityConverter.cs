@@ -11,7 +11,7 @@ namespace EventLogAnalysis
     {
         public const string SimilarLinesString = "SimilarLines";
 
-        public static SingleTraitValueEventCollection FromSimilarLineGroupToSingleTraitValue(Similarity.SimilarLineGroup<ELRecord> similarLineGroup)
+        public static SingleTraitValueEventCollection FromSimilarLineGroupToSingleTraitValue(Similarity.SimilarLineGroup<LogEntry> similarLineGroup)
         {
             var stv = new SingleTraitValueEventCollection
             {
@@ -27,7 +27,7 @@ namespace EventLogAnalysis
             return stv;
         }
 
-        public static TraitValuesCollection FromWorkingSetGroupToTraitValuesCollection(Similarity.WorkingSetGroup<ELRecord> workingSetGroup)
+        public static TraitValuesCollection FromWorkingSetGroupToTraitValuesCollection(Similarity.WorkingSetGroup<LogEntry> workingSetGroup)
         {
             var tvc = new TraitValuesCollection(SimilarLinesString);
 

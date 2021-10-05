@@ -52,7 +52,7 @@ namespace EventLogAnalysis
             LineCollections.Add(col.TraitValue, col);
         }
 
-        public void AddLine(string TraitValue, ELRecord Line)
+        public void AddLine(string TraitValue, LogEntry Line)
         {
             var existsInCollection = LineCollections.TryGetValue(TraitValue, out var lc);
             lc ??= new SingleTraitValueEventCollection()
@@ -85,7 +85,7 @@ namespace EventLogAnalysis
         /// <param name="IndexValue"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public EventCollection LinesFromTraitValue(string TraitValue)
+        public LogEntryCollection<LogEntry> LinesFromTraitValue(string TraitValue)
         {
             LineCollections.TryGetValue(TraitValue, out var lc);
             return lc ?? new();
@@ -99,7 +99,8 @@ namespace EventLogAnalysis
         {
             foreach (var lc in LineCollections.Values)
             {
-                lc.Lock();
+                //is this needed??
+                //lc.Lines.Lock();
             }
         }
 
@@ -127,7 +128,7 @@ namespace EventLogAnalysis
         /// <remarks></remarks>
         public List<TraitValueSummaryLine> ValuesCounts()
         {
-            return this.Select(x => new TraitValueSummaryLine(x.Key, x.Value.Count, x.Value.FirstEvent, x.Value.LastEvent)).ToList();
+            return this.Select(x => new TraitValueSummaryLine(x.Key, x.Value.Lines.Count(), x.Value.FirstEvent, x.Value.LastEvent)).ToList();
         }
 
         public record TraitValueSummaryLine(string TraitValue, long Count, DateTime? First, DateTime? Last)

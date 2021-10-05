@@ -8,7 +8,7 @@ using Serilog;
 
 namespace EventLogAnalysis
 {
-    public class ELRecord : IComparable<ELRecord>, IEquatable<ELRecord>
+    public class ELRecord : LogEntry
     {
         public ELRecord(EventRecord eventRecord, ELog log)
         {
@@ -16,6 +16,7 @@ namespace EventLogAnalysis
             ParentLog = log;
 
             GroupKey = new ProviderEventIdPair(Record.ProviderName, Record.Id);
+            Timestamp = Record.TimeCreated;
 
             // not sure what conditions under which it can be null, need to run into it to find out
             RecordId = (long)Record.RecordId!;
@@ -30,15 +31,8 @@ namespace EventLogAnalysis
         public StandardEventLevel EventLevel { get; }
         public ProviderEventIdPair GroupKey { get; init; }
         public double GroupSimilarity { get; set; }
-        public string Level { get; }
         public string LogFileName => ParentLog.FileName;
 
-        /// <summary>
-        /// Message or empty string if not loaded
-        /// </summary>
-        public string Message { get; private set; } = string.Empty;
-
-        public long MessageCharacterCount => Message.Length;
         public bool MessageIsLoaded { get; private set; }
         public Exception? MessageLoadExeption { get; private set; }
         public ELog ParentLog { get; }
@@ -48,27 +42,6 @@ namespace EventLogAnalysis
         public EventRecord Record { get; init; }
 
         public long RecordId { get; private set; }
-        public string ShortMessage { get; set; } = string.Empty;
-        public DateTime? Timestamp => Record.TimeCreated;
-        public string UniqueId { get; }
-
-        public int CompareTo(ELRecord? other)
-        {
-            return (Timestamp ?? DateTime.MaxValue).CompareTo(other?.Timestamp ?? DateTime.MaxValue);
-        }
-
-        public bool Equals(ELRecord? other)
-        {
-            if (other is null) { return false; }
-            if (object.ReferenceEquals(this, other)) { return true; }
-
-            return UniqueId == other.UniqueId;
-        }
-
-        public override int GetHashCode()
-        {
-            return UniqueId.GetHashCode();
-        }
 
         public string GetMessage()
         {

@@ -12,7 +12,7 @@ using UtilityCommon;
 
 namespace EventLogAnalysis
 {
-    public class EventLogCollection : List<ELog>
+    public class EventLogCollection : List<ILogBase<LogEntry>>
     {
         //convert evt to evtx: wevtutil epl application.evt application.evtx /lf:true
 
@@ -20,23 +20,17 @@ namespace EventLogAnalysis
 
         public delegate void LogsFinishedLoadingEventHandler(object sender, RunWorkerCompletedEventArgs e);
 
-        public long FilteredEventCount => Logs.Sum(x => x.FilteredEventCount);
+        //public long FilteredEventCount => Logs.Sum(x => x.FilteredEventCount);
 
         /// <summary>
         /// This is the same as accessing the object directly.  This just makes the relationship more clear
         /// </summary>
-        public List<ELog> Logs => this;
+        public List<ILogBase<LogEntry>> Logs => this;
 
-        public long TotalEventCount => Logs.Sum(x => x.TotalEventCount);
+        //public long TotalEventCount => Logs.Sum(x => x.TotalEventCount);
         public TraitTypeCollection TraitTypes { get; private set; } = new();
 
-        /// <summary>
-        /// Index collections from each log as it finishes analyzing, to be merged.
-        /// Since these are not tied to the log after adding, probably not the best way to handle this.
-        /// </summary>
-        //private ConcurrentBag<TraitTypeCollection> SeparateTraitTypeCollections { get; } = new();
-
-        public void AddByFile(string filename)
+        public void AddEventLogByFile(string filename)
         {
             var log = new ELog(filename);
             Logs.Add(log);
@@ -44,20 +38,21 @@ namespace EventLogAnalysis
             // adding should reset or mark dirty so anything computed from existing logs is not longer valid for the new set
         }
 
-        public void AddByFileLoader(FileLoader loader)
-        {
-            loader.CopyToTemp();
-            if (loader.TempFile is not null)
-            {
-                AddByFile(loader.TempFile.FullName);
-            }
-        }
+        //public void AddByFileLoader(FileLoader loader)
+        //{
+        //    loader.CopyToTemp();
+        //    if (loader.TempFile is not null)
+        //    {
+        //        AddEventLogByFile(loader.TempFile.FullName);
+        //    }
+        //}
 
-        public void AnalyzeLog(ELog log, CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
+        public void AnalyzeLog(ILogBase<LogEntry> log, CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
             log.LoadTraits(cancelToken);
-            Log.Information($"Finished analysis of log ({stopwatch.ElapsedMilliseconds:n0} ms): {log.FileName}");
+            log.ProcessSimilarity(cancelToken);
+            Log.Information($"Finished analysis of log ({stopwatch.ElapsedMilliseconds:n0} ms)"); //: {log.FileName}");
         }
 
         public void AnalyzeLogs(CancellationToken token, IProgress<ProgressUpdate> progress)
@@ -76,25 +71,25 @@ namespace EventLogAnalysis
             progress.Report(new ProgressUpdate(true, msg));
         }
 
-        public void Filter(string xpath)
-        {
-            foreach (var log in Logs)
-            {
-                log.Filter(xpath);
-            }
-        }
+        //public void Filter(string xpath)
+        //{
+        //    foreach (var log in Logs)
+        //    {
+        //        log.Filter(xpath);
+        //    }
+        //}
 
-        public Dictionary<string, int> FilteredProviders()
-        {
-            Dictionary<string, int> providers = Logs.Select(x => x.FilteredProviders).SelectMany(d => d)
-              .GroupBy(
-                kvp => kvp.Key,
-                (key, kvps) => new { Key = key, Value = kvps.Sum(kvp => kvp.Value) }
-              )
-              .ToDictionary(x => x.Key, x => x.Value);
+        //public Dictionary<string, int> FilteredProviders()
+        //{
+        //    Dictionary<string, int> providers = Logs.Select(x => x.FilteredProviders).SelectMany(d => d)
+        //      .GroupBy(
+        //        kvp => kvp.Key,
+        //        (key, kvps) => new { Key = key, Value = kvps.Sum(kvp => kvp.Value) }
+        //      )
+        //      .ToDictionary(x => x.Key, x => x.Value);
 
-            return providers;
-        }
+        //    return providers;
+        //}
 
         /// <summary>
         /// Need to change to parallel with cancelation

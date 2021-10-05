@@ -31,7 +31,7 @@ namespace EventLogAnalyzer
             list.EndUpdate();
         }
 
-        public EventCollection CurrentLines { get; private set; } = new();
+        public ILogEntryCollection<LogEntry> CurrentLines { get; private set; } = new LogEntryCollection<LogEntry>();
 
         public PropertyGrid DebugProperties { get; }
 
@@ -78,12 +78,12 @@ namespace EventLogAnalyzer
             }
         }
 
-        public void UpdateLineSource(EventCollection newlines)
+        public void UpdateLineSource(ILogEntryCollection<LogEntry> newlines)
         {
             list.BeginUpdate();
             IsDisplayingInternalLog = false;
             CurrentLines = newlines;
-            list.VirtualListSize = CurrentLines.Count;
+            list.VirtualListSize = CurrentLines.Entries.Count();
 
             SelectMostRecentLine();
 
@@ -113,7 +113,7 @@ namespace EventLogAnalyzer
             }
             else
             {
-                var Line = CurrentLines[index];
+                var Line = CurrentLines.Entries.ElementAt(index);
                 LineInfo = new string[] { TimestampOptions.ConvertToString(Line.Timestamp), Line.Level, Line.Message };
             }
 
@@ -137,7 +137,7 @@ namespace EventLogAnalyzer
             }
             else
             {
-                var Line = CurrentLines[index];
+                var Line = CurrentLines.Entries.ElementAt(index);
                 DebugProperties.SelectedObject = Line;
                 DetailText.Text = Line.Message;
             }

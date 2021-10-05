@@ -5,7 +5,8 @@
 //using System.Diagnostics.Eventing.Reader;
 //using System.Linq;
 //using System.Threading.Tasks;
-
+// Maybe need to come back to this approach
+// https://stackoverflow.com/questions/31509513/how-to-create-an-eventbookmark-when-querying-the-event-log
 //namespace EventLogAnalysis
 //{
 //    public class EventLogReading

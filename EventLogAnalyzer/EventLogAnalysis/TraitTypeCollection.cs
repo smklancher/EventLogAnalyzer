@@ -25,6 +25,9 @@ namespace EventLogAnalysis
         public string TypeName { get; set; } = "";
     }
 
+    // Currently traits are just a string name that gets populated somehow in code
+    // Consider: Trait as definition object that defines column behavior and delegate to get value from log or log entry
+
     /// <summary>
     /// Formerly class named IndexCollection
     /// Collection types of traits, meaning a TraitValuesCollection for each type
@@ -53,7 +56,7 @@ namespace EventLogAnalysis
         /// <param name="TraitValue"></param>
         /// <param name="Line"></param>
         /// <remarks></remarks>
-        public void AddLine(string TraitName, string TraitValue, ELRecord Line)
+        public void AddLine(string TraitName, string TraitValue, LogEntry Line)
         {
             var existsInCollection = TraitTypes.TryGetValue(TraitName, out var i);
             i ??= new TraitValuesCollection(TraitName);
@@ -90,10 +93,10 @@ namespace EventLogAnalysis
         /// <param name="IndexValue"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public EventCollection Lines(string IndexType, string IndexValue)
+        public LogEntryCollection<LogEntry> Lines(string IndexType, string IndexValue)
         {
             TraitTypes.TryGetValue(IndexType, out var Idx);
-            return Idx?.LinesFromTraitValue(IndexValue) ?? new EventCollection();
+            return Idx?.LinesFromTraitValue(IndexValue) ?? new LogEntryCollection<LogEntry>();
         }
 
         /// <summary>

@@ -6,10 +6,7 @@ using System.Threading.Tasks;
 
 namespace EventLogAnalysis
 {
-    public interface ILogLineDisplay
+    public interface ILogCollection<out T> where T : LogBase<LogEntry>
     {
-        string LevelString { get; }
-        string Message { get; }
-        string TimestampString { get; }
     }
 }

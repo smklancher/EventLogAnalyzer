@@ -17,7 +17,7 @@ namespace EventLogAnalyzer
             list.BeginUpdate();
             list.View = View.Details;
             list.FullRowSelect = true;
-            list.Columns.Add("Filename");
+            list.Columns.Add("Source");
             list.Columns.Add("Type");
 
             list.SelectedIndexChanged += List_SelectedIndexChanged;
@@ -30,8 +30,8 @@ namespace EventLogAnalyzer
         public bool IsLogSelected => SelectedLog is null;
         public LinesListView LinesList { get; }
         public EventLogCollection Logs { get; private set; } = new();
-        public ELog? SelectedLog => list.SelectedIndices.Count > 0 ? Logs.Logs[list.SelectedIndices[0]] : null;
-        public EventCollection SelectedLogEvents => SelectedLog is not null ? SelectedLog.FilteredEvents : new EventCollection();
+        public ILogBase<LogEntry>? SelectedLog => list.SelectedIndices.Count > 0 ? Logs.Logs[list.SelectedIndices[0]] : null;
+        public LogEntryCollection<LogEntry> SelectedLogEvents => SelectedLog is not null ? (LogEntryCollection<LogEntry>)SelectedLog.EntryCollection : new LogEntryCollection<LogEntry>();
         private ListView list { get; }
 
         public void UpdateLogFilesSource(EventLogCollection logs)
@@ -42,7 +42,7 @@ namespace EventLogAnalyzer
 
             foreach (var Log in Logs)
             {
-                string[] LineInfo = new[] { Log.FileName, "EventLog", string.Empty };
+                string[] LineInfo = new[] { Log.SourceName, Log.TypeName, string.Empty };
                 ListViewItem ListLine = new ListViewItem(LineInfo);
                 list.Items.Add(ListLine);
             }
@@ -54,7 +54,7 @@ namespace EventLogAnalyzer
         {
             if (SelectedLog is not null)
             {
-                LinesList.UpdateLineSource(SelectedLog.FilteredEvents);
+                LinesList.UpdateLineSource(SelectedLog.EntryCollection);
             }
         }
     }
