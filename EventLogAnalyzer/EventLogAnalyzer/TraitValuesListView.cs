@@ -44,23 +44,23 @@ namespace EventLogAnalyzer
 
         public List<TraitValuesCollection.TraitValueSummaryLine> CurrentTraitValueSummaries { get; private set; } = new();
         public PropertyGrid DebugProperties { get; }
-        public bool IsDisplayingInternalLog { get; private set; } = false;
+        //public bool IsDisplayingInternalLog { get; private set; } = false;
 
         public LinesListView LinesList { get; }
         private ListView list { get; }
 
-        public void DisplayInternalLog()
-        {
-            IsDisplayingInternalLog = true;
-            ActiveTraitValue = "";
-            list.BeginUpdate();
-            list.SelectedIndices.Clear();
-            list.VirtualListSize = 0;
-            list.Invalidate();
-            list.EndUpdate();
+        //public void DisplayInternalLog()
+        //{
+        //    IsDisplayingInternalLog = true;
+        //    ActiveTraitValue = "";
+        //    list.BeginUpdate();
+        //    list.SelectedIndices.Clear();
+        //    list.VirtualListSize = 0;
+        //    list.Invalidate();
+        //    list.EndUpdate();
 
-            LinesList.DisplayInternalLog();
-        }
+        //    LinesList.DisplayInternalLog();
+        //}
 
         public string SelectedTraitValue()
         {
@@ -82,7 +82,7 @@ namespace EventLogAnalyzer
         public void UpdateTraitValuesSource(TraitValuesCollection newsource)
         {
             list.BeginUpdate();
-            IsDisplayingInternalLog = false;
+            //IsDisplayingInternalLog = false;
             CurrentTraitValues = newsource;
             list.VirtualListSize = CurrentTraitValues.Count;
 

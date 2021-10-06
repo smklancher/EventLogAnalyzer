@@ -8,6 +8,8 @@ using Serilog;
 
 namespace EventLogAnalysis
 {
+    public record ProviderEventIdPair(string Provider, int EventId);
+
     public class ELRecord : LogEntry
     {
         public ELRecord(EventRecord eventRecord, ELog log)

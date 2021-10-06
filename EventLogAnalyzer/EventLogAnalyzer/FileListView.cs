@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using EventLogAnalysis;
+using Serilog;
+using Serilog.Sinks.ListOfString;
 
 namespace EventLogAnalyzer
 {
@@ -21,18 +23,52 @@ namespace EventLogAnalyzer
             list.Columns.Add("Type");
 
             list.SelectedIndexChanged += List_SelectedIndexChanged;
-            //list.VirtualMode = true;
-            //list.VirtualListSize = 0;
 
+            //update to add internal log
+            Logs = new EventLogCollection();
+            Log.Logger = InternalLog.LogList.AsSeriLogger();
+            Log.Information("Ready for logs...");
+            UpdateLogFilesSource(Logs);
+            SelectInternalLog();
             list.EndUpdate();
         }
 
-        public bool IsLogSelected => SelectedLog is null;
+        public InternalLog InternalLog { get; } = new();
+
+        public bool IsLogSelected => list.SelectedIndices.Count > 0;
+
         public LinesListView LinesList { get; }
-        public EventLogCollection Logs { get; private set; } = new();
-        public ILogBase<LogEntry>? SelectedLog => list.SelectedIndices.Count > 0 ? Logs.Logs[list.SelectedIndices[0]] : null;
-        public LogEntryCollection<LogEntry> SelectedLogEvents => SelectedLog is not null ? (LogEntryCollection<LogEntry>)SelectedLog.EntryCollection : new LogEntryCollection<LogEntry>();
+
+        public EventLogCollection Logs { get; private set; }
+
+        public LogEntryCollection<LogEntry> SelectedLogEvents => (LogEntryCollection<LogEntry>)SelectedLog().EntryCollection;
+
         private ListView list { get; }
+
+        public ILogBase<LogEntry> SelectedLog()
+        {
+            if (IsLogSelected)
+            {
+                var index = list.SelectedIndices[0];
+
+                if (index < Logs.Count)
+                {
+                    return Logs.Logs[index];
+                }
+            }
+
+            // if beyond bounds of list, return internal log
+            return InternalLog;
+        }
+
+        public void SelectInternalLog()
+        {
+            list.SelectedIndices.Clear();
+            if (list.Items.Count > 0)
+            {
+                list.SelectedIndices.Add(list.Items.Count - 1);
+            }
+        }
 
         public void UpdateLogFilesSource(EventLogCollection logs)
         {
@@ -40,21 +76,24 @@ namespace EventLogAnalyzer
 
             list.Items.Clear();
 
-            foreach (var Log in Logs)
+            foreach (var l in Logs)
             {
-                string[] LineInfo = new[] { Log.SourceName, Log.TypeName, string.Empty };
+                string[] LineInfo = new[] { l.SourceName, l.TypeName, string.Empty };
                 ListViewItem ListLine = new ListViewItem(LineInfo);
                 list.Items.Add(ListLine);
             }
+
+            // internal log at end of list
+            list.Items.Add(new ListViewItem(new[] { InternalLog.SourceName, InternalLog.TypeName, string.Empty }));
 
             list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         private void List_SelectedIndexChanged(object? sender, EventArgs e)
         {
-            if (SelectedLog is not null)
+            if (IsLogSelected)
             {
-                LinesList.UpdateLineSource(SelectedLog.EntryCollection);
+                LinesList.UpdateLineSource(SelectedLog().EntryCollection);
             }
         }
     }

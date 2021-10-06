@@ -11,18 +11,17 @@ namespace EventLogAnalyzer
     public partial class GenericLogCollectionDisplay
     {
         //public List<string> InternalLog = new();
-        private const string InternalLogName = "InternalLog";
+        //private const string InternalLogName = "InternalLog";
 
         private string LastSearchText = "";
 
         public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid)
         {
-            ;
             DetailText = txtDetail;
             DebugProperties = propertyGrid;
 
             LinesList = new LinesListView(lstLines, DetailText, DebugProperties);
-            Log.Logger = LinesList.InternalLog.AsSeriLogger();
+            //Log.Logger = LinesList.InternalLog.AsSeriLogger();
             TraitValuesList = new TraitValuesListView(lstIndex, LinesList, DebugProperties);
             TraitTypesList = new TraitTypesListView(lstIndexType, TraitValuesList);
             FileList = new FileListView(lstFiles, LinesList);
@@ -42,11 +41,11 @@ namespace EventLogAnalyzer
             TraitTypesList.UpdateTraitTypesSource(Logs.TraitTypes);
         }
 
-        public void DisplayInternalLog()
-        {
-            TraitValuesList.DisplayInternalLog();
-            LinesList.DisplayInternalLog();
-        }
+        //public void DisplayInternalLog()
+        //{
+        //    TraitValuesList.DisplayInternalLog();
+        //    LinesList.DisplayInternalLog();
+        //}
 
         public void DisplayLines()
         {
@@ -60,18 +59,18 @@ namespace EventLogAnalyzer
 
         public void DisplayTraitValues()
         {
-            if (TraitTypesList.SelectedTraitType() == InternalLogName)
-            {
-                DisplayInternalLog();
-            }
-            else
-            {
-                //var summaries = Logs.TraitTypes.TraitValueSummaries(TraitType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
-                //TraitValuesList.UpdateTraitValueSummarySource(summaries);
+            //if (TraitTypesList.SelectedTraitType() == InternalLogName)
+            //{
+            //    DisplayInternalLog();
+            //}
+            //else
+            //{
+            //var summaries = Logs.TraitTypes.TraitValueSummaries(TraitType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
+            //TraitValuesList.UpdateTraitValueSummarySource(summaries);
 
-                var values = Logs.TraitTypes.TraitValues(TraitTypesList.SelectedTraitType());
-                TraitValuesList.UpdateTraitValuesSource(values);
-            }
+            var values = Logs.TraitTypes.TraitValues(TraitTypesList.SelectedTraitType());
+            TraitValuesList.UpdateTraitValuesSource(values);
+            //}
         }
 
         public void Filter(string searchText)

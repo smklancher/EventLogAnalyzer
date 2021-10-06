@@ -120,5 +120,4 @@ namespace EventLogAnalysis
         }
     }
 
-    public record ProviderEventIdPair(string Provider, int EventId);
 }

@@ -8,6 +8,12 @@ namespace EventLogAnalysis
 {
     public class InternalLog : LogBase<StringAsLogEntry>
     {
+        public InternalLog()
+        {
+            SourceName = "Internal Log";
+            TypeName = "InternalLog";
+        }
+
         public override StringEntryCollection EntryCollection => new StringEntryCollection(LogList);
         public List<string> LogList { get; private set; } = new();
     }
