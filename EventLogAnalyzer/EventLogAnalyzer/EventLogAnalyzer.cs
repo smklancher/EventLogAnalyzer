@@ -28,7 +28,7 @@ namespace EventLogAnalyzer
 
             progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
 
-            LCD = new GenericLogCollectionDisplay(lstLines, lstTraitValues, lstTraitTypes, lstFiles, txtDetail, DebugProperties);
+            LCD = new GenericLogCollectionDisplay(lstLines, lstTraitValues, lstTraitTypes, lstFiles, txtDetail, DebugProperties, ToolStripStatusLabel1, ToolStripProgressBar1);
         }
 
         public static string UNCPath(string path)
@@ -57,7 +57,8 @@ namespace EventLogAnalyzer
 
                 foreach (string File in MyFiles)
                 {
-                    LCD.Logs.AddEventLogByFile(File);
+                    var el = new ELog(File);
+                    LCD.Logs.AddLog(el);
                 }
 
                 LCD.DisplayFiles();
@@ -96,7 +97,9 @@ namespace EventLogAnalyzer
             string[] args = Environment.GetCommandLineArgs();
             if (args.Length > 1)
             {
-                LCD.Logs.AddEventLogByFile(UNCPath(args[1]));
+                var file = UNCPath(args[1]);
+                var el = new ELog(file);
+                LCD.Logs.AddLog(el);
                 LCD.DisplayFiles();
                 await LoadAndAnalyzeAsync();
             }
@@ -105,10 +108,10 @@ namespace EventLogAnalyzer
         private async Task LoadAndAnalyzeAsync()
         {
             LCD.StartProgressBar();
-            await Task.Run(() => LCD.Logs.LoadMessages(cts.Token, progressHandler));
+            await Task.Run(() => LCD.Logs.LoadMessages(cts.Token, LCD.StatusController.ProgressHandler));
             LCD.Refresh();
 
-            await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, progressHandler));
+            await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, LCD.StatusController.ProgressHandler));
             LCD.StopProgressBar();
             LCD.Refresh();
         }
@@ -126,9 +129,9 @@ namespace EventLogAnalyzer
 
         private void ProgressChanged(ProgressUpdate value)
         {
-            if (!string.IsNullOrWhiteSpace(value.StatusBarText))
+            if (!string.IsNullOrWhiteSpace(value.StatusBarUpdate))
             {
-                LCD.StatusBar.Text = value.StatusBarText;
+                LCD.StatusBar.Text = value.StatusBarUpdate;
             }
 
             if (value.RefreshUI)

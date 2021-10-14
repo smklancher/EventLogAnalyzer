@@ -8,10 +8,17 @@ namespace EventLogAnalysis
 {
     public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
     {
-        public IEnumerable<T> Entries => EntryList;
-        public ILogEntryCollection<LogEntry> EntriesGeneric => ((ILogEntryCollection<LogEntry>)this).AsLogEntries;
-        public ILogEntryCollection<LogEntry> EntriesGeneric2 => this;
+        public virtual IEnumerable<T> Entries => EntryList;
+
+        /// <summary>
+        /// Presumably this isn't needed since this object itself can already cast to ILogEntryCollection<LogEntry>
+        /// </summary>
+        public ILogEntryCollection<LogEntry> EntriesGeneric => this;
+
         public DictionaryOnInsertButSortedListOnAccess<T> EntryList { get; } = new();
+
+        // Thought this approach was needed but guess not
+        // public ILogEntryCollection<LogEntry> EntriesGeneric => ((ILogEntryCollection<LogEntry>)this).AsLogEntries;
 
         //convenience for old code
         public IEnumerable<T> Lines => Entries;

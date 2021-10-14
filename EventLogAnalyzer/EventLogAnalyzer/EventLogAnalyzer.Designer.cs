@@ -93,26 +93,26 @@ namespace EventLogAnalyzer
             this.Timer1.Enabled = true;
             this.Timer1.Interval = 60000;
             // 
-            // lstIndexType
+            // lstTraitTypes
             // 
             this.lstTraitTypes.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstTraitTypes.HideSelection = false;
             this.lstTraitTypes.Location = new System.Drawing.Point(0, 0);
             this.lstTraitTypes.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lstTraitTypes.Name = "lstIndexType";
-            this.lstTraitTypes.Size = new System.Drawing.Size(248, 121);
+            this.lstTraitTypes.Name = "lstTraitTypes";
+            this.lstTraitTypes.Size = new System.Drawing.Size(236, 121);
             this.lstTraitTypes.TabIndex = 4;
             this.lstTraitTypes.UseCompatibleStateImageBehavior = false;
             this.lstTraitTypes.View = System.Windows.Forms.View.List;
             // 
-            // lstIndex
+            // lstTraitValues
             // 
             this.lstTraitValues.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lstTraitValues.HideSelection = false;
             this.lstTraitValues.Location = new System.Drawing.Point(0, 0);
             this.lstTraitValues.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
-            this.lstTraitValues.Name = "lstIndex";
-            this.lstTraitValues.Size = new System.Drawing.Size(248, 320);
+            this.lstTraitValues.Name = "lstTraitValues";
+            this.lstTraitValues.Size = new System.Drawing.Size(236, 320);
             this.lstTraitValues.TabIndex = 5;
             this.lstTraitValues.UseCompatibleStateImageBehavior = false;
             this.lstTraitValues.View = System.Windows.Forms.View.Details;
@@ -124,7 +124,7 @@ namespace EventLogAnalyzer
             this.lstLines.Location = new System.Drawing.Point(0, 0);
             this.lstLines.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstLines.Name = "lstLines";
-            this.lstLines.Size = new System.Drawing.Size(494, 259);
+            this.lstLines.Size = new System.Drawing.Size(837, 259);
             this.lstLines.TabIndex = 6;
             this.lstLines.UseCompatibleStateImageBehavior = false;
             // 
@@ -145,7 +145,7 @@ namespace EventLogAnalyzer
             // SplitFilesAndRest.Panel2
             // 
             this.SplitFilesAndRest.Panel2.Controls.Add(this.SplitIndexTypeValueAndLinesDetail);
-            this.SplitFilesAndRest.Size = new System.Drawing.Size(747, 528);
+            this.SplitFilesAndRest.Size = new System.Drawing.Size(1078, 528);
             this.SplitFilesAndRest.SplitterDistance = 77;
             this.SplitFilesAndRest.SplitterWidth = 5;
             this.SplitFilesAndRest.TabIndex = 7;
@@ -157,13 +157,14 @@ namespace EventLogAnalyzer
             this.lstFiles.Location = new System.Drawing.Point(0, 0);
             this.lstFiles.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstFiles.Name = "lstFiles";
-            this.lstFiles.Size = new System.Drawing.Size(747, 77);
+            this.lstFiles.Size = new System.Drawing.Size(1078, 77);
             this.lstFiles.TabIndex = 0;
             this.lstFiles.UseCompatibleStateImageBehavior = false;
             this.lstFiles.View = System.Windows.Forms.View.Details;
             // 
             // SplitIndexTypeValueAndLinesDetail
             // 
+            this.SplitIndexTypeValueAndLinesDetail.Cursor = System.Windows.Forms.Cursors.VSplit;
             this.SplitIndexTypeValueAndLinesDetail.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitIndexTypeValueAndLinesDetail.Location = new System.Drawing.Point(0, 0);
             this.SplitIndexTypeValueAndLinesDetail.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
@@ -176,8 +177,8 @@ namespace EventLogAnalyzer
             // SplitIndexTypeValueAndLinesDetail.Panel2
             // 
             this.SplitIndexTypeValueAndLinesDetail.Panel2.Controls.Add(this.SplitLinesAndDetail);
-            this.SplitIndexTypeValueAndLinesDetail.Size = new System.Drawing.Size(747, 446);
-            this.SplitIndexTypeValueAndLinesDetail.SplitterDistance = 248;
+            this.SplitIndexTypeValueAndLinesDetail.Size = new System.Drawing.Size(1078, 446);
+            this.SplitIndexTypeValueAndLinesDetail.SplitterDistance = 236;
             this.SplitIndexTypeValueAndLinesDetail.SplitterWidth = 5;
             this.SplitIndexTypeValueAndLinesDetail.TabIndex = 0;
             // 
@@ -196,7 +197,7 @@ namespace EventLogAnalyzer
             // SplitIndexTypesAndIndexValues.Panel2
             // 
             this.SplitIndexTypesAndIndexValues.Panel2.Controls.Add(this.lstTraitValues);
-            this.SplitIndexTypesAndIndexValues.Size = new System.Drawing.Size(248, 446);
+            this.SplitIndexTypesAndIndexValues.Size = new System.Drawing.Size(236, 446);
             this.SplitIndexTypesAndIndexValues.SplitterDistance = 121;
             this.SplitIndexTypesAndIndexValues.SplitterWidth = 5;
             this.SplitIndexTypesAndIndexValues.TabIndex = 0;
@@ -216,7 +217,7 @@ namespace EventLogAnalyzer
             // SplitLinesAndDetail.Panel2
             // 
             this.SplitLinesAndDetail.Panel2.Controls.Add(this.SplitDetailAndProperties);
-            this.SplitLinesAndDetail.Size = new System.Drawing.Size(494, 446);
+            this.SplitLinesAndDetail.Size = new System.Drawing.Size(837, 446);
             this.SplitLinesAndDetail.SplitterDistance = 259;
             this.SplitLinesAndDetail.SplitterWidth = 5;
             this.SplitLinesAndDetail.TabIndex = 7;
@@ -236,8 +237,8 @@ namespace EventLogAnalyzer
             // SplitDetailAndProperties.Panel2
             // 
             this.SplitDetailAndProperties.Panel2.Controls.Add(this.DebugProperties);
-            this.SplitDetailAndProperties.Size = new System.Drawing.Size(494, 182);
-            this.SplitDetailAndProperties.SplitterDistance = 344;
+            this.SplitDetailAndProperties.Size = new System.Drawing.Size(837, 182);
+            this.SplitDetailAndProperties.SplitterDistance = 582;
             this.SplitDetailAndProperties.SplitterWidth = 5;
             this.SplitDetailAndProperties.TabIndex = 1;
             // 
@@ -249,7 +250,7 @@ namespace EventLogAnalyzer
             this.txtDetail.Multiline = true;
             this.txtDetail.Name = "txtDetail";
             this.txtDetail.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtDetail.Size = new System.Drawing.Size(344, 182);
+            this.txtDetail.Size = new System.Drawing.Size(582, 182);
             this.txtDetail.TabIndex = 0;
             // 
             // DebugProperties
@@ -259,7 +260,7 @@ namespace EventLogAnalyzer
             this.DebugProperties.Location = new System.Drawing.Point(0, 0);
             this.DebugProperties.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.DebugProperties.Name = "DebugProperties";
-            this.DebugProperties.Size = new System.Drawing.Size(145, 182);
+            this.DebugProperties.Size = new System.Drawing.Size(250, 182);
             this.DebugProperties.TabIndex = 0;
             // 
             // MenuStrip1
@@ -270,7 +271,7 @@ namespace EventLogAnalyzer
             this.MenuStrip1.Location = new System.Drawing.Point(0, 0);
             this.MenuStrip1.Name = "MenuStrip1";
             this.MenuStrip1.Padding = new System.Windows.Forms.Padding(7, 2, 0, 2);
-            this.MenuStrip1.Size = new System.Drawing.Size(775, 24);
+            this.MenuStrip1.Size = new System.Drawing.Size(1106, 24);
             this.MenuStrip1.TabIndex = 9;
             this.MenuStrip1.Text = "MenuStrip1";
             // 
@@ -398,7 +399,7 @@ namespace EventLogAnalyzer
             this.StatusStrip1.Location = new System.Drawing.Point(0, 601);
             this.StatusStrip1.Name = "StatusStrip1";
             this.StatusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 16, 0);
-            this.StatusStrip1.Size = new System.Drawing.Size(775, 24);
+            this.StatusStrip1.Size = new System.Drawing.Size(1106, 24);
             this.StatusStrip1.TabIndex = 10;
             this.StatusStrip1.Text = "StatusStrip1";
             // 
@@ -406,7 +407,7 @@ namespace EventLogAnalyzer
             // 
             this.ToolStripStatusLabel1.BackColor = System.Drawing.SystemColors.Control;
             this.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1";
-            this.ToolStripStatusLabel1.Size = new System.Drawing.Size(639, 19);
+            this.ToolStripStatusLabel1.Size = new System.Drawing.Size(970, 19);
             this.ToolStripStatusLabel1.Spring = true;
             this.ToolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -424,7 +425,7 @@ namespace EventLogAnalyzer
             this.MessageSearchTextBox.Location = new System.Drawing.Point(125, 33);
             this.MessageSearchTextBox.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.MessageSearchTextBox.Name = "MessageSearchTextBox";
-            this.MessageSearchTextBox.Size = new System.Drawing.Size(637, 23);
+            this.MessageSearchTextBox.Size = new System.Drawing.Size(968, 23);
             this.MessageSearchTextBox.TabIndex = 12;
             // 
             // label1
@@ -441,7 +442,7 @@ namespace EventLogAnalyzer
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(775, 625);
+            this.ClientSize = new System.Drawing.Size(1106, 625);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.MessageSearchTextBox);
             this.Controls.Add(this.StatusStrip1);

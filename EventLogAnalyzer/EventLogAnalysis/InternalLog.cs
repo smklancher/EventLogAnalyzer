@@ -26,14 +26,14 @@ namespace EventLogAnalysis
         }
     }
 
-    public class StringEntryCollection : ILogEntryCollection<StringAsLogEntry>
+    public class StringEntryCollection : LogEntryCollection<StringAsLogEntry>
     {
         public StringEntryCollection(List<string> list)
         {
             this.list = list;
         }
 
-        public IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
+        public override IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
         private List<string> list { get; }
     }
 }

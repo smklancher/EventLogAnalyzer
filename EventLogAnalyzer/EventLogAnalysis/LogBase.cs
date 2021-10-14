@@ -17,7 +17,7 @@ namespace EventLogAnalysis
         public TraitTypeCollection Traits { get; protected set; } = new();
         public string TypeName { get; protected set; } = nameof(LogBase<T>);
 
-        public virtual void InitialLoad()
+        public virtual void InitialLoad(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
         }
 
@@ -28,6 +28,8 @@ namespace EventLogAnalysis
         public virtual void LoadTraits(CancellationToken cancelToken)
         {
         }
+
+        public virtual string LogStatus() => string.Empty;
 
         public virtual void ProcessSimilarity(CancellationToken cancelToken)
         {

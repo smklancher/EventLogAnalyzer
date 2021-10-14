@@ -12,20 +12,32 @@ namespace EventLogAnalyzer
 {
     public class FileListView
     {
+        private ListViewItem InternalLogListItem;
+
+        private ListViewItem[] listCache;
+
         public FileListView(ListView lv, LinesListView llv)
         {
             LinesList = llv;
             list = lv;
+            InternalLogListItem = new ListViewItem(new[] { InternalLog.SourceName, InternalLog.TypeName, string.Empty });
+
             list.BeginUpdate();
             list.View = View.Details;
             list.FullRowSelect = true;
             list.Columns.Add("Source");
             list.Columns.Add("Type");
+            list.Columns.Add("Status");
+
+            list.VirtualMode = true;
+            list.VirtualListSize = 0;
 
             list.SelectedIndexChanged += List_SelectedIndexChanged;
+            list.RetrieveVirtualItem += List_RetrieveVirtualItem;
 
             //update to add internal log
-            Logs = new EventLogCollection();
+            Logs = new LogCollection();
+            listCache = new ListViewItem[0];
             Log.Logger = InternalLog.LogList.AsSeriLogger();
             Log.Information("Ready for logs...");
             UpdateLogFilesSource(Logs);
@@ -39,11 +51,19 @@ namespace EventLogAnalyzer
 
         public LinesListView LinesList { get; }
 
-        public EventLogCollection Logs { get; private set; }
+        public LogCollection Logs { get; private set; }
 
-        public LogEntryCollection<LogEntry> SelectedLogEvents => (LogEntryCollection<LogEntry>)SelectedLog().EntryCollection;
+        public ILogEntryCollection<LogEntry> SelectedLogEvents => SelectedLog().EntryCollection;
 
         private ListView list { get; }
+
+        public void Refresh()
+        {
+            list.BeginUpdate();
+            list.Invalidate();
+            list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            list.EndUpdate();
+        }
 
         public ILogBase<LogEntry> SelectedLog()
         {
@@ -70,24 +90,41 @@ namespace EventLogAnalyzer
             }
         }
 
-        public void UpdateLogFilesSource(EventLogCollection logs)
+        public void UpdateLogFilesSource(LogCollection logs)
         {
+            list.BeginUpdate();
+            listCache = new ListViewItem[logs.Count + 1];
+            listCache[logs.Count] = InternalLogListItem;
             Logs = logs;
+            list.VirtualListSize = Logs.Logs.Count() + 1;
+            list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            list.EndUpdate();
+        }
 
-            list.Items.Clear();
-
-            foreach (var l in Logs)
+        private void List_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+        {
+            var l = e.ItemIndex > Logs.Logs.Count - 1 ? InternalLog : Logs.Logs[e.ItemIndex];
+            var cacheItem = listCache[e.ItemIndex];
+            if (cacheItem is null)
             {
-                string[] LineInfo = new[] { l.SourceName, l.TypeName, string.Empty };
-                ListViewItem ListLine = new ListViewItem(LineInfo);
-                list.Items.Add(ListLine);
+                var LineInfo = new string[] { l.SourceName, l.TypeName, l.LogStatus() };
+
+                cacheItem = new ListViewItem(LineInfo);
+                listCache[e.ItemIndex] = cacheItem;
             }
 
-            // internal log at end of list
-            list.Items.Add(new ListViewItem(new[] { InternalLog.SourceName, InternalLog.TypeName, string.Empty }));
+            cacheItem.SubItems[2].Text = l.LogStatus();
 
-            list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            e.Item = cacheItem;
         }
+
+        //private void List_SelectedIndexChanged(object? sender, EventArgs e)
+        //{
+        //    if (IsLogSelected)
+        //    {
+        //        LinesList.UpdateLineSource(SelectedLog().EntryCollection);
+        //    }
+        //}
 
         private void List_SelectedIndexChanged(object? sender, EventArgs e)
         {

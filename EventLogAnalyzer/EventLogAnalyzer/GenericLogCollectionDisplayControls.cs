@@ -35,7 +35,7 @@ namespace EventLogAnalyzer
         public FileListView FileList { get; private set; }
 
         public LinesListView LinesList { get; private set; }
-        public EventLogCollection Logs { get; private set; } = new();
+        public LogCollection Logs { get; private set; } = new();
 
         public ToolStripProgressBar ProgressBar
         {

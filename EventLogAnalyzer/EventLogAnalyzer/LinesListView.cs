@@ -37,28 +37,9 @@ namespace EventLogAnalyzer
 
         public TextBox DetailText { get; }
 
-        //public List<string> InternalLog { get; set; } = new();
-
-        //public bool IsDisplayingInternalLog { get; private set; } = false;
-
         public bool SortNewestFirst { get; set; } = true;
 
         private ListView list { get; }
-
-        //public void DisplayInternalLog()
-        //{
-        //    if (InternalLog is null) { return; }
-
-        //    list.BeginUpdate();
-
-        //    IsDisplayingInternalLog = true;
-        //    list.VirtualListSize = InternalLog.Count;
-
-        //    SelectMostRecentLine();
-
-        //    list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        //    list.EndUpdate();
-        //}
 
         public void SelectEarliestLine()
         {
@@ -107,15 +88,11 @@ namespace EventLogAnalyzer
             string[] LineInfo;
             int index = ReversableIndex(e.ItemIndex, true);
 
-            //if (IsDisplayingInternalLog)
-            //{
-            //    LineInfo = new string[] { string.Empty, "Debug", InternalLog[index] };
-            //}
-            //else
-            //{
-            var Line = CurrentLines.Entries.ElementAt(index);
+            //this only makes senes knowing that it is really an IList
+            // for a pure IEnumerable this will kill performance
+            var Line = CurrentLines.Entries.ElementAt(index); 
+
             LineInfo = new string[] { TimestampOptions.ConvertToString(Line.Timestamp), Line.Level, Line.Message };
-            //}
 
             e.Item = new ListViewItem(LineInfo);
         }
@@ -129,18 +106,9 @@ namespace EventLogAnalyzer
 
             int index = ReversableIndex(list.SelectedIndices[0], true);
 
-            //if (IsDisplayingInternalLog)
-            //{
-            //    var line = InternalLog[index];
-            //    DetailText.Text = line ?? string.Empty;
-            //    DebugProperties.SelectedObject = null;
-            //}
-            //else
-            //{
             var Line = CurrentLines.Entries.ElementAt(index);
             DebugProperties.SelectedObject = Line;
             DetailText.Text = Line.Message;
-            //}
         }
 
         private int ReversableIndex(int index, bool indexFromUI = false) => ReversableIndex(index, list.VirtualListSize, SortNewestFirst, indexFromUI);

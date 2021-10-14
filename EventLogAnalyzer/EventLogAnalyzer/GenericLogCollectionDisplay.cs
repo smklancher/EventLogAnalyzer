@@ -10,12 +10,9 @@ namespace EventLogAnalyzer
 {
     public partial class GenericLogCollectionDisplay
     {
-        //public List<string> InternalLog = new();
-        //private const string InternalLogName = "InternalLog";
-
         private string LastSearchText = "";
 
-        public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid)
+        public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar)
         {
             DetailText = txtDetail;
             DebugProperties = propertyGrid;
@@ -25,7 +22,11 @@ namespace EventLogAnalyzer
             TraitValuesList = new TraitValuesListView(lstIndex, LinesList, DebugProperties);
             TraitTypesList = new TraitTypesListView(lstIndexType, TraitValuesList);
             FileList = new FileListView(lstFiles, LinesList);
+
+            StatusController = new StatusController(statusLabel, progressBar, FileList);
         }
+
+        public StatusController StatusController { get; private set; }
 
         public TimestampOptions TimestampConversion { get; } = new TimestampOptions();
 
@@ -41,12 +42,6 @@ namespace EventLogAnalyzer
             TraitTypesList.UpdateTraitTypesSource(Logs.TraitTypes);
         }
 
-        //public void DisplayInternalLog()
-        //{
-        //    TraitValuesList.DisplayInternalLog();
-        //    LinesList.DisplayInternalLog();
-        //}
-
         public void DisplayLines()
         {
             var newlines = LinesFromFileOrTraitValue();
@@ -59,18 +54,8 @@ namespace EventLogAnalyzer
 
         public void DisplayTraitValues()
         {
-            //if (TraitTypesList.SelectedTraitType() == InternalLogName)
-            //{
-            //    DisplayInternalLog();
-            //}
-            //else
-            //{
-            //var summaries = Logs.TraitTypes.TraitValueSummaries(TraitType).OrderByDescending(x => x.Count.ToString("000000000")).ToList();
-            //TraitValuesList.UpdateTraitValueSummarySource(summaries);
-
             var values = Logs.TraitTypes.TraitValues(TraitTypesList.SelectedTraitType());
             TraitValuesList.UpdateTraitValuesSource(values);
-            //}
         }
 
         public void Filter(string searchText)

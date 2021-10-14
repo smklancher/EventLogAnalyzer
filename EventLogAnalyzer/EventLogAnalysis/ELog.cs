@@ -16,6 +16,10 @@ namespace EventLogAnalysis
     {
         private LogEntryCollection<ELRecord> filteredEvents = new();
 
+        private string StatusCompleted = string.Empty;
+
+        private string StatusInProgress = string.Empty;
+
         public ELog(string filename)
         {
             SourceName = filename;
@@ -25,6 +29,8 @@ namespace EventLogAnalysis
             ProvidersNotToFormat.Add("KofaxTransformationServerService");
             ProvidersNotToFormat.Add("TotalAgility");
             ProvidersNotToFormat.Add("Total Agility");
+
+            TypeName = "Event Log (evtx)";
         }
 
         public Dictionary<string, int> AllProviders { get; private set; } = new();
@@ -48,20 +54,20 @@ namespace EventLogAnalysis
             TraitProducers.Add(new LogBasedTraitProducer());
         }
 
-        public void Filter(string xpath)
-        {
-            var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
-            LoadEvents(eq);
-            UpdateProvidersFromEvents(FilteredProviders, EntryCollection);
-        }
+        //public void Filter(string xpath)
+        //{
+        //    var eq = new EventLogQuery(FileName, PathType.FilePath, xpath);
+        //    LoadEvents(eq);
+        //    UpdateProvidersFromEvents(FilteredProviders, EntryCollection);
+        //}
 
-        public override void InitialLoad()
+        public override void InitialLoad(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
             RenameMtaFileIfPossible(false);
             var eq = new EventLogQuery(FileName, PathType.FilePath);
             //SaveCopy(eq);
-            LoadEvents(eq);
+            LoadEvents(eq, cancelToken, progress);
             TotalEventCount = UnfilteredEvents.Lines.Count();
 
             UpdateProvidersFromEvents(AllProviders, UnfilteredEvents);
@@ -71,6 +77,9 @@ namespace EventLogAnalysis
             CreateLogBasedTraitProducers();
 
             RenameMtaFileIfPossible(true);
+
+            StatusCompleted = $"{TotalEventCount} events loaded";
+            StatusInProgress = string.Empty;
             Log.Information($"Finished loading events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
         }
 
@@ -78,7 +87,7 @@ namespace EventLogAnalysis
         {
             var stopwatch = Stopwatch.StartNew();
 
-            if (TotalEventCount == 0) { InitialLoad(); }
+            if (TotalEventCount == 0) { InitialLoad(cancelToken, progress); }
 
             RenameMtaFileIfPossible(false);
 
@@ -87,19 +96,33 @@ namespace EventLogAnalysis
             Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
             using var dt = new DisposableTrace(Label: $"{UnfilteredEvents.Lines.Count()} messages from {fileInfo.Name}");
-            foreach (var e in EntryCollection.Lines)
-            {
-                if (cancelToken.IsCancellationRequested)
-                {
-                    Thread.CurrentThread.CurrentCulture = OriginalCulture;
-                    return;
-                }
 
+            int loadedMessages = 0;
+            //load in reverse to get newset events first
+            foreach (var e in EntryCollection.EntryList.FastReverse())
+            {
                 e.GetMessage();
+                loadedMessages++;
+
+                if (loadedMessages % 1000 == 0)
+                {
+                    StatusInProgress = $"{loadedMessages / (double)EntryCollection.EntryList.Count:P0} ({loadedMessages} / {EntryCollection.EntryList.Count}) loaded event messages...";
+
+                    progress.Report(new ProgressUpdate() { RefreshLogsView = true });
+
+                    if (cancelToken.IsCancellationRequested)
+                    {
+                        Thread.CurrentThread.CurrentCulture = OriginalCulture;
+                        return;
+                    }
+                }
             }
 
             // Parallel message loading does not help... must be a lock in the whole log when getting a message.
             //Parallel.ForEach(FilteredEvents, e => e.GetMessage());
+
+            StatusCompleted = $"{TotalEventCount} event messages loaded";
+            StatusInProgress = string.Empty;
 
             Log.Information($"Finished loading messages of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
             progress.Report(new ProgressUpdate(true, string.Empty));
@@ -113,6 +136,11 @@ namespace EventLogAnalysis
             Traits = new();
 
             LoadTraitsPerLine();
+        }
+
+        public override string LogStatus()
+        {
+            return $"{StatusCompleted}  {StatusInProgress}";
         }
 
         private string GetMtaFilePath(FileInfo evtx)
@@ -130,19 +158,21 @@ namespace EventLogAnalysis
         /// Load the actual event objects that match a query, without loading event messages
         /// </summary>
         /// <param name="query"></param>
-        private void LoadEvents(EventLogQuery query)
+        private void LoadEvents(EventLogQuery query, CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             using var dt = new DisposableTrace($"Loading events from {fileInfo.Name}");
 
             currentFilterEventIndexes.Clear();
             EntryCollection.Clear();
 
+            int loadedEvents = 0;
             using (EventLogReader reader = new EventLogReader(query))
             {
                 EventRecord ev;
                 while ((ev = reader.ReadEvent()) != null)
                 {
                     var elr = new ELRecord(ev, this);
+                    loadedEvents++;
 
                     // after initial load these are ignored
                     UnfilteredEvents.Add(elr);
@@ -151,6 +181,18 @@ namespace EventLogAnalysis
                     EntryCollection.Add(elr);
 
                     currentFilterEventIndexes.Add(elr.RecordId);
+
+                    if (loadedEvents % 1000 == 0)
+                    {
+                        StatusInProgress = $"{loadedEvents} loaded events...";
+
+                        progress.Report(new ProgressUpdate() { RefreshLogsView = true });
+
+                        if (cancelToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+                    }
                 }
             }
         }

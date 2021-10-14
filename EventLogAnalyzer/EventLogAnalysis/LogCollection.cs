@@ -12,40 +12,24 @@ using UtilityCommon;
 
 namespace EventLogAnalysis
 {
-    public class EventLogCollection : List<ILogBase<LogEntry>>
+    public class LogCollection : List<ILogBase<LogEntry>>
     {
         //convert evt to evtx: wevtutil epl application.evt application.evtx /lf:true
 
-        //public delegate void LineParsedEventHandler(object sender, LineParsedEventArgs e);
-
         public delegate void LogsFinishedLoadingEventHandler(object sender, RunWorkerCompletedEventArgs e);
-
-        //public long FilteredEventCount => Logs.Sum(x => x.FilteredEventCount);
 
         /// <summary>
         /// This is the same as accessing the object directly.  This just makes the relationship more clear
         /// </summary>
         public List<ILogBase<LogEntry>> Logs => this;
 
-        //public long TotalEventCount => Logs.Sum(x => x.TotalEventCount);
         public TraitTypeCollection TraitTypes { get; private set; } = new();
 
-        public void AddEventLogByFile(string filename)
+        public void AddLog(ILogBase<LogEntry> log)
         {
-            var log = new ELog(filename);
             Logs.Add(log);
-
             // adding should reset or mark dirty so anything computed from existing logs is not longer valid for the new set
         }
-
-        //public void AddByFileLoader(FileLoader loader)
-        //{
-        //    loader.CopyToTemp();
-        //    if (loader.TempFile is not null)
-        //    {
-        //        AddEventLogByFile(loader.TempFile.FullName);
-        //    }
-        //}
 
         public void AnalyzeLog(ILogBase<LogEntry> log, CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
@@ -71,37 +55,17 @@ namespace EventLogAnalysis
             progress.Report(new ProgressUpdate(true, msg));
         }
 
-        //public void Filter(string xpath)
-        //{
-        //    foreach (var log in Logs)
-        //    {
-        //        log.Filter(xpath);
-        //    }
-        //}
-
-        //public Dictionary<string, int> FilteredProviders()
-        //{
-        //    Dictionary<string, int> providers = Logs.Select(x => x.FilteredProviders).SelectMany(d => d)
-        //      .GroupBy(
-        //        kvp => kvp.Key,
-        //        (key, kvps) => new { Key = key, Value = kvps.Sum(kvp => kvp.Value) }
-        //      )
-        //      .ToDictionary(x => x.Key, x => x.Value);
-
-        //    return providers;
-        //}
-
         /// <summary>
         /// Need to change to parallel with cancelation
         /// </summary>
         public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
         {
             var stopwatch = Stopwatch.StartNew();
-            Parallel.ForEach(Logs, x => x.InitialLoad());
+            Parallel.ForEach(Logs, x => x.InitialLoad(cancelToken, progress));
             Parallel.ForEach(Logs, x => x.LoadMessages(cancelToken, progress));
             Log.Information($"Finished loading messages of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
-            progress.Report(new ProgressUpdate(true, $"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}"));
+            progress.Report(new ProgressUpdate(true, $"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}") { RefreshLogsView = true });
         }
 
         public void MergeLogAnalysis()
@@ -113,11 +77,10 @@ namespace EventLogAnalysis
                 // as a hack for now, this skips merging "SimilarLines"
                 TraitTypes.Merge(log.Traits);
             }
-            var similarityGroups = Logs.Select(x => x.SimilarityGroups);
-            var mergedSimilarityGroup = Similarity.Processing.MergeWorkingSets(similarityGroups!);
+            var similarityGroups = Logs.Select(x => x.SimilarityGroups).OfType<Similarity.WorkingSetGroup<LogEntry>>();
+            var mergedSimilarityGroup = Similarity.Processing.MergeWorkingSets(similarityGroups);
             var tvc = SimilarityConverter.FromWorkingSetGroupToTraitValuesCollection(mergedSimilarityGroup);
             TraitTypes.AddTraitType(tvc);
         }
     }
-
 }

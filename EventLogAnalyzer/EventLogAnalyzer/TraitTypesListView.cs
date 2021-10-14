@@ -21,7 +21,6 @@ namespace EventLogAnalyzer
             list.FullRowSelect = true;
             list.Columns.Add("#");
             list.Columns.Add("Trait Type");
-            //list.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
 
             list.SelectedIndexChanged += List_SelectedIndexChanged;
             //list.VirtualMode = true;
@@ -57,8 +56,6 @@ namespace EventLogAnalyzer
                 list.Items.Add(new ListViewItem(new string[] { IdxAndCount.Count.ToString(), IdxAndCount.TypeName }));
             }
 
-           // list.Items.Add(new ListViewItem(new[] { "N/A", InternalLogName }));
-
             list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
@@ -71,18 +68,8 @@ namespace EventLogAnalyzer
 
             //unset search text
             //SearchBox.Text = string.Empty;
-
-            //if (SelectedTraitType() == InternalLogName)
-            //{
-            //    TraitValuesList.DisplayInternalLog();
-            //}
-            //else
-            //{
-                var tvc = CurrentTraitTypes.TraitValues(SelectedTraitType());
-                TraitValuesList.UpdateTraitValuesSource(tvc);
-            //}
-
-            
+            var tvc = CurrentTraitTypes.TraitValues(SelectedTraitType());
+            TraitValuesList.UpdateTraitValuesSource(tvc);
         }
     }
 }

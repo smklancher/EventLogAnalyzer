@@ -19,11 +19,13 @@ namespace EventLogAnalysis
         public TraitTypeCollection Traits { get; }
         public string TypeName { get; }
 
-        public void InitialLoad();
+        public void InitialLoad(CancellationToken cancelToken, IProgress<ProgressUpdate> progress);
 
         public void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress);
 
         public void LoadTraits(CancellationToken cancelToken);
+
+        public string LogStatus();
 
         public void ProcessSimilarity(CancellationToken cancelToken);
     }
