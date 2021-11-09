@@ -27,10 +27,10 @@ Drag and drop any number of evtx files and analysis will be performed across the
 ## Other functionality
 
 * Search at top to filter the currently displayed events
-* View > Toggle Line Property View shows a property grid of the current line to see any property of the object or underlying [EventRecord](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader.eventrecord?view=net-5.0) object.
+* View > Toggle Line Property View shows a property grid of the current line to see any property of the object or underlying [EventRecord](https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader.eventrecord) object.
 * Not visible in the screenshot (requires scrolling), the list of trait values also shows the first and last occurrence of the included events.
 * Run the included RegisterInPlace.ps1 script to register it as the default evtx file handler
 
 ## Requirements
 
-* [.NET 5.0 or higher](https://dotnet.microsoft.com/download/dotnet)
+* [.NET 6.0 or higher](https://dotnet.microsoft.com/download/dotnet)
