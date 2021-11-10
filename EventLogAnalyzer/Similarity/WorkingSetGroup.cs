@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Similarity
+﻿namespace Similarity
 {
     public class WorkingSetGroup<T> where T : notnull
     {

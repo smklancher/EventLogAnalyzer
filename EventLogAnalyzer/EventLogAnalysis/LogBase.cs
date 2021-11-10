@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading;
-using Serilog;
-using Similarity;
+﻿using Similarity;
 
 namespace EventLogAnalysis
 {

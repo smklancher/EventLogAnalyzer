@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace EventLogAnalysis
+﻿namespace EventLogAnalysis
 {
     internal class EventLogFilter
     {

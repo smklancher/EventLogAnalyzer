@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Similarity;
-
-namespace EventLogAnalysis
+﻿namespace EventLogAnalysis
 {
     public static class SimilarityConverter
     {

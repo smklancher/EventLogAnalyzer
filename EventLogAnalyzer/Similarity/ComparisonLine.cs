@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fastenshtein;
+﻿using Fastenshtein;
 
 namespace Similarity
 {
@@ -22,7 +16,7 @@ namespace Similarity
 
             ComparisonString = ThingToString(ComparisonRecord);
 
-            // should 
+            // should
             //if (string.IsNullOrEmpty(ComparisonString))
             //{
             //    Debug.WriteLine($"null lstring message");

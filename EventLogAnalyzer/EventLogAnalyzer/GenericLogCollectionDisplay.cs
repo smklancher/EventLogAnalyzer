@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using EventLogAnalysis;
-using Serilog;
-using Serilog.Sinks.ListOfString;
+﻿using EventLogAnalysis;
 
 namespace EventLogAnalyzer
 {
@@ -114,7 +108,7 @@ namespace EventLogAnalyzer
 
         private void handleTypingTimerTimeout(object? sender, EventArgs e)
         {
-            var timer = sender as Timer;
+            var timer = sender as System.Windows.Forms.Timer;
 
             if (timer is not null)
             {
@@ -142,7 +136,7 @@ namespace EventLogAnalyzer
         {
             if (mTypingTimer == null)
             {
-                mTypingTimer = new Timer();
+                mTypingTimer = new System.Windows.Forms.Timer();
                 mTypingTimer.Interval = 300;
                 mTypingTimer.Tick += this.handleTypingTimerTimeout;
             }

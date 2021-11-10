@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace EventLogAnalysis
+﻿namespace EventLogAnalysis
 {
     public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
     {

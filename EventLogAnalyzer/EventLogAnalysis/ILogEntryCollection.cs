@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-// might need to make this an interface to take advangage of generic covariance (not supported for classes)
+﻿// might need to make this an interface to take advangage of generic covariance (not supported for classes)
 // ILogEntryCollection<out T> where T : LogEntry
 // then a function could return an EventCollction (ILogEntryCollection<ELRecord>) as ILogEntryCollection<LogEntry> to use generically in UI, etc.
 // And Entries becomes IEnumerable for covariance as well
