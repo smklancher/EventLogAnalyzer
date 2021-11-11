@@ -1,47 +1,46 @@
 ﻿using System.ComponentModel;
 using Similarity;
 
-namespace EventLogAnalysis
+namespace EventLogAnalysis;
+
+public class Options
 {
-    public class Options
+    private const string SimilarityCategory = "Similarity";
+    private const string TestingCategory = "Testing";
+    private const string TimestampCategory = "Timestamp";
+
+    private static readonly Lazy<Options> Lazy =
+                                new Lazy<Options>(() => new Options());
+
+    private Options()
     {
-        private const string SimilarityCategory = "Similarity";
-        private const string TestingCategory = "Testing";
-        private const string TimestampCategory = "Timestamp";
+    }
 
-        private static readonly Lazy<Options> Lazy =
-                                    new Lazy<Options>(() => new Options());
+    public static Options Instance => Lazy.Value;
 
-        private Options()
-        {
-        }
+    [Category(TimestampCategory)]
+    public int HourOffset { get; set; } = 0;
 
-        public static Options Instance => Lazy.Value;
+    [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
+    [Category(TestingCategory)]
+    public bool RenameMtaDuringLoad { get; set; } = true;
 
-        [Category(TimestampCategory)]
-        public int HourOffset { get; set; } = 0;
+    [Category(SimilarityCategory)]
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
 
-        [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
-        [Category(TestingCategory)]
-        public bool RenameMtaDuringLoad { get; set; } = true;
+    [Description("Just combine event properties instead of requesting formated event message")]
+    [Category(TestingCategory)]
+    public bool SkipFormattedMessage { get; set; } = false;
 
-        [Category(SimilarityCategory)]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        public SimilarityOptions SimilarityOptions { get; set; } = Similarity.SimilarityOptions.Instance;
+    [Category(TimestampCategory)]
+    public OffsetOption TimestampConversion { get; set; } = OffsetOption.ConvertToLocal;
 
-        [Description("Just combine event properties instead of requesting formated event message")]
-        [Category(TestingCategory)]
-        public bool SkipFormattedMessage { get; set; } = false;
+    [Description("Show columns for earliest and last date before actual value.  Not wired to be changed at runtime.")]
+    [Category(TestingCategory)]
+    public bool TraitDatesBeforeTraitValue { get; set; } = true;
 
-        [Category(TimestampCategory)]
-        public OffsetOption TimestampConversion { get; set; } = OffsetOption.ConvertToLocal;
-
-        [Description("Show columns for earliest and last date before actual value.  Not wired to be changed at runtime.")]
-        [Category(TestingCategory)]
-        public bool TraitDatesBeforeTraitValue { get; set; } = true;
-
-        public void OnCloseOptionsForm()
-        {
-        }
+    public void OnCloseOptionsForm()
+    {
     }
 }

@@ -1,36 +1,35 @@
-﻿namespace EventLogAnalysis
+﻿namespace EventLogAnalysis;
+
+public static class SimilarityConverter
 {
-    public static class SimilarityConverter
+    public const string SimilarLinesString = "SimilarLines";
+
+    public static SingleTraitValueEventCollection FromSimilarLineGroupToSingleTraitValue(Similarity.SimilarLineGroup<LogEntry> similarLineGroup)
     {
-        public const string SimilarLinesString = "SimilarLines";
-
-        public static SingleTraitValueEventCollection FromSimilarLineGroupToSingleTraitValue(Similarity.SimilarLineGroup<LogEntry> similarLineGroup)
+        var stv = new SingleTraitValueEventCollection
         {
-            var stv = new SingleTraitValueEventCollection
-            {
-                TraitName = SimilarLinesString,
-                TraitValue = similarLineGroup.ComparisonLine.ComparisonString
-            };
+            TraitName = SimilarLinesString,
+            TraitValue = similarLineGroup.ComparisonLine.ComparisonString
+        };
 
-            foreach (var sl in similarLineGroup.Items)
-            {
-                stv.Add(sl);
-            }
-
-            return stv;
+        foreach (var sl in similarLineGroup.Items)
+        {
+            stv.Add(sl);
         }
 
-        public static TraitValuesCollection FromWorkingSetGroupToTraitValuesCollection(Similarity.WorkingSetGroup<LogEntry> workingSetGroup)
+        return stv;
+    }
+
+    public static TraitValuesCollection FromWorkingSetGroupToTraitValuesCollection(Similarity.WorkingSetGroup<LogEntry> workingSetGroup)
+    {
+        var tvc = new TraitValuesCollection(SimilarLinesString);
+
+        foreach (var slg in workingSetGroup.SubGroups)
         {
-            var tvc = new TraitValuesCollection(SimilarLinesString);
-
-            foreach (var slg in workingSetGroup.SubGroups)
-            {
-                var stv = FromSimilarLineGroupToSingleTraitValue(slg);
-                tvc.AddCollection(stv);
-            }
-
-            return tvc;
+            var stv = FromSimilarLineGroupToSingleTraitValue(slg);
+            tvc.AddCollection(stv);
         }
+
+        return tvc;
     }
 }

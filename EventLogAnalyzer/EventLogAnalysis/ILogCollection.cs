@@ -1,6 +1,5 @@
-﻿namespace EventLogAnalysis
+﻿namespace EventLogAnalysis;
+
+public interface ILogCollection<out T> where T : LogBase<LogEntry>
 {
-    public interface ILogCollection<out T> where T : LogBase<LogEntry>
-    {
-    }
 }

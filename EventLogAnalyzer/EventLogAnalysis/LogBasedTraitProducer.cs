@@ -1,9 +1,8 @@
-﻿namespace EventLogAnalysis
+﻿namespace EventLogAnalysis;
+
+public class LogBasedTraitProducer
 {
-    public class LogBasedTraitProducer
+    public void AddTraits(ELog log)
     {
-        public void AddTraits(ELog log)
-        {
-        }
     }
 }

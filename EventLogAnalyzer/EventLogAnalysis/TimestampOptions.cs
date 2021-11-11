@@ -1,43 +1,42 @@
-﻿namespace EventLogAnalysis
+﻿namespace EventLogAnalysis;
+
+public enum OffsetOption
 {
-    public enum OffsetOption
+    ConvertToLocal,
+    UTC,
+    OffsetFromLocal,
+    OffsetFromUTC
+}
+
+public class TimestampOptions
+{
+    public static DateTime Convert(DateTime dateTime)
     {
-        ConvertToLocal,
-        UTC,
-        OffsetFromLocal,
-        OffsetFromUTC
+        // event log returns timestamp as local even though internally is UTC
+        if (Options.Instance.TimestampConversion == OffsetOption.ConvertToLocal) { return dateTime; }
+
+        var localDate = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+        var newDate = Options.Instance.TimestampConversion switch
+        {
+            OffsetOption.UTC => localDate.ToUniversalTime(),
+            OffsetOption.OffsetFromLocal => dateTime.AddHours(Options.Instance.HourOffset),
+            OffsetOption.OffsetFromUTC => localDate.ToUniversalTime().AddHours(Options.Instance.HourOffset),
+            OffsetOption.ConvertToLocal => dateTime,
+            _ => dateTime,
+        };
+
+        return newDate;
     }
 
-    public class TimestampOptions
+    public static string ConvertToString(DateTime? dateTime)
     {
-        public static DateTime Convert(DateTime dateTime)
+        if (dateTime is null)
         {
-            // event log returns timestamp as local even though internally is UTC
-            if (Options.Instance.TimestampConversion == OffsetOption.ConvertToLocal) { return dateTime; }
-
-            var localDate = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
-            var newDate = Options.Instance.TimestampConversion switch
-            {
-                OffsetOption.UTC => localDate.ToUniversalTime(),
-                OffsetOption.OffsetFromLocal => dateTime.AddHours(Options.Instance.HourOffset),
-                OffsetOption.OffsetFromUTC => localDate.ToUniversalTime().AddHours(Options.Instance.HourOffset),
-                OffsetOption.ConvertToLocal => dateTime,
-                _ => dateTime,
-            };
-
-            return newDate;
+            return string.Empty;
         }
-
-        public static string ConvertToString(DateTime? dateTime)
+        else
         {
-            if (dateTime is null)
-            {
-                return string.Empty;
-            }
-            else
-            {
-                return Convert((DateTime)dateTime).ToString();
-            }
+            return Convert((DateTime)dateTime).ToString();
         }
     }
 }

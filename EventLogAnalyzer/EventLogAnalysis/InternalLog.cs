@@ -1,33 +1,32 @@
-﻿namespace EventLogAnalysis
+﻿namespace EventLogAnalysis;
+
+public class InternalLog : LogBase<StringAsLogEntry>
 {
-    public class InternalLog : LogBase<StringAsLogEntry>
+    public InternalLog()
     {
-        public InternalLog()
-        {
-            SourceName = "Internal Log";
-            TypeName = "InternalLog";
-        }
-
-        public override StringEntryCollection EntryCollection => new StringEntryCollection(LogList);
-        public List<string> LogList { get; private set; } = new();
+        SourceName = "Internal Log";
+        TypeName = "InternalLog";
     }
 
-    public class StringAsLogEntry : LogEntry
+    public override StringEntryCollection EntryCollection => new StringEntryCollection(LogList);
+    public List<string> LogList { get; private set; } = new();
+}
+
+public class StringAsLogEntry : LogEntry
+{
+    public StringAsLogEntry(string msg)
     {
-        public StringAsLogEntry(string msg)
-        {
-            Message = msg;
-        }
+        Message = msg;
+    }
+}
+
+public class StringEntryCollection : LogEntryCollection<StringAsLogEntry>
+{
+    public StringEntryCollection(List<string> list)
+    {
+        this.list = list;
     }
 
-    public class StringEntryCollection : LogEntryCollection<StringAsLogEntry>
-    {
-        public StringEntryCollection(List<string> list)
-        {
-            this.list = list;
-        }
-
-        public override IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
-        private List<string> list { get; }
-    }
+    public override IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
+    private List<string> list { get; }
 }
