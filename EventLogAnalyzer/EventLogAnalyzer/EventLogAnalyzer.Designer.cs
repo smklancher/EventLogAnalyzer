@@ -95,8 +95,8 @@ namespace EventLogAnalyzer
             // 
             // lstTraitTypes
             // 
+            this.lstTraitTypes.Cursor = System.Windows.Forms.Cursors.Default;
             this.lstTraitTypes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstTraitTypes.HideSelection = false;
             this.lstTraitTypes.Location = new System.Drawing.Point(0, 0);
             this.lstTraitTypes.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstTraitTypes.Name = "lstTraitTypes";
@@ -107,8 +107,8 @@ namespace EventLogAnalyzer
             // 
             // lstTraitValues
             // 
+            this.lstTraitValues.Cursor = System.Windows.Forms.Cursors.Default;
             this.lstTraitValues.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstTraitValues.HideSelection = false;
             this.lstTraitValues.Location = new System.Drawing.Point(0, 0);
             this.lstTraitValues.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstTraitValues.Name = "lstTraitValues";
@@ -119,8 +119,8 @@ namespace EventLogAnalyzer
             // 
             // lstLines
             // 
+            this.lstLines.Cursor = System.Windows.Forms.Cursors.Default;
             this.lstLines.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstLines.HideSelection = false;
             this.lstLines.Location = new System.Drawing.Point(0, 0);
             this.lstLines.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstLines.Name = "lstLines";
@@ -153,7 +153,6 @@ namespace EventLogAnalyzer
             // lstFiles
             // 
             this.lstFiles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstFiles.HideSelection = false;
             this.lstFiles.Location = new System.Drawing.Point(0, 0);
             this.lstFiles.Margin = new System.Windows.Forms.Padding(4, 3, 4, 3);
             this.lstFiles.Name = "lstFiles";
@@ -255,6 +254,7 @@ namespace EventLogAnalyzer
             // 
             // DebugProperties
             // 
+            this.DebugProperties.Cursor = System.Windows.Forms.Cursors.Default;
             this.DebugProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.DebugProperties.LineColor = System.Drawing.SystemColors.ControlDark;
             this.DebugProperties.Location = new System.Drawing.Point(0, 0);
