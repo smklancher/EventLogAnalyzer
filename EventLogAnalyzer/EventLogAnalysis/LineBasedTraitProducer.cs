@@ -36,6 +36,8 @@ public class LineBasedTraitProducer
             }
         }
 
+        TotalAgilityTraits.TotalAgilityTenantName(traits, r);
+
         CrashMessageTraits(traits, r);
     }
 
