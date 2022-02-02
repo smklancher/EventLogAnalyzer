@@ -34,6 +34,11 @@ public class LineBasedTraitProducer
             {
                 traits.AddLine("StackTraceBottomFrame", ellt.StackTraceBottomFrame, r);
             }
+
+            if (!string.IsNullOrWhiteSpace(ellt.RequestUrl))
+            {
+                traits.AddLine("RequestUrl", ellt.RequestUrl, r);
+            }
         }
 
         TotalAgilityTraits.TotalAgilityTenantName(traits, r);

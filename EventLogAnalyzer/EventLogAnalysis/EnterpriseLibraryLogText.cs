@@ -5,6 +5,9 @@ namespace EventLogAnalysis;
 public class EnterpriseLibraryLogText
 {
     // language=regex
+    private const string exPropRegex = @"^(?<key>.+?) - (?<value>.+?)$";
+
+    // language=regex
     private const string msgregex = "Timestamp:(?<timestamp>.+)Message:(?<message>.+)Category:(?<category>.+)Priority:(?<priority>.+)EventId:(?<eventid>.+)" +
         "Severity:(?<severity>.+)Title:(?<title>.+)Machine:(?<machine>.+)App Domain:(?<appdomain>.+)ProcessId:(?<processid>.+)Process Name:(?<processname>.+)Thread Name:(?<threadname>.+)" +
         "Win32 ThreadId:(?<threadid>.+)Extended Properties:(?<extentedproperties>.+)";
@@ -33,12 +36,14 @@ public class EnterpriseLibraryLogText
 
     public string EventText { get; }
     public List<string> ExceptionMessages { get; } = new();
+    public Dictionary<string, string> ExtendedProperties { get; private set; } = new Dictionary<string, string>();
     public string InnerException => ExceptionMessages.LastOrDefault() ?? string.Empty;
     public string Message { get; private set; } = string.Empty;
     public string OuterException => ExceptionMessages.FirstOrDefault() ?? string.Empty;
     public string ProcessId { get; private set; } = string.Empty;
     public string ProcessName { get; private set; } = string.Empty;
 
+    public string RequestUrl { get; private set; } = string.Empty;
     public string StackTrace { get; private set; } = string.Empty;
     public string StackTraceBottomFrame { get; private set; } = string.Empty;
     public string StackTraceTopFrame { get; private set; } = string.Empty;
@@ -52,6 +57,8 @@ public class EnterpriseLibraryLogText
             Message = ContentMatch.Groups["message"].Value.Trim();
             ProcessName = ContentMatch.Groups["processname"].Value.Trim();
             ProcessId = ContentMatch.Groups["processid"].Value.Trim();
+
+            ParseExtendedProperties(ContentMatch.Groups["extentedproperties"].Value.Trim());
 
             //each message value of exception and inner exceptions
             // could certainly expand to get other properties
@@ -70,6 +77,24 @@ public class EnterpriseLibraryLogText
                 StackTraceBottomFrame = ContentMatch.Groups["line"].Captures.LastOrDefault()?.Value.Trim() ?? string.Empty;
                 StackTrace = ContentMatch.Value.Trim();
             }
+        }
+    }
+
+    private void ParseExtendedProperties(string exprop)
+    {
+        // outer message
+        var ContentMatch = Regex.Match(exprop, exPropRegex, RegexOptions.Multiline);
+        while (ContentMatch.Success)
+        {
+            var key = ContentMatch.Groups["key"].Value.Trim();
+            var value = ContentMatch.Groups["value"].Value.Trim();
+            ExtendedProperties.Add(key, value);
+            ContentMatch = ContentMatch.NextMatch();
+        }
+
+        if (ExtendedProperties.TryGetValue("Http Request Url", out var value2))
+        {
+            RequestUrl = value2;
         }
     }
 }
