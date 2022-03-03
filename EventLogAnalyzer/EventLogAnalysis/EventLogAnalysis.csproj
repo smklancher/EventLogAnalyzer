@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+	  <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
-	<ImplicitUsings>enable</ImplicitUsings>
+	<ImplicitUsings>false</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>

@@ -73,8 +73,17 @@ public class EnterpriseLibraryLogText
             ContentMatch = Regex.Match(Message, stackTraceRegex, RegexOptions.Multiline);
             if (ContentMatch.Success)
             {
-                StackTraceTopFrame = ContentMatch.Groups["line"].Captures.FirstOrDefault()?.Value.Trim() ?? string.Empty;
-                StackTraceBottomFrame = ContentMatch.Groups["line"].Captures.LastOrDefault()?.Value.Trim() ?? string.Empty;
+#if NETFRAMEWORK
+                // in .NET Framework CaptureCollection, GroupCollection, and MatchCollection  only implement the non-generic interfaces.
+                // https://github.com/dotnet/runtime/issues/13933
+                var captures = ContentMatch.Groups["line"].Captures.Cast<Capture>();
+#else
+                var captures = ContentMatch.Groups["line"].Captures;
+#endif
+
+                StackTraceTopFrame = captures.FirstOrDefault()?.Value.Trim() ?? string.Empty;
+                StackTraceBottomFrame = captures.LastOrDefault()?.Value.Trim() ?? string.Empty;
+
                 StackTrace = ContentMatch.Value.Trim();
             }
         }

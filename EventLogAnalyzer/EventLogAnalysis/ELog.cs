@@ -26,12 +26,13 @@ public class ELog : LogBase<ELRecord>
     }
 
     public Dictionary<string, int> AllProviders { get; private set; } = new();
-    public override LogEntryCollection<ELRecord> EntryCollection => filteredEvents;
+    public override ILogEntryCollection<ELRecord> EntryCollection => filteredEvents;
     public int EventsWithMessagesLoaded => UnfilteredEvents.Lines.Where(x => x.MessageIsLoaded).Count();
     public string FileName => SourceName;
     public long FilteredEventCount => currentFilterEventIndexes.Count;
     public Dictionary<string, int> FilteredProviders { get; private set; } = new();
     public List<string> ProvidersNotToFormat { get; private set; } = new();
+    public LogEntryCollection<ELRecord> RecordCollection => filteredEvents;
     public long TotalEventCount { get; private set; }
     public List<LogBasedTraitProducer> TraitProducers { get; } = new();
     public LogEntryCollection<ELRecord> UnfilteredEvents { get; private set; } = new();
@@ -91,14 +92,14 @@ public class ELog : LogBase<ELRecord>
 
         int loadedMessages = 0;
         //load in reverse to get newset events first
-        foreach (var e in EntryCollection.EntryList.FastReverse())
+        foreach (var e in RecordCollection.EntryList.FastReverse())
         {
             e.GetMessage();
             loadedMessages++;
 
             if (loadedMessages % 1000 == 0)
             {
-                StatusInProgress = $"{loadedMessages / (double)EntryCollection.EntryList.Count:P0} ({loadedMessages} / {EntryCollection.EntryList.Count}) loaded event messages...";
+                StatusInProgress = $"{loadedMessages / (double)RecordCollection.EntryList.Count:P0} ({loadedMessages} / {RecordCollection.EntryList.Count}) loaded event messages...";
 
                 progress.Report(new ProgressUpdate() { RefreshLogsView = true });
 
@@ -137,9 +138,12 @@ public class ELog : LogBase<ELRecord>
 
     private string GetMtaFilePath(FileInfo evtx)
     {
-        string folder = Path.Join(evtx.DirectoryName!, "LocaleMetaData");
+        // changing from Join (.net core only) to Combine.  Not sure if relevant:
+        // Unlike the Combine method, the Join method does not attempt to root the returned path.
+        // (That is, if path2 is an absolute path, the Join method does not discard the previous paths as the Combine method does.
+        string folder = Path.Combine(evtx.DirectoryName!, "LocaleMetaData");
         string filename = Path.GetFileNameWithoutExtension(evtx.Name) + "_1033.MTA";
-        return Path.Join(folder, filename);
+        return Path.Combine(folder, filename);
     }
 
     private void LoadComplexTraits(CancellationToken cancelToken)
@@ -155,7 +159,7 @@ public class ELog : LogBase<ELRecord>
         using var dt = new DisposableTrace($"Loading events from {fileInfo.Name}");
 
         currentFilterEventIndexes.Clear();
-        EntryCollection.Clear();
+        RecordCollection.Clear();
 
         int loadedEvents = 0;
         using (EventLogReader reader = new EventLogReader(query))
@@ -170,7 +174,7 @@ public class ELog : LogBase<ELRecord>
                 UnfilteredEvents.Add(elr);
 
                 // filtered events are cleared at start of each load events
-                EntryCollection.Add(elr);
+                RecordCollection.Add(elr);
 
                 currentFilterEventIndexes.Add(elr.RecordId);
 
@@ -195,7 +199,7 @@ public class ELog : LogBase<ELRecord>
         List<LineBasedTraitProducer> producers = new();
         producers.Add(new LineBasedTraitProducer());
 
-        foreach (var r in EntryCollection.Lines)
+        foreach (var r in RecordCollection.Lines)
         {
             foreach (var p in producers)
             {

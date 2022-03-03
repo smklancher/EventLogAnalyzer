@@ -10,7 +10,10 @@ internal static class Program
     [STAThread]
     private static void Main()
     {
+#if NET6_0_OR_GREATER
         Application.SetHighDpiMode(HighDpiMode.SystemAware);
+#endif
+
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new EventLogAnalyzer());

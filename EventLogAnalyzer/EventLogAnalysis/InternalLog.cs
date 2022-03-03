@@ -8,7 +8,7 @@ public class InternalLog : LogBase<StringAsLogEntry>
         TypeName = "InternalLog";
     }
 
-    public override StringEntryCollection EntryCollection => new StringEntryCollection(LogList);
+    public override ILogEntryCollection<StringAsLogEntry> EntryCollection => new StringEntryCollection(LogList);
     public List<string> LogList { get; private set; } = new();
 }
 

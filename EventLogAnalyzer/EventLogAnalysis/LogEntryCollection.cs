@@ -2,6 +2,7 @@
 
 public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
 {
+    public virtual ILogEntryCollection<LogEntry> AsLogEntries => this;
     public virtual IEnumerable<T> Entries => EntryList;
 
     /// <summary>
@@ -13,6 +14,10 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
 
     // Thought this approach was needed but guess not
     // public ILogEntryCollection<LogEntry> EntriesGeneric => ((ILogEntryCollection<LogEntry>)this).AsLogEntries;
+
+    public virtual DateTime FirstEvent => Entries.FirstOrDefault()?.Timestamp ?? DateTime.MinValue;
+
+    public virtual DateTime LastEvent => Entries.LastOrDefault()?.Timestamp ?? DateTime.MaxValue;
 
     //convenience for old code
     public IEnumerable<T> Lines => Entries;
@@ -29,6 +34,18 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
     public void Clear()
     {
         EntryList.Clear();
+    }
+
+    public virtual ILogEntryCollection<T> FilteredCopy(string FilterText)
+    {
+        var lc = new LogEntryCollection<T>();
+        foreach (var l in Entries.Where(x => x.Message.ToLower().Contains(FilterText.ToLower())))
+        {
+            lc.Add(l);
+        }
+
+        lc.EntryList.Lock();
+        return lc;
     }
 
     /// <summary>

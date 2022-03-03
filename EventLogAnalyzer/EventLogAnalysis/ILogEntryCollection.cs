@@ -7,7 +7,7 @@ namespace EventLogAnalysis;
 
 public interface ILogEntryCollection<out T> where T : LogEntry
 {
-    public ILogEntryCollection<LogEntry> AsLogEntries => this;
+    public ILogEntryCollection<LogEntry> AsLogEntries { get; }
 
     public IEnumerable<T> Entries { get; }
 
@@ -17,7 +17,7 @@ public interface ILogEntryCollection<out T> where T : LogEntry
     /// <value></value>
     /// <returns></returns>
     /// <remarks></remarks>
-    public virtual DateTime FirstEvent => Entries.FirstOrDefault()?.Timestamp ?? DateTime.MinValue;
+    public DateTime FirstEvent { get; }
 
     /// <summary>
     /// Returns the date of the last event in the collection... currently this causes a sort (costly))
@@ -25,17 +25,7 @@ public interface ILogEntryCollection<out T> where T : LogEntry
     /// <value></value>
     /// <returns></returns>
     /// <remarks></remarks>
-    public virtual DateTime LastEvent => Entries.LastOrDefault()?.Timestamp ?? DateTime.MaxValue;
+    public DateTime LastEvent { get; }
 
-    public virtual ILogEntryCollection<T> FilteredCopy(string FilterText)
-    {
-        var lc = new LogEntryCollection<T>();
-        foreach (var l in Entries.Where(x => x.Message.ToLower().Contains(FilterText.ToLower())))
-        {
-            lc.Add(l);
-        }
-
-        lc.EntryList.Lock();
-        return lc;
-    }
+    public ILogEntryCollection<T> FilteredCopy(string FilterText);
 }

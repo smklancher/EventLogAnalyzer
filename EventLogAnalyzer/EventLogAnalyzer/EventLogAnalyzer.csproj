@@ -2,10 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <!-- <TargetFramework>net6.0-windows</TargetFramework>-->
+	  <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
-	<ImplicitUsings>enable</ImplicitUsings>
+	<ImplicitUsings>false</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
