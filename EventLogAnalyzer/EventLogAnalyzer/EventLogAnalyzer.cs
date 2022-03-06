@@ -46,8 +46,16 @@ public partial class EventLogAnalyzer : Form
 
             foreach (string File in MyFiles)
             {
-                var el = new ELog(File);
-                LCD.Logs.AddLog(el);
+                if (Options.Instance.EnableCurrentTest)
+                {
+                    var el = new TextFileLog(File);
+                    LCD.Logs.AddLog(el);
+                }
+                else
+                {
+                    var el = new ELog(File);
+                    LCD.Logs.AddLog(el);
+                }
             }
 
             LCD.DisplayFiles();

@@ -18,6 +18,10 @@ public class Options
 
     public static Options Instance => Lazy.Value;
 
+    [Description("Enable whatever current behavior is being tested during development.")]
+    [Category(TestingCategory)]
+    public bool EnableCurrentTest { get; set; } = true;
+
     [Category(TimestampCategory)]
     public int HourOffset { get; set; } = 0;
 
