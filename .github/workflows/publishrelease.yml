@@ -63,7 +63,7 @@ jobs:
         
       - name: Publish win
         working-directory: .\${{ env.PROJECT_NAME }}
-        run: dotnet publish ${{ env.PROJECT_NAME }} -r win-x64 -f net6.0 -c Release -p:PublishSingleFile=true --no-self-contained -o:.\FrameworkDependentSingleFile\win
+        run: dotnet publish ${{ env.PROJECT_NAME }} -r win-x64 -f net6.0-windows -c Release -p:PublishSingleFile=true --no-self-contained -o:.\FrameworkDependentSingleFile\win
         
       - name: Create Release
         id: create_release
