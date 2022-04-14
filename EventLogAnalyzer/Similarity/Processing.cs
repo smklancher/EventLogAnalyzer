@@ -51,7 +51,7 @@ public class Processing
         var stopwatch = Stopwatch.StartNew();
         var opts = new ParallelOptions()
         {
-            MaxDegreeOfParallelism = Environment.ProcessorCount - 1, // give the system a little bit of room for other things
+            MaxDegreeOfParallelism = Environment.ProcessorCount
                                                                      //TODO: cancelation
         };
 
