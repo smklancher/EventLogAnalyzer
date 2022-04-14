@@ -7,6 +7,8 @@ public class LineBasedTraitProducer
     public void AddTraitsFromLine(TraitTypeCollection traits, ELRecord r)
     {
         traits.AddLine("Provider", r.ProviderName, r);
+        traits.AddLine("Level", r.Level, r);
+
         if (r.MessageLoadExeption is not null)
         {
             traits.AddLine("EventLogReadingException", r.MessageLoadExeption.Message, r);

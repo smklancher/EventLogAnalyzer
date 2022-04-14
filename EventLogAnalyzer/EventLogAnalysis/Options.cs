@@ -20,7 +20,7 @@ public class Options
 
     [Description("Enable whatever current behavior is being tested during development.")]
     [Category(TestingCategory)]
-    public bool EnableCurrentTest { get; set; } = true;
+    public bool EnableCurrentTest { get; set; } = false;
 
     [Category(TimestampCategory)]
     public int HourOffset { get; set; } = 0;
