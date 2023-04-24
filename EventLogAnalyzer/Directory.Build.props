@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <LangVersion>10.0</LangVersion>
+    <LangVersion>11.0</LangVersion>
     <Nullable>enable</Nullable>
 
     <!-- required for auto incrementing assembly version, which is needed for KTA -->
@@ -23,15 +23,11 @@
   -->
   <ItemGroup Condition=" '$(LangVersion)' >= '8.0' " >
     <!-- C# 8.0 on .NET Framework: Indexes and Ranges -->
-    <!--
-    <PackageReference Include="IndexRange" Version="1.0.0" />
-    <Compile Include="$(MSBuildThisFileDirectory)/RuntimeHelpers.cs" />
-	  -->
 
-    <!-- C# 8.0 on .NET Framework: Async Streams -->
-    <!--
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.1.0" />
-	  -->
+	  <PackageReference Include="PolySharp" Version="1.13.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 
     <!-- 
     C# 8.0 on .NET Framework: Provide nullable attribures and nullability annotations
@@ -45,13 +41,5 @@
 	
   </ItemGroup>
 
-
-  <ItemGroup Condition=" '$(LangVersion)' >= '9.0' " >
-    <!-- enable records syntax in C# 9.0 -->
-    <PackageReference Include="IsExternalInit" Version="1.0.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
 </Project>

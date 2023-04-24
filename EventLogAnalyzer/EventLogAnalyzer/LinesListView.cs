@@ -80,7 +80,7 @@ public class LinesListView
         string[] LineInfo;
         int index = ReversableIndex(e.ItemIndex, true);
 
-        //this only makes senes knowing that it is really an IList
+        //this only makes sense knowing that it is really an IList
         // for a pure IEnumerable this will kill performance
         var Line = CurrentLines.Entries.ElementAt(index);
 

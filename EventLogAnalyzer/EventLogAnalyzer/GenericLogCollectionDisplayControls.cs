@@ -5,6 +5,7 @@ namespace EventLogAnalyzer;
 public partial class GenericLogCollectionDisplay
 {
     private PropertyGrid mDebugProperties = new();
+    private TextBox mExcludehBox = new();
     private ToolStripProgressBar mProgressBar = new();
 
     private TextBox mSearchBox = new();
@@ -25,6 +26,21 @@ public partial class GenericLogCollectionDisplay
     }
 
     public TextBox DetailText { get; private set; } = new();
+
+    public TextBox ExcludeBox
+    {
+        get => mExcludehBox;
+        set
+        {
+            if (mExcludehBox is not null)
+            {
+                mExcludehBox.TextChanged -= mExcludehBox_TextChanged;
+            }
+
+            mExcludehBox = value;
+            mExcludehBox.TextChanged += mExcludehBox_TextChanged;
+        }
+    }
 
     public FileListView FileList { get; private set; }
 

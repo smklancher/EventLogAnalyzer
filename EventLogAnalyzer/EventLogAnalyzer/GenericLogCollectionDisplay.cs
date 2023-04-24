@@ -2,6 +2,8 @@
 
 public partial class GenericLogCollectionDisplay
 {
+    private string LastExcludeText = "";
+    private FilterOptions LastFilterOptions = new FilterOptions(string.Empty, string.Empty);
     private string LastSearchText = "";
 
     public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar)
@@ -67,6 +69,24 @@ public partial class GenericLogCollectionDisplay
         LastSearchText = searchText;
     }
 
+    public void Filter(FilterOptions filterOptions)
+    {
+        if (FilterOptions.ResultsAreSubset(LastFilterOptions, filterOptions))
+        {
+            // if we can filter to a subset of existing filter...
+            LinesList.UpdateLineSource(LinesList.CurrentLines.FilteredCopy(filterOptions));
+        }
+        else
+        {
+            //...otherwise need to get content from the source
+            var newlines = LinesFromFileOrTraitValue();
+            newlines = newlines.FilteredCopy(filterOptions);
+            LinesList.UpdateLineSource(newlines);
+        }
+
+        LastFilterOptions = filterOptions;
+    }
+
     public void Refresh()
     {
         DisplayFiles();
@@ -110,14 +130,30 @@ public partial class GenericLogCollectionDisplay
 
         if (timer is not null)
         {
-            string SearchText = timer.Tag.ToString() ?? string.Empty;
-            Filter(SearchText);
+            //string SearchText = timer.Tag.ToString() ?? string.Empty;
+            //Filter(SearchText);
+            var filter = new FilterOptions(SearchBox.Text, ExcludeBox.Text);
+            Filter(filter);
             timer.Stop();
         }
     }
 
     private ILogEntryCollection<LogEntry> LinesFromFileOrTraitValue() =>
         IsDisplayingFullFile ? FileList.SelectedLogEvents : Logs.TraitTypes.Lines(TraitTypesList.SelectedTraitType(), TraitValuesList.ActiveTraitValue);
+
+    private void mExcludehBox_TextChanged(object? sender, EventArgs e)
+    {
+        if (mTypingTimer == null)
+        {
+            mTypingTimer = new System.Windows.Forms.Timer();
+            mTypingTimer.Interval = 300;
+            mTypingTimer.Tick += this.handleTypingTimerTimeout;
+        }
+
+        mTypingTimer.Stop();
+        mTypingTimer.Tag = (sender as TextBox)?.Text ?? string.Empty;
+        mTypingTimer.Start();
+    }
 
     private void mLogs_LogsFinishedLoading(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
     {
@@ -132,7 +168,7 @@ public partial class GenericLogCollectionDisplay
 
     private void mSearchBox_TextChanged(object? sender, EventArgs e)
     {
-        if (mTypingTimer == null)
+        if (mTypingTimer == null) //mExcludehBox_TextChanged
         {
             mTypingTimer = new System.Windows.Forms.Timer();
             mTypingTimer.Interval = 300;

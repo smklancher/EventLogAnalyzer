@@ -48,6 +48,94 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
         return lc;
     }
 
+    //public virtual ILogEntryCollection<T> FilteredCopy(FilterOptions filterOptions)
+    //{
+    //    var lc = new LogEntryCollection<T>();
+
+    //    var includes = filterOptions.Includes;
+    //    var excludes = filterOptions.Excludes;
+
+    //    foreach (var e in Entries)
+    //    {
+    //        var isIncluded = true;
+
+    //        if (includes.Count > 0)
+    //        {
+    //            if (Options.Instance.CsvSearchWithOR)
+    //            {
+    //                isIncluded = includes.Any(x => e.Message.ToLower().Contains(x));
+    //            }
+    //            else
+    //            {
+    //                isIncluded = includes.All(x => e.Message.ToLower().Contains(x));
+    //            }
+    //        }
+
+    //        if (isIncluded)
+    //        {
+    //            var isExcluded = excludes.Any(x => e.Message.ToLower().Contains(x));
+
+    //            if (!isExcluded)
+    //            {
+    //                lc.Add(e);
+    //            }
+    //        }
+    //    }
+
+    //    lc.EntryList.Lock();
+    //    return lc;
+    //}
+
+    public virtual ILogEntryCollection<T> FilteredCopy(FilterOptions filterOptions)
+    {
+        var lc = new LogEntryCollection<T>();
+
+        var includes = filterOptions.Includes;
+        var excludes = filterOptions.Excludes;
+
+        foreach (var e in Entries)
+        {
+            // if no include filters, then everything is included
+            var isIncluded = filterOptions.IncludeFilters.Count == 0;
+
+            // otherwise include if it meets an include filter
+            foreach (var f in filterOptions.IncludeFilters)
+            {
+                if (f.AppliesTo.IsAssignableFrom(e.GetType()))
+                {
+                    isIncluded = f.TestObject(e);
+
+                    // if any include filter met, skip remaining
+                    if (isIncluded) { break; }
+                }
+            }
+
+            var isExcluded = false;
+            // if included, check exclude filters
+            if (isIncluded)
+            {
+                foreach (var f in filterOptions.ExcludeFilters)
+                {
+                    if (f.AppliesTo.IsAssignableFrom(e.GetType()))
+                    {
+                        isExcluded = f.TestObject(e);
+
+                        // if any exclude filter met, skip remaining
+                        if (isExcluded) { break; }
+                    }
+                }
+            }
+
+            if (isIncluded && !isExcluded)
+            {
+                lc.Add(e);
+            }
+        }
+
+        lc.EntryList.Lock();
+        return lc;
+    }
+
     /// <summary>
     /// Merges another LineCollection into this one
     /// </summary>

@@ -18,6 +18,14 @@ public class Options
 
     public static Options Instance => Lazy.Value;
 
+    [Description("Search/exclude are treated as CSV")]
+    [Category(TestingCategory)]
+    public bool CsvSearchTerms { get; set; } = true;
+
+    [Description("CSV search terms are OR, meaning find messages that match this or that.  Set false for AND search.  Exclude is always OR, meaning exlude if message matches this or that.")]
+    [Category(TestingCategory)]
+    public bool CsvSearchWithOR { get; set; } = true;
+
     [Description("Enable whatever current behavior is being tested during development.")]
     [Category(TestingCategory)]
     public bool EnableCurrentTest { get; set; } = false;

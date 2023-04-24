@@ -27,5 +27,7 @@ public interface ILogEntryCollection<out T> where T : LogEntry
     /// <remarks></remarks>
     public DateTime LastEvent { get; }
 
+    public ILogEntryCollection<T> FilteredCopy(FilterOptions filterOptions);
+
     public ILogEntryCollection<T> FilteredCopy(string FilterText);
 }

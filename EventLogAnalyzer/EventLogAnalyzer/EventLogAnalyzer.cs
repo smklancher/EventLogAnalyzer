@@ -83,6 +83,7 @@ public partial class EventLogAnalyzer : Form
         // enable memory/cpu status
         AppDomain.MonitoringIsEnabled = true;
         LCD.SearchBox = MessageSearchTextBox;
+        LCD.ExcludeBox = SearchExcludeTextBox;
         LCD.ProgressBar = ToolStripProgressBar1;
         LCD.StatusBar = ToolStripStatusLabel1;
 
