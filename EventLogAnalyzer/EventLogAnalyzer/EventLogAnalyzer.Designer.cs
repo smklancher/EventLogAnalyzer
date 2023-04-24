@@ -181,6 +181,7 @@ namespace EventLogAnalyzer
             // 
             // SplitIndexTypesAndIndexValues
             // 
+            this.SplitIndexTypesAndIndexValues.Cursor= System.Windows.Forms.Cursors.HSplit; 
             this.SplitIndexTypesAndIndexValues.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitIndexTypesAndIndexValues.Location = new System.Drawing.Point(0, 0);
             this.SplitIndexTypesAndIndexValues.Name = "SplitIndexTypesAndIndexValues";
@@ -199,6 +200,7 @@ namespace EventLogAnalyzer
             // 
             // SplitLinesAndDetail
             // 
+            this.SplitLinesAndDetail.Cursor = System.Windows.Forms.Cursors.HSplit;
             this.SplitLinesAndDetail.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitLinesAndDetail.Location = new System.Drawing.Point(0, 0);
             this.SplitLinesAndDetail.Name = "SplitLinesAndDetail";
@@ -230,7 +232,7 @@ namespace EventLogAnalyzer
             // 
             this.SplitDetailAndProperties.Panel2.Controls.Add(this.DebugProperties);
             this.SplitDetailAndProperties.Size = new System.Drawing.Size(718, 159);
-            this.SplitDetailAndProperties.SplitterDistance = 499;
+            this.SplitDetailAndProperties.SplitterDistance = 498;
             this.SplitDetailAndProperties.TabIndex = 1;
             // 
             // txtDetail
@@ -240,7 +242,7 @@ namespace EventLogAnalyzer
             this.txtDetail.Multiline = true;
             this.txtDetail.Name = "txtDetail";
             this.txtDetail.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtDetail.Size = new System.Drawing.Size(499, 159);
+            this.txtDetail.Size = new System.Drawing.Size(498, 159);
             this.txtDetail.TabIndex = 0;
             // 
             // DebugProperties
@@ -250,7 +252,7 @@ namespace EventLogAnalyzer
             this.DebugProperties.LineColor = System.Drawing.SystemColors.ControlDark;
             this.DebugProperties.Location = new System.Drawing.Point(0, 0);
             this.DebugProperties.Name = "DebugProperties";
-            this.DebugProperties.Size = new System.Drawing.Size(215, 159);
+            this.DebugProperties.Size = new System.Drawing.Size(216, 159);
             this.DebugProperties.TabIndex = 0;
             // 
             // MenuStrip1
