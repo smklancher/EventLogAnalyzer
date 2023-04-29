@@ -10,8 +10,12 @@ public enum OffsetOption
 
 public class TimestampOptions
 {
-    public static DateTime Convert(DateTime dateTime)
+    public static DateTime? Convert(DateTime? nullableDateTime)
     {
+        if( nullableDateTime == null) { return nullableDateTime; }
+
+        var dateTime = nullableDateTime.Value;
+
         // event log returns timestamp as local even though internally is UTC
         if (Options.Instance.TimestampConversion == OffsetOption.ConvertToLocal) { return dateTime; }
 
@@ -30,13 +34,6 @@ public class TimestampOptions
 
     public static string ConvertToString(DateTime? dateTime)
     {
-        if (dateTime is null)
-        {
-            return string.Empty;
-        }
-        else
-        {
-            return Convert((DateTime)dateTime).ToString();
-        }
+        return Convert(dateTime).ToString() ?? string.Empty;
     }
 }

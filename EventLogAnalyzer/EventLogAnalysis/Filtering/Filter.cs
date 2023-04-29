@@ -6,43 +6,54 @@ using System.Threading.Tasks;
 
 namespace EventLogAnalysis.Filtering
 {
-    //applicable object: class or interface the filter can apply to
-
-    //relation: way of comparing object to value
-    //value: with relation determines if filter is met for input object
-    //action: what to do if met (include/exclude/maybe highlight/etc)
-
     public class Filter
     {
+        /// <summary>
+        /// action: what to do if met (include/exclude/maybe highlight/etc)
+        /// </summary>
         public FilterAction Action { get; set; } = FilterAction.Include;
+
+        /// <summary>
+        /// applicable object: class or interface the filter can apply to
+        /// </summary>
         public Type AppliesTo => Column.Type;
 
-        //object value function: Func<object type,string>
-        // the column list of the filter window is actually whatever this is
-        // so needs to be it's own type and more fleshed out
-        // probably "AppliesTo" becomes part of this type instead of distinct
+        /// <summary>
+        /// knows the type and how to get the relevant value from the type instance
+        /// </summary>
         public required FilterColumn Column { get; set; }
 
+        public DateTime? DateValue { get; set; }
+
+        /// <summary>
+        /// relation: way of comparing object to value
+        /// </summary>
         public FilterRelation Relation { get; set; } = new RelationContains();
 
+        /// <summary>
+        /// value: with relation determines if filter is met for input object
+        /// </summary>
         public required string Value { get; set; }
-
-        public void test()
-        {
-            //var x = List<IList>();
-            var obj = new object();
-            var filters = new List<Filter>();
-            foreach (var filter in filters)
-            {
-                var meetsFilter = filter.TestObject(obj);
-            }
-        }
 
         public bool TestObject(object obj)
         {
-            var objValue = Column.ObjectValue(obj).ToLower();
+            if (Column.IsDate && DateValue.HasValue)
+            {
+                var objValue = Column.DateValue(obj);
 
-            return Relation.TestValues(objValue, Value.ToLower());
+                return Relation.TestDates(objValue, DateValue);
+            }
+            else
+            {
+                var objValue = Column.ObjectValue(obj).ToLower();
+
+                return Relation.TestValues(objValue, Value.ToLower());
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{Action} {Column.DisplayName} {Relation.DisplayName} {Value}";
         }
     }
 }

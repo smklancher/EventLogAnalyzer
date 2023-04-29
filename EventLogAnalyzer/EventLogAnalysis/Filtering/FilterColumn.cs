@@ -18,7 +18,9 @@ namespace EventLogAnalysis.Filtering
             DisplayName = displayName;
         }
 
+        public Func<object, DateTime?>? DateFunc { get; set; }
         public string DisplayName { get; init; }
+        public bool IsDate => DateFunc != null;
         public Type Type { get; init; }
 
         public static void test()
@@ -26,7 +28,11 @@ namespace EventLogAnalysis.Filtering
             var x = new FilterColumn(typeof(LogEntry), x => ((LogEntry)x).Message, "Log Message");
         }
 
-        public void Notes()
+        public DateTime? DateValue(object obj) => DateFunc?.Invoke(obj);
+
+        public string ObjectValue(object obj) => valueFunc(obj);
+
+        private void Notes()
         {
             // needs to be an interface to take advangage of generic covariance (not supported for classes)
             // ILogEntryCollection<out T> where T : LogEntry
@@ -37,7 +43,5 @@ namespace EventLogAnalysis.Filtering
             // here I want FilterColumn to have an input type like FilterColumn<LogEntry>
             // and a method that returns a string from a property on that type
         }
-
-        public string ObjectValue(object obj) => valueFunc(obj);
     }
 }

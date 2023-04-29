@@ -71,9 +71,10 @@ public partial class GenericLogCollectionDisplay
 
     public void Filter(FilterOptions filterOptions)
     {
+        // if we can logically be sure that the filter should produce only a subset of the previous filter...
         if (FilterOptions.ResultsAreSubset(LastFilterOptions, filterOptions))
         {
-            // if we can filter to a subset of existing filter...
+            // then it is better performance to filter what is already displayed...
             LinesList.UpdateLineSource(LinesList.CurrentLines.FilteredCopy(filterOptions));
         }
         else

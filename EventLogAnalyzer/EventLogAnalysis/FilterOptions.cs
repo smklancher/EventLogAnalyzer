@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,25 +17,23 @@ namespace EventLogAnalysis
                 Includes = include.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
                 Excludes = exclude.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-                IncludeFilters = Includes.Select(x => TermToFilter(x, FilterAction.Include)).ToList();
-                ExcludeFilters = Excludes.Select(x => TermToFilter(x, FilterAction.Exclude)).ToList();
+                FilterSet.Filters.AddRange(Includes.Select(x => TermToFilter(x, FilterAction.Include)));
+                FilterSet.Filters.AddRange(Excludes.Select(x => TermToFilter(x, FilterAction.Exclude)));
+
+                DescribeFilters();
             }
             else
             {
                 Includes = new();
                 Excludes = new();
-                IncludeFilters = new();
-                ExcludeFilters = new();
             }
         }
 
-        public List<Filter> ExcludeFilters { get; set; }
-
+        public List<Filter> ExcludeFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Exclude).ToList();
         public List<string> Excludes { get; set; }
-
         public string ExcludeText { get; set; } = string.Empty;
-
-        public List<Filter> IncludeFilters { get; set; }
+        public FilterSet FilterSet { get; set; } = new FilterSet();
+        public List<Filter> IncludeFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Include).ToList();
 
         public List<string> Includes { get; set; }
 
@@ -68,20 +67,76 @@ namespace EventLogAnalysis
             return false;
         }
 
+        public string DescribeFilters()
+        {
+            var sb = new StringBuilder();
+            foreach (var filter in IncludeFilters)
+            {
+                sb.AppendLine(filter.ToString());
+            }
+
+            foreach (var filter in ExcludeFilters)
+            {
+                sb.AppendLine(filter.ToString());
+            }
+
+            var desc = sb.ToString();
+
+            Trace.WriteLine(desc);
+
+            return desc;
+        }
+
         private static Filter TermToFilter(string term, FilterAction action)
         {
-            var filter = new Filter()
+            if (DateTime.TryParse(term, out var date))
             {
-                Column = new FilterColumn(
+                var col = new FilterColumn(
+                    typeof(LogEntry),
+                    x => ((LogEntry)x).Timestamp.ToString() ?? string.Empty,
+                    "TimeStamp");
+                col.DateFunc = x => TimestampOptions.Convert(((LogEntry)x).Timestamp);
+
+                var filter = new Filter()
+                {
+                    Column = col,
+                    Value = term,
+                    DateValue = date,
+                    Action = action,
+                    Relation = new RelationGreaterThan(),
+                };
+
+                // for now, date in include is a start date (exclude less than)
+                //  and date in exclude is end date (exclude greater than)
+                if (action == FilterAction.Include)
+                {
+                    filter.Relation = new RelationLessThan();
+
+                    //this means it changes to an exclude filter
+                    filter.Action = FilterAction.Exclude;
+                }
+                else
+                {
+                    filter.Relation = new RelationGreaterThan();
+                }
+
+                return filter;
+            }
+            else
+            {
+                var filter = new Filter()
+                {
+                    Column = new FilterColumn(
                     typeof(LogEntry),
                     x => ((LogEntry)x).Message,
                     "Log Message"),
-                Value = term,
-                Action = action,
-                Relation = new RelationContains(),
-            };
+                    Value = term,
+                    Action = action,
+                    Relation = new RelationContains(),
+                };
 
-            return filter;
+                return filter;
+            }
         }
     }
 }
