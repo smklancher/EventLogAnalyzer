@@ -11,7 +11,7 @@ namespace EventLogAnalysis.Filtering
         //couldn't figure out how to use generics for the type without co/contra variance issues
         private Func<object, string> valueFunc;
 
-        public FilterColumn(Type type, Func<object, string> valueFunc, string displayName)
+        private FilterColumn(Type type, Func<object, string> valueFunc, string displayName)
         {
             this.valueFunc = valueFunc;
             Type = type;
@@ -19,9 +19,19 @@ namespace EventLogAnalysis.Filtering
         }
 
         public Func<object, DateTime?>? DateFunc { get; set; }
+
         public string DisplayName { get; init; }
+
         public bool IsDate => DateFunc != null;
+
         public Type Type { get; init; }
+
+        public static FilterColumn New(Type type, Func<object, string> valueFunc, string displayName)
+        {
+            var fc = new FilterColumn(type, valueFunc, displayName);
+            KnownFilter.Columns.TryAdd(fc.DisplayName, fc);
+            return fc;
+        }
 
         public static void test()
         {

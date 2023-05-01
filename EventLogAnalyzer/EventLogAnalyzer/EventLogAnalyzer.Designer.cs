@@ -66,6 +66,7 @@ namespace EventLogAnalyzer
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.SearchExcludeTextBox = new System.Windows.Forms.TextBox();
+            this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -181,7 +182,7 @@ namespace EventLogAnalyzer
             // 
             // SplitIndexTypesAndIndexValues
             // 
-            this.SplitIndexTypesAndIndexValues.Cursor= System.Windows.Forms.Cursors.HSplit; 
+            this.SplitIndexTypesAndIndexValues.Cursor = System.Windows.Forms.Cursors.HSplit;
             this.SplitIndexTypesAndIndexValues.Dock = System.Windows.Forms.DockStyle.Fill;
             this.SplitIndexTypesAndIndexValues.Location = new System.Drawing.Point(0, 0);
             this.SplitIndexTypesAndIndexValues.Name = "SplitIndexTypesAndIndexValues";
@@ -281,20 +282,20 @@ namespace EventLogAnalyzer
             // 
             this.ClearToolStripMenuItem.Enabled = false;
             this.ClearToolStripMenuItem.Name = "ClearToolStripMenuItem";
-            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.ClearToolStripMenuItem.Text = "Clear";
             // 
             // DumpToCombinedCSVToolStripMenuItem
             // 
             this.DumpToCombinedCSVToolStripMenuItem.Enabled = false;
             this.DumpToCombinedCSVToolStripMenuItem.Name = "DumpToCombinedCSVToolStripMenuItem";
-            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.DumpToCombinedCSVToolStripMenuItem.Text = "Combined to CSV";
             // 
             // loadEventLogToolStripMenuItem
             // 
             this.loadEventLogToolStripMenuItem.Name = "loadEventLogToolStripMenuItem";
-            this.loadEventLogToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.loadEventLogToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.loadEventLogToolStripMenuItem.Text = "Load Event Log...";
             // 
             // ViewToolStripMenuItem
@@ -304,7 +305,8 @@ namespace EventLogAnalyzer
             this.SaveCurrentIndiciesToolStripMenuItem,
             this.OptionsMenuItem,
             this.toggleLineToolStripMenuItem,
-            this.timestampAsToolStripMenuItem});
+            this.timestampAsToolStripMenuItem,
+            this.filtersToolStripMenuItem});
             this.ViewToolStripMenuItem.Name = "ViewToolStripMenuItem";
             this.ViewToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.ViewToolStripMenuItem.Text = "View";
@@ -444,6 +446,13 @@ namespace EventLogAnalyzer
             this.SearchExcludeTextBox.Size = new System.Drawing.Size(296, 20);
             this.SearchExcludeTextBox.TabIndex = 15;
             // 
+            // filtersToolStripMenuItem
+            // 
+            this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
+            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.filtersToolStripMenuItem.Text = "Filters...";
+            this.filtersToolStripMenuItem.Click += new System.EventHandler(this.filtersToolStripMenuItem_Click);
+            // 
             // EventLogAnalyzer
             // 
             this.AllowDrop = true;
@@ -530,5 +539,6 @@ namespace EventLogAnalyzer
         private ToolStripMenuItem specificLocalOffsetToolStripMenuItem;
         private Label label2;
         private TextBox SearchExcludeTextBox;
+        private ToolStripMenuItem filtersToolStripMenuItem;
     }
 }

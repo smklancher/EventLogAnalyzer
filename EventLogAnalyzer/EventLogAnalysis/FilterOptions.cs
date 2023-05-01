@@ -91,7 +91,7 @@ namespace EventLogAnalysis
         {
             if (DateTime.TryParse(term, out var date))
             {
-                var col = new FilterColumn(
+                var col = FilterColumn.New(
                     typeof(LogEntry),
                     x => ((LogEntry)x).Timestamp.ToString() ?? string.Empty,
                     "TimeStamp");
@@ -126,7 +126,7 @@ namespace EventLogAnalysis
             {
                 var filter = new Filter()
                 {
-                    Column = new FilterColumn(
+                    Column = FilterColumn.New(
                     typeof(LogEntry),
                     x => ((LogEntry)x).Message,
                     "Log Message"),

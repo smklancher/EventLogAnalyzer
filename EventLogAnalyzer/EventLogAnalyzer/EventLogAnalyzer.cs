@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using EventLogAnalysis.Filtering;
+using Microsoft.Win32;
 
 namespace EventLogAnalyzer;
 
@@ -101,6 +102,12 @@ public partial class EventLogAnalyzer : Form
             LCD.DisplayFiles();
             await LoadAndAnalyzeAsync();
         }
+    }
+
+    private void filtersToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        var f = new FilterForm();
+        var result = f.ShowDialog(this);
     }
 
     private async Task LoadAndAnalyzeAsync()
