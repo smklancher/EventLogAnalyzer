@@ -123,7 +123,7 @@ public class FileListView
     {
         if (IsLogSelected)
         {
-            LinesList.UpdateLineSource(SelectedLog().EntryCollection);
+            LinesList.UpdateLineSourceAndApplyFilter(SelectedLog().EntryCollection, true);
         }
     }
 }

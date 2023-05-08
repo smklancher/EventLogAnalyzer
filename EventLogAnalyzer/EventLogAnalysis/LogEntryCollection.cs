@@ -90,9 +90,6 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
     {
         var lc = new LogEntryCollection<T>();
 
-        var includes = filterOptions.Includes;
-        var excludes = filterOptions.Excludes;
-
         foreach (var e in Entries)
         {
             // if no include filters, then everything is included
@@ -128,6 +125,21 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
 
             if (isIncluded && !isExcluded)
             {
+                // if it is included and not excluded, check any highlight filters
+                var highlighted = false;
+                e.Color = null;
+
+                foreach (var f in filterOptions.HighlightFilters)
+                {
+                    if (f.AppliesTo.IsAssignableFrom(e.GetType()))
+                    {
+                        highlighted = f.TestObject(e);
+
+                        // if any highlighted filter met, skip remaining
+                        if (highlighted) { e.Color = f.HighlightColor; break; }
+                    }
+                }
+
                 lc.Add(e);
             }
         }

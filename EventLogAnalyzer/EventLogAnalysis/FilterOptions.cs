@@ -10,81 +10,70 @@ namespace EventLogAnalysis
 {
     public class FilterOptions
     {
-        public FilterOptions(string include, string exclude)
-        {
-            if (Options.Instance.CsvSearchTerms)
-            {
-                Includes = include.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-                Excludes = exclude.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-
-                FilterSet.Filters.AddRange(Includes.Select(x => TermToFilter(x, FilterAction.Include)));
-                FilterSet.Filters.AddRange(Excludes.Select(x => TermToFilter(x, FilterAction.Exclude)));
-
-                DescribeFilters();
-            }
-            else
-            {
-                Includes = new();
-                Excludes = new();
-            }
-        }
-
         public List<Filter> ExcludeFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Exclude).ToList();
-        public List<string> Excludes { get; set; }
-        public string ExcludeText { get; set; } = string.Empty;
-        public FilterSet FilterSet { get; set; } = new FilterSet();
-        public List<Filter> IncludeFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Include).ToList();
 
-        public List<string> Includes { get; set; }
+        public string ExcludeText { get; set; } = string.Empty;
+
+        public FilterSet FilterSet { get; set; } = new FilterSet();
+
+        public List<Filter> HighlightFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Hightlight).ToList();
+
+        public List<Filter> IncludeFilters => FilterSet.Filters.Where(x => x.Action == FilterAction.Include).ToList();
 
         public string SearchText { get; set; } = string.Empty;
 
-        public static bool ResultsAreSubset(FilterOptions old, FilterOptions newf)
+        /// <summary>
+        /// Add filter columns to known filters... probably these should be on the types they apply to, to allow for extensible plugins
+        /// </summary>
+        public static void InitializeFilterColumns()
         {
-            //searchText.Length > LastSearchText.Length && searchText.StartsWith(LastSearchText)
+            var col = FilterColumn.New(
+                    typeof(LogEntry),
+                    x => ((LogEntry)x).Timestamp.ToString() ?? string.Empty,
+                    "TimeStamp");
+            col.DateFunc = x => TimestampOptions.Convert(((LogEntry)x).Timestamp);
 
-            if (!Options.Instance.CsvSearchTerms)
-            {
-                // simple search:
-                // if you just keep typing include search or deleting exclude search, then
-                // the results will continue to be a smaller subset of existing results
-                return newf.SearchText.StartsWith(old.SearchText, StringComparison.OrdinalIgnoreCase) &&
-                    old.ExcludeText.StartsWith(newf.ExcludeText, StringComparison.OrdinalIgnoreCase);
-            }
-            else
-            {
-                //// can only be a subset if include terms are the same or less
-                //var includeTermsSameOrLess = newf.Includes.Count <= old.Includes.Count;
+            FilterColumn.New(
+                typeof(LogEntry),
+                x => ((LogEntry)x).Message,
+                "Log Message");
 
-                //// can only be a subset if exclude terms are the same or more
-                //var excludeTermsSameOrMore = newf.Excludes.Count >= old.Excludes.Count;
+            col = FilterColumn.New(
+                typeof(LogEntry),
+                x => ((LogEntry)x).Level,
+                "Log Level");
 
-                //return includeTermsSameOrLess && excludeTermsSameOrMore &&
-                //    newf.SearchText.StartsWith(old.SearchText, StringComparison.OrdinalIgnoreCase) &&
-                //    old.ExcludeText.StartsWith(newf.ExcludeText, StringComparison.OrdinalIgnoreCase);
-            }
-
-            return false;
+            col.SuggestedValuesFunc = () => Enum.GetNames(typeof(TraceEventType));
         }
 
-        public string DescribeFilters()
+        /// <summary>
+        /// Create filters from csv inputs
+        /// </summary>
+        /// <param name="include">CSV: Each term creates a contains include filter.  Dates become a start date filter (exclude less than).</param>
+        /// <param name="exclude">CSV: Each term creates a contains exclude filter.  Dates become a end date filter (exclude greater than).</param>
+        /// <returns></returns>
+        public static List<Filter> QuickFilters(string include, string exclude)
         {
-            var sb = new StringBuilder();
-            foreach (var filter in IncludeFilters)
-            {
-                sb.AppendLine(filter.ToString());
-            }
+            var list = new List<Filter>();
 
-            foreach (var filter in ExcludeFilters)
-            {
-                sb.AppendLine(filter.ToString());
-            }
+            var incList = include.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
+            var excList = exclude.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-            var desc = sb.ToString();
+            list.AddRange(incList.Select(x => TermToFilter(x, FilterAction.Include)));
+            list.AddRange(excList.Select(x => TermToFilter(x, FilterAction.Exclude)));
 
-            Trace.WriteLine(desc);
+            return list;
+        }
 
-            return desc;
+        public static bool ResultsAreSubset(FilterOptions old, FilterOptions newf)
+        {
+            return false;
+
+            // simple search:
+            // if you just keep typing include search or deleting exclude search, then
+            // the results will continue to be a smaller subset of existing results
+            //return newf.SearchText.StartsWith(old.SearchText, StringComparison.OrdinalIgnoreCase) &&
+            //    old.ExcludeText.StartsWith(newf.ExcludeText, StringComparison.OrdinalIgnoreCase);
         }
 
         private static Filter TermToFilter(string term, FilterAction action)
@@ -101,7 +90,6 @@ namespace EventLogAnalysis
                 {
                     Column = col,
                     Value = term,
-                    DateValue = date,
                     Action = action,
                     Relation = new RelationGreaterThan(),
                 };

@@ -1,9 +1,12 @@
-﻿namespace EventLogAnalysis;
+﻿using System.Diagnostics;
+
+namespace EventLogAnalysis;
 
 public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
 {
     //TODO: review use of protected properties
 
+    public Color? Color { get; set; }
     public string Level { get; protected set; } = string.Empty;
     public string Message { get; protected set; } = string.Empty;
 

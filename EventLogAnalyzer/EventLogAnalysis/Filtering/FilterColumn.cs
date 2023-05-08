@@ -24,6 +24,7 @@ namespace EventLogAnalysis.Filtering
 
         public bool IsDate => DateFunc != null;
 
+        public Func<IEnumerable<string>>? SuggestedValuesFunc { get; set; }
         public Type Type { get; init; }
 
         public static FilterColumn New(Type type, Func<object, string> valueFunc, string displayName)

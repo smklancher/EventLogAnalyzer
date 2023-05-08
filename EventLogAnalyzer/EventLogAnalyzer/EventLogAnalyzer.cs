@@ -18,7 +18,7 @@ public partial class EventLogAnalyzer : Form
 
         progressHandler = new Progress<ProgressUpdate>(ProgressChanged);
 
-        LCD = new GenericLogCollectionDisplay(lstLines, lstTraitValues, lstTraitTypes, lstFiles, txtDetail, DebugProperties, ToolStripStatusLabel1, ToolStripProgressBar1);
+        LCD = new GenericLogCollectionDisplay(lstLines, lstTraitValues, lstTraitTypes, lstFiles, txtDetail, DebugProperties, ToolStripStatusLabel1, ToolStripProgressBar1, this);
     }
 
     public static string UNCPath(string path)
@@ -43,11 +43,11 @@ public partial class EventLogAnalyzer : Form
         if (e.Data is not null && e.Data.GetDataPresent(DataFormats.FileDrop))
         {
             string[] MyFiles;
-            MyFiles = (string[])e.Data.GetData(DataFormats.FileDrop);
+            MyFiles = (string[])e.Data.GetData(DataFormats.FileDrop)!;
 
-            foreach (string File in MyFiles)
+            foreach (string File in MyFiles!)
             {
-                if (Options.Instance.EnableCurrentTest)
+                if (Options.Instance.EnableTextLogTest)
                 {
                     var el = new TextFileLog(File);
                     LCD.Logs.AddLog(el);
@@ -89,6 +89,8 @@ public partial class EventLogAnalyzer : Form
         LCD.StatusBar = ToolStripStatusLabel1;
 
         //LCD.DisplayInternalLog();
+
+        FilterOptions.InitializeFilterColumns();
     }
 
     private async void EventLogAnalyzer_ShownAsync(object sender, EventArgs e)
@@ -106,8 +108,7 @@ public partial class EventLogAnalyzer : Form
 
     private void filtersToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        var f = new FilterForm();
-        var result = f.ShowDialog(this);
+        LCD.OpenFilterDialog();
     }
 
     private async Task LoadAndAnalyzeAsync()

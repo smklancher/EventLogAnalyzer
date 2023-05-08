@@ -57,6 +57,14 @@ public class TraitValuesListView
         list.EndUpdate();
     }
 
+    public void UnselectTrait()
+    {
+        list.BeginUpdate();
+        list.SelectedIndices.Clear();
+        ActiveTraitValue = string.Empty;
+        list.EndUpdate();
+    }
+
     public void UpdateTraitValuesSource(TraitValuesCollection newsource)
     {
         list.BeginUpdate();
@@ -73,7 +81,7 @@ public class TraitValuesListView
         InternalDisplayLines();
     }
 
-    private void InternalDisplayLines() => LinesList.UpdateLineSource(CurrentTraitValues.LinesFromTraitValue(SelectedTraitValue()));
+    private void InternalDisplayLines() => LinesList.UpdateLineSourceAndApplyFilter(CurrentTraitValues.LinesFromTraitValue(SelectedTraitValue()), false);
 
     private void List_ColumnClick(object? sender, ColumnClickEventArgs e)
     {

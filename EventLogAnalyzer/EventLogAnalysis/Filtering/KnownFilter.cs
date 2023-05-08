@@ -21,7 +21,7 @@ namespace EventLogAnalysis.Filtering
                 if (inst != null)
                 {
                     var rel = (FilterRelation)inst;
-                    Relations.Add(rel.DisplayName, rel);
+                    Relations.TryAdd(rel.DisplayName, rel);
                 }
             }
 
@@ -29,7 +29,7 @@ namespace EventLogAnalysis.Filtering
             {
                 if (a != null)
                 {
-                    Actions.Add(a.ToString(), (FilterAction)a);
+                    Actions.TryAdd(a.ToString(), (FilterAction)a);
                 }
             }
         }

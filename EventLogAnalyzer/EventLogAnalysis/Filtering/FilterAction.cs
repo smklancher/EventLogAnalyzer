@@ -10,5 +10,6 @@ namespace EventLogAnalysis.Filtering
     {
         Include,
         Exclude,
+        Hightlight,
     }
 }

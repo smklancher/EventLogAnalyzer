@@ -8,6 +8,8 @@ namespace EventLogAnalysis.Filtering
 {
     public class Filter
     {
+        private string strValue = string.Empty;
+
         /// <summary>
         /// action: what to do if met (include/exclude/maybe highlight/etc)
         /// </summary>
@@ -23,7 +25,9 @@ namespace EventLogAnalysis.Filtering
         /// </summary>
         public required FilterColumn Column { get; set; }
 
-        public DateTime? DateValue { get; set; }
+        public DateTime? DateValue { get; private set; }
+
+        public Color HighlightColor { get; set; } = Color.LightYellow;
 
         /// <summary>
         /// relation: way of comparing object to value
@@ -33,7 +37,19 @@ namespace EventLogAnalysis.Filtering
         /// <summary>
         /// value: with relation determines if filter is met for input object
         /// </summary>
-        public required string Value { get; set; }
+        public required string Value
+        {
+            get { return strValue; }
+            set
+            {
+                if (DateTime.TryParse(value, out var date))
+                {
+                    DateValue = date;
+                }
+
+                strValue = value;
+            }
+        }
 
         public bool TestObject(object obj)
         {

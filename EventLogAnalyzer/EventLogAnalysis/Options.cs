@@ -18,20 +18,16 @@ public class Options
 
     public static Options Instance => Lazy.Value;
 
-    [Description("Search/exclude are treated as CSV")]
-    [Category(TestingCategory)]
-    public bool CsvSearchTerms { get; set; } = true;
-
-    [Description("CSV search terms are OR, meaning find messages that match this or that.  Set false for AND search.  Exclude is always OR, meaning exlude if message matches this or that.")]
-    [Category(TestingCategory)]
-    public bool CsvSearchWithOR { get; set; } = true;
-
     [Description("Enable whatever current behavior is being tested during development.")]
     [Category(TestingCategory)]
-    public bool EnableCurrentTest { get; set; } = false;
+    public bool EnableTextLogTest { get; set; } = false;
 
     [Category(TimestampCategory)]
     public int HourOffset { get; set; } = 0;
+
+    [Description("Include filters use OR, meaning find messages that match this or that.  Set false for AND search.  Exclude is always OR, meaning exlude if message matches this or that.")]
+    [Category(TestingCategory)]
+    public bool IncludeFilterUsesOR { get; set; } = true;
 
     [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
     [Category(TestingCategory)]

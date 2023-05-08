@@ -1,4 +1,11 @@
-﻿namespace EventLogAnalyzer;
+﻿using EventLogAnalysis.Filtering;
+
+namespace EventLogAnalyzer;
+
+// TODO: Find/Find next functionality:
+// https://learn.microsoft.com/en-us/windows/win32/dlgbox/find-and-replace-dialog-boxes
+// https://github.com/microsoft/CsWin32
+// https://stackoverflow.com/questions/46011643/correct-passing-struct-to-findtext-function-using-pinvoke
 
 public class LinesListView
 {
@@ -23,15 +30,24 @@ public class LinesListView
         list.EndUpdate();
     }
 
+    public FilterOptions CurrentFilters { get; set; } = new FilterOptions();
     public ILogEntryCollection<LogEntry> CurrentLines { get; private set; } = new LogEntryCollection<LogEntry>();
-
     public PropertyGrid DebugProperties { get; }
-
     public TextBox DetailText { get; }
 
-    public bool SortNewestFirst { get; set; } = true;
+    /// <summary>
+    /// Probably need a better aproach to avoid needing this, but for now needed in the GLCD class above.
+    /// </summary>
+    public bool IsFullFile { get; private set; }
 
+    public bool SortNewestFirst { get; set; } = true;
+    public ILogEntryCollection<LogEntry> UnfilteredLines { get; private set; } = new LogEntryCollection<LogEntry>();
     private ListView list { get; }
+
+    public void ReFilter()
+    {
+        UpdateCurrentLines(UnfilteredLines.FilteredCopy(CurrentFilters));
+    }
 
     public void SelectEarliestLine()
     {
@@ -51,17 +67,19 @@ public class LinesListView
         }
     }
 
-    public void UpdateLineSource(ILogEntryCollection<LogEntry> newlines)
+    public void UpdateLineSourceAndApplyFilter(ILogEntryCollection<LogEntry> newlines, bool isFullFile)
     {
-        list.BeginUpdate();
-        //IsDisplayingInternalLog = false;
-        CurrentLines = newlines;
-        list.VirtualListSize = CurrentLines.Entries.Count();
+        IsFullFile = IsFullFile;
+        UnfilteredLines = newlines;
+        var filtered = newlines.FilteredCopy(CurrentFilters);
 
-        SelectMostRecentLine();
+        UpdateCurrentLines(filtered);
+    }
 
-        list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
-        list.EndUpdate();
+    public void UpdateLineSourceAndDontApplyFilter(ILogEntryCollection<LogEntry> newlines)
+    {
+        UnfilteredLines = newlines;
+        UpdateCurrentLines(newlines);
     }
 
     private void List_ColumnClick(object? sender, ColumnClickEventArgs e)
@@ -87,6 +105,10 @@ public class LinesListView
         LineInfo = new string[] { TimestampOptions.ConvertToString(Line.Timestamp), Line.Level, Line.Message };
 
         e.Item = new ListViewItem(LineInfo);
+        if (Line.Color != null)
+        {
+            e.Item.BackColor = (Color)Line.Color;
+        }
     }
 
     private void List_SelectedIndexChanged(object? sender, EventArgs e)
@@ -117,5 +139,17 @@ public class LinesListView
     {
         bool reverse = reverseSortPreference ^ indexFromUI;
         return Math.Abs((Convert.ToInt32(!reverse) * (count - 1)) - index);
+    }
+
+    private void UpdateCurrentLines(ILogEntryCollection<LogEntry> newlines)
+    {
+        list.BeginUpdate();
+        CurrentLines = newlines;
+        list.VirtualListSize = CurrentLines.Entries.Count();
+
+        SelectMostRecentLine();
+
+        list.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+        list.EndUpdate();
     }
 }

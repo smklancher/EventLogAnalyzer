@@ -38,12 +38,11 @@
             this.RemoveButton = new System.Windows.Forms.Button();
             this.FilterList = new System.Windows.Forms.ListView();
             this.OKButton = new System.Windows.Forms.Button();
-            this.CancelButton = new System.Windows.Forms.Button();
-            this.ApplyButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ColumnDropdown
             // 
+            this.ColumnDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ColumnDropdown.FormattingEnabled = true;
             this.ColumnDropdown.Location = new System.Drawing.Point(12, 12);
             this.ColumnDropdown.Name = "ColumnDropdown";
@@ -52,6 +51,7 @@
             // 
             // RelationDropdown
             // 
+            this.RelationDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.RelationDropdown.FormattingEnabled = true;
             this.RelationDropdown.Location = new System.Drawing.Point(173, 12);
             this.RelationDropdown.Name = "RelationDropdown";
@@ -71,6 +71,7 @@
             // ActionDropdown
             // 
             this.ActionDropdown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ActionDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ActionDropdown.FormattingEnabled = true;
             this.ActionDropdown.Location = new System.Drawing.Point(668, 12);
             this.ActionDropdown.Name = "ActionDropdown";
@@ -95,6 +96,7 @@
             this.ResetButton.TabIndex = 5;
             this.ResetButton.Text = "Reset";
             this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
             // 
             // AddButton
             // 
@@ -105,6 +107,7 @@
             this.AddButton.TabIndex = 6;
             this.AddButton.Text = "Add";
             this.AddButton.UseVisualStyleBackColor = true;
+            this.AddButton.Click += new System.EventHandler(this.AddButton_Click);
             // 
             // RemoveButton
             // 
@@ -115,6 +118,7 @@
             this.RemoveButton.TabIndex = 7;
             this.RemoveButton.Text = "Remove";
             this.RemoveButton.UseVisualStyleBackColor = true;
+            this.RemoveButton.Click += new System.EventHandler(this.RemoveButton_Click);
             // 
             // FilterList
             // 
@@ -129,46 +133,26 @@
             this.FilterList.TabIndex = 8;
             this.FilterList.UseCompatibleStateImageBehavior = false;
             this.FilterList.View = System.Windows.Forms.View.Details;
+            this.FilterList.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.FilterList_MouseDoubleClick);
             // 
             // OKButton
             // 
-            this.OKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.OKButton.Location = new System.Drawing.Point(553, 415);
+            this.OKButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.OKButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.OKButton.Location = new System.Drawing.Point(713, 415);
             this.OKButton.Name = "OKButton";
             this.OKButton.Size = new System.Drawing.Size(75, 23);
             this.OKButton.TabIndex = 9;
             this.OKButton.Text = "OK";
             this.OKButton.UseVisualStyleBackColor = true;
             // 
-            // CancelButton
-            // 
-            this.CancelButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.CancelButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.CancelButton.Location = new System.Drawing.Point(632, 415);
-            this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(75, 23);
-            this.CancelButton.TabIndex = 10;
-            this.CancelButton.Text = "Cancel";
-            this.CancelButton.UseVisualStyleBackColor = true;
-            // 
-            // ApplyButton
-            // 
-            this.ApplyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ApplyButton.Location = new System.Drawing.Point(713, 415);
-            this.ApplyButton.Name = "ApplyButton";
-            this.ApplyButton.Size = new System.Drawing.Size(75, 23);
-            this.ApplyButton.TabIndex = 11;
-            this.ApplyButton.Text = "Apply";
-            this.ApplyButton.UseVisualStyleBackColor = true;
-            // 
             // FilterForm
             // 
+            this.AcceptButton = this.OKButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.CancelButton;
+            this.CancelButton = this.OKButton;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.ApplyButton);
-            this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.FilterList);
             this.Controls.Add(this.RemoveButton);
@@ -181,7 +165,6 @@
             this.Controls.Add(this.ColumnDropdown);
             this.Name = "FilterForm";
             this.Text = "FilterForm";
-            this.Load += new System.EventHandler(this.FilterForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -199,7 +182,5 @@
         private Button RemoveButton;
         private ListView FilterList;
         private Button OKButton;
-        private Button CancelButton;
-        private Button ApplyButton;
     }
 }

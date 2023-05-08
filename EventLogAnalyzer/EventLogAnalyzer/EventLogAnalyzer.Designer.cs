@@ -59,6 +59,7 @@ namespace EventLogAnalyzer
             this.uTCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.specificUTCOffsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.specificLocalOffsetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip1 = new System.Windows.Forms.StatusStrip();
             this.ToolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.ToolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
@@ -66,7 +67,6 @@ namespace EventLogAnalyzer
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.SearchExcludeTextBox = new System.Windows.Forms.TextBox();
-            this.filtersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.SplitFilesAndRest)).BeginInit();
             this.SplitFilesAndRest.Panel1.SuspendLayout();
             this.SplitFilesAndRest.Panel2.SuspendLayout();
@@ -282,20 +282,20 @@ namespace EventLogAnalyzer
             // 
             this.ClearToolStripMenuItem.Enabled = false;
             this.ClearToolStripMenuItem.Name = "ClearToolStripMenuItem";
-            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.ClearToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.ClearToolStripMenuItem.Text = "Clear";
             // 
             // DumpToCombinedCSVToolStripMenuItem
             // 
             this.DumpToCombinedCSVToolStripMenuItem.Enabled = false;
             this.DumpToCombinedCSVToolStripMenuItem.Name = "DumpToCombinedCSVToolStripMenuItem";
-            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.DumpToCombinedCSVToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.DumpToCombinedCSVToolStripMenuItem.Text = "Combined to CSV";
             // 
             // loadEventLogToolStripMenuItem
             // 
             this.loadEventLogToolStripMenuItem.Name = "loadEventLogToolStripMenuItem";
-            this.loadEventLogToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.loadEventLogToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
             this.loadEventLogToolStripMenuItem.Text = "Load Event Log...";
             // 
             // ViewToolStripMenuItem
@@ -384,6 +384,13 @@ namespace EventLogAnalyzer
             this.specificLocalOffsetToolStripMenuItem.Text = "Specific local offset...";
             this.specificLocalOffsetToolStripMenuItem.Click += new System.EventHandler(this.specificLocalOffsetToolStripMenuItem_Click);
             // 
+            // filtersToolStripMenuItem
+            // 
+            this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
+            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
+            this.filtersToolStripMenuItem.Text = "Filters...";
+            this.filtersToolStripMenuItem.Click += new System.EventHandler(this.filtersToolStripMenuItem_Click);
+            // 
             // StatusStrip1
             // 
             this.StatusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -414,6 +421,7 @@ namespace EventLogAnalyzer
             // 
             this.MessageSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.MessageSearchTextBox.Enabled = false;
             this.MessageSearchTextBox.Location = new System.Drawing.Point(107, 29);
             this.MessageSearchTextBox.Name = "MessageSearchTextBox";
             this.MessageSearchTextBox.Size = new System.Drawing.Size(483, 20);
@@ -441,17 +449,11 @@ namespace EventLogAnalyzer
             // SearchExcludeTextBox
             // 
             this.SearchExcludeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SearchExcludeTextBox.Enabled = false;
             this.SearchExcludeTextBox.Location = new System.Drawing.Point(640, 29);
             this.SearchExcludeTextBox.Name = "SearchExcludeTextBox";
             this.SearchExcludeTextBox.Size = new System.Drawing.Size(296, 20);
             this.SearchExcludeTextBox.TabIndex = 15;
-            // 
-            // filtersToolStripMenuItem
-            // 
-            this.filtersToolStripMenuItem.Name = "filtersToolStripMenuItem";
-            this.filtersToolStripMenuItem.Size = new System.Drawing.Size(210, 22);
-            this.filtersToolStripMenuItem.Text = "Filters...";
-            this.filtersToolStripMenuItem.Click += new System.EventHandler(this.filtersToolStripMenuItem_Click);
             // 
             // EventLogAnalyzer
             // 

@@ -1,12 +1,10 @@
-﻿namespace EventLogAnalyzer;
+﻿using EventLogAnalysis.Filtering;
+
+namespace EventLogAnalyzer;
 
 public partial class GenericLogCollectionDisplay
 {
-    private string LastExcludeText = "";
-    private FilterOptions LastFilterOptions = new FilterOptions(string.Empty, string.Empty);
-    private string LastSearchText = "";
-
-    public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar)
+    public GenericLogCollectionDisplay(ListView lstLines, ListView lstIndex, ListView lstIndexType, ListView lstFiles, TextBox txtDetail, PropertyGrid propertyGrid, ToolStripStatusLabel statusLabel, ToolStripProgressBar progressBar, Form form)
     {
         DetailText = txtDetail;
         DebugProperties = propertyGrid;
@@ -18,13 +16,16 @@ public partial class GenericLogCollectionDisplay
         FileList = new FileListView(lstFiles, LinesList);
 
         StatusController = new StatusController(statusLabel, progressBar, FileList);
+
+        ParentForm = form;
     }
 
+    public Form ParentForm { get; private set; }
     public StatusController StatusController { get; private set; }
 
     public TimestampOptions TimestampConversion { get; } = new TimestampOptions();
 
-    private bool IsDisplayingFullFile => string.IsNullOrEmpty(TraitValuesList.ActiveTraitValue) && string.IsNullOrEmpty(TraitTypesList.SelectedTraitType()) && FileList.IsLogSelected;
+    private bool IsDisplayingFullFile => LinesList.IsFullFile;
 
     public void DisplayFiles()
     {
@@ -42,7 +43,7 @@ public partial class GenericLogCollectionDisplay
 
         if (newlines != null)
         {
-            LinesList.UpdateLineSource(newlines);
+            LinesList.UpdateLineSourceAndApplyFilter(newlines, LinesList.IsFullFile);
         }
     }
 
@@ -52,40 +53,34 @@ public partial class GenericLogCollectionDisplay
         TraitValuesList.UpdateTraitValuesSource(values);
     }
 
-    public void Filter(string searchText)
-    {
-        if (searchText.Length > LastSearchText.Length && searchText.StartsWith(LastSearchText))
-        {
-            //if just adding to the last search (continuing to type) then can filter from what is already showing
-            LinesList.UpdateLineSource(LinesList.CurrentLines.FilteredCopy(searchText));
-        }
-        else
-        {
-            //...otherwise need to get content from the source
-            var newlines = LinesFromFileOrTraitValue();
-            newlines = newlines.FilteredCopy(searchText);
-            LinesList.UpdateLineSource(newlines);
-        }
-        LastSearchText = searchText;
-    }
-
     public void Filter(FilterOptions filterOptions)
     {
-        // if we can logically be sure that the filter should produce only a subset of the previous filter...
-        if (FilterOptions.ResultsAreSubset(LastFilterOptions, filterOptions))
-        {
-            // then it is better performance to filter what is already displayed...
-            LinesList.UpdateLineSource(LinesList.CurrentLines.FilteredCopy(filterOptions));
-        }
-        else
-        {
-            //...otherwise need to get content from the source
-            var newlines = LinesFromFileOrTraitValue();
-            newlines = newlines.FilteredCopy(filterOptions);
-            LinesList.UpdateLineSource(newlines);
-        }
+        //// if we can logically be sure that the filter should produce only a subset of the previous filter...
+        //if (FilterOptions.ResultsAreSubset(LastFilterOptions, filterOptions))
+        //{
+        //    // then it is better performance to filter what is already displayed...
+        //    LinesList.UpdateLineSourceAndApplyFilter(LinesList.CurrentLines.FilteredCopy(filterOptions));
+        //}
+        //else
+        //{
+        //    //...otherwise need to get content from the source
+        //    var newlines = LinesFromFileOrTraitValue();
+        //    newlines = newlines.FilteredCopy(filterOptions);
+        //    LinesList.UpdateLineSourceAndApplyFilter(newlines);
+        //}
 
-        LastFilterOptions = filterOptions;
+        //LastFilterOptions = filterOptions;
+    }
+
+    public void OpenFilterDialog()
+    {
+        var f = new FilterForm();
+
+        // modify FilterOptions in place
+        f.LoadFilters(LinesList.CurrentFilters.FilterSet);
+        var result = f.ShowDialog(ParentForm);
+
+        LinesList.ReFilter();
     }
 
     public void Refresh()
@@ -133,9 +128,10 @@ public partial class GenericLogCollectionDisplay
         {
             //string SearchText = timer.Tag.ToString() ?? string.Empty;
             //Filter(SearchText);
-            var filter = new FilterOptions(SearchBox.Text, ExcludeBox.Text);
-            Filter(filter);
-            timer.Stop();
+
+            //var filter = new FilterOptions(SearchBox.Text, ExcludeBox.Text);
+            //Filter(filter);
+            //timer.Stop();
         }
     }
 

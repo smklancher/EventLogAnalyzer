@@ -58,7 +58,7 @@ public class TextFileLog : LogBase<TextFileLogEntry>
             while (!sr.EndOfStream)
             {
                 LineNumber = LineNumber + 1;
-                string line = sr.ReadLine();
+                string line = sr.ReadLine()!;
 
                 // Always skip the number of lines which are already loaded, so this can be called initially or as an update
                 if (LineNumber > LinesAlreadyLoaded)
