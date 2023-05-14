@@ -46,6 +46,13 @@ namespace EventLogAnalysis.Filtering
         public override bool TestValues(string objectValue, string filterValue) => false;
     }
 
+    public class RelationIsNonBlank : FilterRelation
+    {
+        public override string DisplayName { get => "Is Not Blank"; }
+
+        public override bool TestValues(string objectValue, string filterValue) => !string.IsNullOrWhiteSpace(objectValue);
+    }
+
     public class RelationLessThan : FilterRelation
     {
         public override string DisplayName { get => "Less than"; }
