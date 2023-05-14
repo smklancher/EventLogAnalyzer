@@ -6,12 +6,12 @@ public class LineBasedTraitProducer
 {
     public void AddTraitsFromLine(TraitTypeCollection traits, ELRecord r)
     {
-        traits.AddLine("Provider", r.ProviderName, r);
-        traits.AddLine("Level", r.Level, r);
+        r.AddTrait("Provider", r.ProviderName, traits);
+        r.AddTrait("Level", r.Level, traits);
 
         if (r.MessageLoadExeption is not null)
         {
-            traits.AddLine("EventLogReadingException", r.MessageLoadExeption.Message, r);
+            r.AddTrait("EventLogReadingException", r.MessageLoadExeption.Message, traits);
         }
 
         if (r.Message.Contains("App Domain:"))
@@ -23,23 +23,23 @@ public class LineBasedTraitProducer
             if (!string.IsNullOrWhiteSpace(ellt.InnerException))
             {
                 r.ShortMessage = ellt.InnerException;
-                traits.AddLine("Inner Exception", ellt.InnerException, r);
+                r.AddTrait("Inner Exception", ellt.InnerException, traits);
             }
 
             if (!string.IsNullOrWhiteSpace(ellt.StackTraceTopFrame))
             {
                 r.ShortMessage = ellt.StackTraceTopFrame;
-                traits.AddLine("StackTraceTopFrame", ellt.StackTraceTopFrame, r);
+                r.AddTrait("StackTraceTopFrame", ellt.StackTraceTopFrame, traits);
             }
 
             if (!string.IsNullOrWhiteSpace(ellt.StackTraceBottomFrame))
             {
-                traits.AddLine("StackTraceBottomFrame", ellt.StackTraceBottomFrame, r);
+                r.AddTrait("StackTraceBottomFrame", ellt.StackTraceBottomFrame, traits);
             }
 
             if (!string.IsNullOrWhiteSpace(ellt.RequestUrl))
             {
-                traits.AddLine("RequestUrl", ellt.RequestUrl, r);
+                r.AddTrait("RequestUrl", ellt.RequestUrl, traits);
             }
         }
 
@@ -63,11 +63,11 @@ public class LineBasedTraitProducer
 
                 if (!string.IsNullOrWhiteSpace(name))
                 {
-                    traits.AddLine("Faulting Application", name, r);
+                    r.AddTrait("Faulting Application", name, traits);
                 }
                 if (!string.IsNullOrWhiteSpace(excode))
                 {
-                    traits.AddLine("Faulting Exception Code", excode, r);
+                    r.AddTrait("Faulting Exception Code", excode, traits);
                 }
             }
         }

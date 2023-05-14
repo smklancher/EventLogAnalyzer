@@ -49,7 +49,7 @@ namespace EventLogAnalysis.Filtering
             // ILogEntryCollection<out T> where T : LogEntry
             // then a function could return an EventCollction (ILogEntryCollection<ELRecord>) as ILogEntryCollection<LogEntry> to use generically in UI, etc.
             // And Entries becomes IEnumerable for covariance as well
-            var x = nameof(ILogEntryCollection<LogEntry>);
+            //var x = nameof(ILogEntryCollection<LogEntry>);
 
             // here I want FilterColumn to have an input type like FilterColumn<LogEntry>
             // and a method that returns a string from a property on that type

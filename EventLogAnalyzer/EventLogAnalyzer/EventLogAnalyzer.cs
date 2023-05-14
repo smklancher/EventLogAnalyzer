@@ -1,4 +1,5 @@
-﻿using EventLogAnalysis.Filtering;
+﻿using EventLogAnalysis;
+using EventLogAnalysis.Filtering;
 using Microsoft.Win32;
 
 namespace EventLogAnalyzer;
@@ -120,6 +121,8 @@ public partial class EventLogAnalyzer : Form
         await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, LCD.StatusController.ProgressHandler));
         LCD.StopProgressBar();
         LCD.Refresh();
+
+        FilterOptions.AddTraitsAsTypeColumns(LCD.Logs);
     }
 
     private void localTimeEventLogDefaultToolStripMenuItem_Click(object sender, EventArgs e)

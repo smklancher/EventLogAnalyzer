@@ -29,7 +29,8 @@ namespace EventLogAnalysis.Filtering
             {
                 if (a != null)
                 {
-                    Actions.TryAdd(a.ToString(), (FilterAction)a);
+                    var name = a.ToString() ?? string.Empty;
+                    Actions.TryAdd(name, (FilterAction)a);
                 }
             }
         }

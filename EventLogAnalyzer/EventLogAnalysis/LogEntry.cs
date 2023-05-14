@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 
 namespace EventLogAnalysis;
 
@@ -13,7 +14,24 @@ public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
     public long MessageCharacterCount => Message.Length;
     public string ShortMessage { get; set; } = string.Empty;
     public virtual DateTime? Timestamp { get; protected set; }
+
     public virtual string UniqueId { get; protected set; } = new Guid().ToString();
+
+    /// <summary>
+    /// May want to rethink how traits are stored...
+    /// originally stored on the log, but need on the line for filtering and using the existing types for now
+    /// </summary>
+    private TraitTypeCollection Traits { get; } = new TraitTypeCollection();
+
+    public void AddTrait(string traitName, string traitValue, TraitTypeCollection? logTraits = null)
+    {
+        if (logTraits != null)
+        {
+            logTraits.AddLine(traitName, traitValue, this);
+        }
+
+        Traits.AddLine(traitName, traitValue, this);
+    }
 
     public int CompareTo(LogEntry? other)
     {
@@ -31,5 +49,20 @@ public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
     public override int GetHashCode()
     {
         return UniqueId.GetHashCode();
+    }
+
+    public string GetTraitByName(string name)
+    {
+        // using existing types for now even though it's an odd fit
+        if (Traits.TryGetValue(name, out var traitValuesCollection))
+        {
+            // any trait that exists should only have the one value for this line
+            if (traitValuesCollection.Count > 0)
+            {
+                return traitValuesCollection.Keys.ToList()[0];
+            }
+        }
+
+        return string.Empty;
     }
 }

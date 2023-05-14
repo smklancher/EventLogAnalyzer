@@ -22,11 +22,11 @@ namespace EventLogAnalysis
 
                 if (!string.IsNullOrWhiteSpace(dep))
                 {
-                    traits.AddLine("TotalAgility Deployment Type", dep, r);
+                    r.AddTrait("TotalAgility Deployment Type", dep, traits);
                 }
                 if (!string.IsNullOrWhiteSpace(tenantcode))
                 {
-                    traits.AddLine("TotalAgility Tenant Code", tenantcode, r);
+                    r.AddTrait("TotalAgility Tenant Code", tenantcode, traits);
                 }
             }
 
@@ -40,7 +40,7 @@ namespace EventLogAnalysis
 
                 if (!string.IsNullOrWhiteSpace(tenantcode))
                 {
-                    traits.AddLine("TotalAgility Tenant Code", tenantcode, r);
+                    r.AddTrait("TotalAgility Tenant Code", tenantcode, traits);
                 }
             }
         }

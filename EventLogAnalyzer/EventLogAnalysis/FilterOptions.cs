@@ -22,6 +22,17 @@ namespace EventLogAnalysis
 
         public string SearchText { get; set; } = string.Empty;
 
+        public static void AddTraitsAsTypeColumns(LogCollection logs)
+        {
+            foreach (var traitName in logs.TraitTypes.Keys)
+            {
+                FilterColumn.New(
+                typeof(LogEntry),
+                x => ((LogEntry)x).GetTraitByName(traitName),
+                traitName);
+            }
+        }
+
         /// <summary>
         /// Add filter columns to known filters... probably these should be on the types they apply to, to allow for extensible plugins
         /// </summary>
