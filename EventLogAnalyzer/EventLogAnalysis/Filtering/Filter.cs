@@ -28,6 +28,7 @@ namespace EventLogAnalysis.Filtering
         public DateTime? DateValue { get; private set; }
         public List<DateTime> DateValues { get; private set; } = new List<DateTime>();
         public Color HighlightColor { get; set; } = Color.LightYellow;
+        public bool IsQuickFilter { get; set; } = false;
 
         /// <summary>
         /// relation: way of comparing object to value

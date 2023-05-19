@@ -421,7 +421,6 @@ namespace EventLogAnalyzer
             // 
             this.MessageSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.MessageSearchTextBox.Enabled = false;
             this.MessageSearchTextBox.Location = new System.Drawing.Point(107, 29);
             this.MessageSearchTextBox.Name = "MessageSearchTextBox";
             this.MessageSearchTextBox.Size = new System.Drawing.Size(483, 20);
@@ -449,7 +448,6 @@ namespace EventLogAnalyzer
             // SearchExcludeTextBox
             // 
             this.SearchExcludeTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SearchExcludeTextBox.Enabled = false;
             this.SearchExcludeTextBox.Location = new System.Drawing.Point(640, 29);
             this.SearchExcludeTextBox.Name = "SearchExcludeTextBox";
             this.SearchExcludeTextBox.Size = new System.Drawing.Size(296, 20);

@@ -1,4 +1,5 @@
-﻿using EventLogAnalysis.Filtering;
+﻿using System.Collections.Generic;
+using EventLogAnalysis.Filtering;
 
 namespace EventLogAnalyzer;
 
@@ -129,9 +130,12 @@ public partial class GenericLogCollectionDisplay
             //string SearchText = timer.Tag.ToString() ?? string.Empty;
             //Filter(SearchText);
 
-            //var filter = new FilterOptions(SearchBox.Text, ExcludeBox.Text);
+            var filters = FilterOptions.QuickFilters(SearchBox.Text, ExcludeBox.Text);
+            LinesList.CurrentFilters.FilterSet.ReplaceQuickFilters(filters);
+            LinesList.ReFilter();
+            //LinesList.CurrentFilters.FilterSet
             //Filter(filter);
-            //timer.Stop();
+            timer.Stop();
         }
     }
 

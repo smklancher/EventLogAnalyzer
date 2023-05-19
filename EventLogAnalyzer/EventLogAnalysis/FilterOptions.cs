@@ -70,8 +70,8 @@ namespace EventLogAnalysis
             var incList = include.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             var excList = exclude.Split(',').Select(x => x.Trim()).Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
 
-            list.AddRange(incList.Select(x => TermToFilter(x, FilterAction.Include)));
-            list.AddRange(excList.Select(x => TermToFilter(x, FilterAction.Exclude)));
+            list.AddRange(incList.Select(x => TermToQuickFilter(x, FilterAction.Include)));
+            list.AddRange(excList.Select(x => TermToQuickFilter(x, FilterAction.Exclude)));
 
             return list;
         }
@@ -87,7 +87,7 @@ namespace EventLogAnalysis
             //    old.ExcludeText.StartsWith(newf.ExcludeText, StringComparison.OrdinalIgnoreCase);
         }
 
-        private static Filter TermToFilter(string term, FilterAction action)
+        private static Filter TermToQuickFilter(string term, FilterAction action)
         {
             if (DateTime.TryParse(term, out var date))
             {
@@ -119,6 +119,7 @@ namespace EventLogAnalysis
                     filter.Relation = new RelationGreaterThan();
                 }
 
+                filter.IsQuickFilter = true;
                 return filter;
             }
             else
@@ -134,6 +135,7 @@ namespace EventLogAnalysis
                     Relation = new RelationContains(),
                 };
 
+                filter.IsQuickFilter = true;
                 return filter;
             }
         }

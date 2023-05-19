@@ -12,6 +12,12 @@ namespace EventLogAnalysis.Filtering
     {
         public List<Filter> Filters { get; set; } = new List<Filter>();
 
+        public void ReplaceQuickFilters(List<Filter> filters)
+        {
+            Filters.RemoveAll(x => x.IsQuickFilter);
+            Filters.AddRange(filters);
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
