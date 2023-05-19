@@ -26,7 +26,7 @@ namespace EventLogAnalysis.Filtering
         public required FilterColumn Column { get; set; }
 
         public DateTime? DateValue { get; private set; }
-
+        public List<DateTime> DateValues { get; private set; } = new List<DateTime>();
         public Color HighlightColor { get; set; } = Color.LightYellow;
 
         /// <summary>
@@ -42,19 +42,41 @@ namespace EventLogAnalysis.Filtering
             get { return strValue; }
             set
             {
+                strValue = value.ToLower();
+
                 if (DateTime.TryParse(value, out var date))
                 {
                     DateValue = date;
                 }
 
-                strValue = value;
+                // set possible compound values
+                Values = value.Split(',').Select(x => x.ToLower()).ToList();
+
+                DateValues.Clear();
+                foreach (var str in Values)
+                {
+                    if (DateTime.TryParse(str, out var date2))
+                    {
+                        DateValues.Add(date2);
+                    }
+                }
             }
         }
 
+        public List<string> Values { get; private set; } = new List<string> { string.Empty };
+
         public bool TestObject(object obj)
         {
+            if (Relation.UseComplexFilter)
+            {
+                return Relation.TestComplexFilter(obj, this);
+            }
+
             if (Column.IsDate && DateValue.HasValue)
             {
+                // if the column and filter can both provide date values
+                // then call the relation's date function.
+                // If the relation doesn't implment one, this just returns false;
                 var objValue = Column.DateValue(obj);
 
                 return Relation.TestDates(objValue, DateValue);
