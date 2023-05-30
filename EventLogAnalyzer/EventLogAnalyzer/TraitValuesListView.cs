@@ -81,7 +81,12 @@ public class TraitValuesListView
         InternalDisplayLines();
     }
 
-    private void InternalDisplayLines() => LinesList.UpdateLineSourceAndApplyFilter(CurrentTraitValues.LinesFromTraitValue(SelectedTraitValue()), false);
+    private void InternalDisplayLines()
+    {
+        var lines = CurrentTraitValues.LinesFromTraitValue(SelectedTraitValue());
+        LineSource.SetSource(() => lines);
+        LinesList.RefreshFromLineSourceAndApplyFilter();
+    }
 
     private void List_ColumnClick(object? sender, ColumnClickEventArgs e)
     {

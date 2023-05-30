@@ -49,6 +49,20 @@ public class LinesListView
         UpdateCurrentLines(UnfilteredLines.FilteredCopy(CurrentFilters));
     }
 
+    public void RefreshFromLineSourceAndApplyFilter()
+    {
+        UnfilteredLines = LineSource.LinesFromSource();
+        var filtered = UnfilteredLines.FilteredCopy(CurrentFilters);
+
+        UpdateCurrentLines(filtered);
+    }
+
+    public void RefreshFromLineSourceAndDontApplyFilter()
+    {
+        UnfilteredLines = LineSource.LinesFromSource();
+        UpdateCurrentLines(UnfilteredLines);
+    }
+
     public void SelectEarliestLine()
     {
         list.SelectedIndices.Clear();
@@ -65,21 +79,6 @@ public class LinesListView
         {
             list.SelectedIndices.Add(ReversableIndex(list.VirtualListSize - 1, list.VirtualListSize, SortNewestFirst));
         }
-    }
-
-    public void UpdateLineSourceAndApplyFilter(ILogEntryCollection<LogEntry> newlines, bool isFullFile)
-    {
-        IsFullFile = IsFullFile;
-        UnfilteredLines = newlines;
-        var filtered = newlines.FilteredCopy(CurrentFilters);
-
-        UpdateCurrentLines(filtered);
-    }
-
-    public void UpdateLineSourceAndDontApplyFilter(ILogEntryCollection<LogEntry> newlines)
-    {
-        UnfilteredLines = newlines;
-        UpdateCurrentLines(newlines);
     }
 
     private void List_ColumnClick(object? sender, ColumnClickEventArgs e)

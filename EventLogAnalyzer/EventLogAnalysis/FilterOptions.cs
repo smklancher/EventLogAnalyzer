@@ -87,6 +87,17 @@ namespace EventLogAnalysis
             //    old.ExcludeText.StartsWith(newf.ExcludeText, StringComparison.OrdinalIgnoreCase);
         }
 
+        /// <summary>
+        /// Probably move implementation from LogEntryCollection to FilterOptions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="unfiltered"></param>
+        /// <returns></returns>
+        public ILogEntryCollection<T> FilteredCopy<T>(LogEntryCollection<T> unfiltered) where T : LogEntry
+        {
+            return unfiltered.FilteredCopy(this);
+        }
+
         private static Filter TermToQuickFilter(string term, FilterAction action)
         {
             if (DateTime.TryParse(term, out var date))

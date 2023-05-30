@@ -27,19 +27,20 @@ public class LogCollection : List<ILogBase<LogEntry>>
     {
         var stopwatch = Stopwatch.StartNew();
         log.LoadTraits(cancelToken);
+        AddToAllLinesTrait(log);
         log.ProcessSimilarity(cancelToken);
-        Log.Information($"Finished analysis of log ({stopwatch.ElapsedMilliseconds:n0} ms)"); //: {log.FileName}");
+        InternalLog.WriteLine($"Finished analysis of log ({stopwatch.ElapsedMilliseconds:n0} ms)"); //: {log.FileName}");
     }
 
     public void AnalyzeLogs(CancellationToken token, IProgress<ProgressUpdate> progress)
     {
         var stopwatch = Stopwatch.StartNew();
         Parallel.ForEach(Logs, x => AnalyzeLog(x, token, progress));
-        Log.Information($"Finished analysis of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
+        InternalLog.WriteLine($"Finished analysis of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
         stopwatch.Restart();
         MergeLogAnalysis();
-        Log.Information($"Finished merge of log analysis ({stopwatch.ElapsedMilliseconds:n0} ms)");
+        InternalLog.WriteLine($"Finished merge of log analysis ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
         string msg = $"Finished merged analysis of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}";
         Log.Logger.Information(msg);
@@ -55,7 +56,7 @@ public class LogCollection : List<ILogBase<LogEntry>>
         var stopwatch = Stopwatch.StartNew();
         Parallel.ForEach(Logs, x => x.InitialLoad(cancelToken, progress));
         Parallel.ForEach(Logs, x => x.LoadMessages(cancelToken, progress));
-        Log.Information($"Finished loading messages of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
+        InternalLog.WriteLine($"Finished loading messages of all logs ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
         progress.Report(new ProgressUpdate(true, $"Finished loading lines of {Logs.Count} file{(Logs.Count == 1 ? string.Empty : "s")}") { RefreshLogsView = true });
     }
@@ -73,5 +74,13 @@ public class LogCollection : List<ILogBase<LogEntry>>
         var mergedSimilarityGroup = Similarity.Processing.MergeWorkingSets(similarityGroups);
         var tvc = SimilarityConverter.FromWorkingSetGroupToTraitValuesCollection(mergedSimilarityGroup);
         TraitTypes.AddTraitType(tvc);
+    }
+
+    private void AddToAllLinesTrait(ILogBase<LogEntry> log)
+    {
+        foreach (var e in log.EntryCollection.Entries)
+        {
+            e.AddTrait("All", "All", log.Traits);
+        }
     }
 }

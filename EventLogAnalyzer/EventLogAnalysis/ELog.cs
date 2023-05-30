@@ -73,7 +73,7 @@ public class ELog : LogBase<ELRecord>
 
         StatusCompleted = $"{TotalEventCount} events loaded";
         StatusInProgress = string.Empty;
-        Log.Information($"Finished loading events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
+        InternalLog.WriteLine($"Finished loading events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
     }
 
     public override void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
@@ -117,7 +117,7 @@ public class ELog : LogBase<ELRecord>
         StatusCompleted = $"{TotalEventCount} event messages loaded";
         StatusInProgress = string.Empty;
 
-        Log.Information($"Finished loading messages of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
+        InternalLog.WriteLine($"Finished loading messages of log ({stopwatch.ElapsedMilliseconds:n0} ms): {FileName}");
         progress.Report(new ProgressUpdate(true, string.Empty));
 
         Thread.CurrentThread.CurrentCulture = OriginalCulture;
@@ -240,7 +240,7 @@ public class ELog : LogBase<ELRecord>
     //    var newFile = $"{FileName}-tmp.evtx";
 
     //    eq.Session.ExportLogAndMessages(FileName, PathType.FilePath, "", newFile);
-    //    Log.Information($"Finished saving events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {newFile}");
+    //    InternalLog.WriteLine($"Finished saving events of log ({stopwatch.ElapsedMilliseconds:n0} ms): {newFile}");
     //}
 
     private void UpdateProvidersFromEvents(Dictionary<string, int> providers, LogEntryCollection<ELRecord> events)

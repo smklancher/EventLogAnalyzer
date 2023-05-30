@@ -24,7 +24,7 @@ public class Processing
             merged.Merge(w);
         }
 
-        Log.Information($"Merged similarity groups ({stopwatch.ElapsedMilliseconds:n0} ms)");
+        Trace.WriteLine($"Merged similarity groups ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
         return merged;
     }
@@ -52,12 +52,12 @@ public class Processing
         var opts = new ParallelOptions()
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount
-                                                                     //TODO: cancelation
+            //TODO: cancelation
         };
 
         // for now simply run the work in parallel
         Parallel.ForEach(workingSets, opts, x => x.GroupSimilarLines());
-        Log.Information($"Finished parallel processing of {workingSets.Count()} similarity groups ({stopwatch.ElapsedMilliseconds:n0} ms)");
+        Trace.WriteLine($"Finished parallel processing of {workingSets.Count()} similarity groups ({stopwatch.ElapsedMilliseconds:n0} ms)");
 
         stopwatch.Restart();
 

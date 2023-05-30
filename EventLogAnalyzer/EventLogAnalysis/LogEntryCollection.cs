@@ -88,6 +88,9 @@ public class LogEntryCollection<T> : ILogEntryCollection<T> where T : LogEntry
 
     public virtual ILogEntryCollection<T> FilteredCopy(FilterOptions filterOptions)
     {
+        // Consider allowing defined AND/OR filter sets
+        // https://enlear.academy/building-a-dynamic-logical-expression-builder-in-c-c8f998451334
+
         var lc = new LogEntryCollection<T>();
 
         foreach (var e in Entries)

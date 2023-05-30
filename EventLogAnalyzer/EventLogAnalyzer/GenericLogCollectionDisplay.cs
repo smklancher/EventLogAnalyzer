@@ -26,8 +26,6 @@ public partial class GenericLogCollectionDisplay
 
     public TimestampOptions TimestampConversion { get; } = new TimestampOptions();
 
-    private bool IsDisplayingFullFile => LinesList.IsFullFile;
-
     public void DisplayFiles()
     {
         FileList.UpdateLogFilesSource(Logs);
@@ -38,15 +36,7 @@ public partial class GenericLogCollectionDisplay
         TraitTypesList.UpdateTraitTypesSource(Logs.TraitTypes);
     }
 
-    public void DisplayLines()
-    {
-        var newlines = LinesFromFileOrTraitValue();
-
-        if (newlines != null)
-        {
-            LinesList.UpdateLineSourceAndApplyFilter(newlines, LinesList.IsFullFile);
-        }
-    }
+    public void DisplayLines() => LinesList.RefreshFromLineSourceAndApplyFilter();
 
     public void DisplayTraitValues()
     {
@@ -138,9 +128,6 @@ public partial class GenericLogCollectionDisplay
             timer.Stop();
         }
     }
-
-    private ILogEntryCollection<LogEntry> LinesFromFileOrTraitValue() =>
-        IsDisplayingFullFile ? FileList.SelectedLogEvents : Logs.TraitTypes.Lines(TraitTypesList.SelectedTraitType(), TraitValuesList.ActiveTraitValue);
 
     private void mExcludehBox_TextChanged(object? sender, EventArgs e)
     {

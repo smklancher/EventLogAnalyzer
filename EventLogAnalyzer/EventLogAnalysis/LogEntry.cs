@@ -15,7 +15,7 @@ public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
     public string ShortMessage { get; set; } = string.Empty;
     public virtual DateTime? Timestamp { get; protected set; }
 
-    public virtual string UniqueId { get; protected set; } = new Guid().ToString();
+    public virtual string UniqueId { get; protected set; } = Guid.NewGuid().ToString();
 
     /// <summary>
     /// May want to rethink how traits are stored...

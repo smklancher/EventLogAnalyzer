@@ -26,7 +26,6 @@ public class ELRecord : LogEntry
         Level = EventLevel.ToString();
     }
 
-    public bool AltMessage { get; private set; } = false;
     public StandardEventLevel EventLevel { get; }
     public ProviderEventIdPair GroupKey { get; init; }
     public double GroupSimilarity { get; set; }
@@ -68,28 +67,13 @@ public class ELRecord : LogEntry
                 {
                     if (!skipFormat)
                     {
-                        Log.Information($"Skipping subsequent formatting for provider {Record.ProviderName} due to empty message.");
+                        InternalLog.WriteLine($"Skipping subsequent formatting for provider {Record.ProviderName} due to empty message.");
                         if (MessageLoadExeption is not null)
-                        { Log.Information($"Additionally format attempt with provider {Record.ProviderName} threw error: {MessageLoadExeption.Message}."); }
+                        { InternalLog.WriteLine($"Additionally format attempt with provider {Record.ProviderName} threw error: {MessageLoadExeption.Message}."); }
                         ParentLog.ProvidersNotToFormat.Add(Record.ProviderName);
                     }
 
-                    if (Record.Properties.Count > 1)
-                    {
-                        Message = Record.Properties[0].Value.ToString() ?? string.Empty;
-                        var second = Record.Properties[1].Value.ToString() ?? string.Empty;
-                        AltMessage = true;
-                    }
-                    else if (Record.Properties.Count > 0)
-                    {
-                        Message = Record.Properties[0].Value.ToString() ?? string.Empty;
-                        AltMessage = true;
-                    }
-                    else
-                    {
-                        Message = string.Empty;
-                        AltMessage = true;
-                    }
+                    Message = PropertiesAsString();
                 }
             }
 

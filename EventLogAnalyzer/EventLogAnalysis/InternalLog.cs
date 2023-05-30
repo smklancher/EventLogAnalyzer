@@ -1,32 +1,55 @@
 ﻿namespace EventLogAnalysis;
 
-public class InternalLog : LogBase<StringAsLogEntry>
+public class InternalLog : LogBase<InternalLogLine>
 {
-    public InternalLog()
+    private static readonly Lazy<InternalLog> Lazy =
+                                new Lazy<InternalLog>(() => new InternalLog());
+
+    private InternalLog()
     {
         SourceName = "Internal Log";
         TypeName = "InternalLog";
     }
 
-    public override ILogEntryCollection<StringAsLogEntry> EntryCollection => new StringEntryCollection(LogList);
+    public static InternalLog Instance => Lazy.Value;
+    public InternalLogLineCollection Entries { get; private set; } = new();
+    public override ILogEntryCollection<InternalLogLine> EntryCollection => Entries;
     public List<string> LogList { get; private set; } = new();
+
+    public static void WriteLine(string message)
+    {
+        Instance.Entries.Add(new InternalLogLine(message));
+    }
 }
 
-public class StringAsLogEntry : LogEntry
+public class InternalLogLine : LogEntry
 {
-    public StringAsLogEntry(string msg)
+    public InternalLogLine(string msg)
     {
         Message = msg;
+        Timestamp = DateTime.Now;
     }
 }
 
-public class StringEntryCollection : LogEntryCollection<StringAsLogEntry>
-{
-    public StringEntryCollection(List<string> list)
-    {
-        this.list = list;
-    }
+//public class StringAsLogEntry : LogEntry
+//{
+//    public StringAsLogEntry(string msg)
+//    {
+//        Message = msg;
+//    }
+//}
 
-    public override IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
-    private List<string> list { get; }
+//public class StringEntryCollection : LogEntryCollection<StringAsLogEntry>
+//{
+//    public StringEntryCollection(List<string> list)
+//    {
+//        this.list = list;
+//    }
+
+//    public override IEnumerable<StringAsLogEntry> Entries => list.Select(x => new StringAsLogEntry(x)).ToList();
+//    private List<string> list { get; }
+//}
+
+public class InternalLogLineCollection : LogEntryCollection<InternalLogLine>
+{
 }
