@@ -32,6 +32,9 @@ public class TextFileLog : LogBase<TextFileLogEntry>
     public override void InitialLoad(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)
     {
         base.InitialLoad(cancelToken, progress);
+
+        // consider indexing lines here, possibly a separate mode when files are large?
+        // https://social.msdn.microsoft.com/Forums/vstudio/en-US/d47c3e79-08b0-40a9-9fb7-af683c40d755/tip-1-index-lines-in-large-text-file-for-fast-random-access?forum=vbgeneral
     }
 
     public override void LoadMessages(CancellationToken cancelToken, IProgress<ProgressUpdate> progress)

@@ -34,18 +34,11 @@ public class ELog : LogBase<ELRecord>
     public List<string> ProvidersNotToFormat { get; private set; } = new();
     public LogEntryCollection<ELRecord> RecordCollection => filteredEvents;
     public long TotalEventCount { get; private set; }
-    public List<LogBasedTraitProducer> TraitProducers { get; } = new();
     public LogEntryCollection<ELRecord> UnfilteredEvents { get; private set; } = new();
     private List<long> currentFilterEventIndexes { get; set; } = new();
     private FileInfo fileInfo { get; init; }
 
     private string MtaFilePath { get; }
-
-    public void CreateLogBasedTraitProducers()
-    {
-        // do this via plugin or whatever in the future
-        TraitProducers.Add(new LogBasedTraitProducer());
-    }
 
     //public void Filter(string xpath)
     //{
@@ -65,9 +58,6 @@ public class ELog : LogBase<ELRecord>
 
         UpdateProvidersFromEvents(AllProviders, UnfilteredEvents);
         FilteredProviders = new(AllProviders);
-
-        // remove in future
-        CreateLogBasedTraitProducers();
 
         RenameMtaFileIfPossible(true);
 
