@@ -118,7 +118,11 @@ public partial class EventLogAnalyzer : Form
         await Task.Run(() => LCD.Logs.LoadMessages(cts.Token, LCD.StatusController.ProgressHandler));
         LCD.Refresh();
 
-        await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, LCD.StatusController.ProgressHandler));
+        if (!Options.Instance.LargeFileMode)
+        {
+            await Task.Run(() => LCD.Logs.AnalyzeLogs(cts.Token, LCD.StatusController.ProgressHandler));
+        }
+
         LCD.StopProgressBar();
         LCD.Refresh();
 

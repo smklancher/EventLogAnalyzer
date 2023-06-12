@@ -26,16 +26,15 @@ public class ELog : LogBase<ELRecord>
     }
 
     public Dictionary<string, int> AllProviders { get; private set; } = new();
-    public override ILogEntryCollection<ELRecord> EntryCollection => filteredEvents;
-    public int EventsWithMessagesLoaded => UnfilteredEvents.Lines.Where(x => x.MessageIsLoaded).Count();
+    public override ILogEntryCollection<ELRecord> EntryCollection => RecordCollection;
     public string FileName => SourceName;
-    public long FilteredEventCount => currentFilterEventIndexes.Count;
     public Dictionary<string, int> FilteredProviders { get; private set; } = new();
     public List<string> ProvidersNotToFormat { get; private set; } = new();
-    public LogEntryCollection<ELRecord> RecordCollection => filteredEvents;
+    public LogEntryCollection<ELRecord> RecordCollection { get; private set; } = new();
     public long TotalEventCount { get; private set; }
-    public LogEntryCollection<ELRecord> UnfilteredEvents { get; private set; } = new();
-    private List<long> currentFilterEventIndexes { get; set; } = new();
+
+    //public LogEntryCollection<ELRecord> UnfilteredEvents { get; private set; } = new();
+    //private List<long> currentFilterEventIndexes { get; set; } = new();
     private FileInfo fileInfo { get; init; }
 
     private string MtaFilePath { get; }
@@ -52,12 +51,11 @@ public class ELog : LogBase<ELRecord>
         var stopwatch = Stopwatch.StartNew();
         RenameMtaFileIfPossible(false);
         var eq = new EventLogQuery(FileName, PathType.FilePath);
-        //SaveCopy(eq);
-        LoadEvents(eq, cancelToken, progress);
-        TotalEventCount = UnfilteredEvents.Lines.Count();
 
-        UpdateProvidersFromEvents(AllProviders, UnfilteredEvents);
-        FilteredProviders = new(AllProviders);
+        LoadEvents(eq, cancelToken, progress);
+        TotalEventCount = RecordCollection.Lines.Count();
+
+        UpdateProvidersFromEvents(AllProviders, RecordCollection);
 
         RenameMtaFileIfPossible(true);
 
@@ -78,7 +76,7 @@ public class ELog : LogBase<ELRecord>
         var OriginalCulture = Thread.CurrentThread.CurrentCulture;
         Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
 
-        using var dt = new DisposableTrace(Label: $"{UnfilteredEvents.Lines.Count()} messages from {fileInfo.Name}");
+        using var dt = new DisposableTrace(Label: $"{RecordCollection.Lines.Count()} messages from {fileInfo.Name}");
 
         int loadedMessages = 0;
         //load in reverse to get newset events first
@@ -148,7 +146,6 @@ public class ELog : LogBase<ELRecord>
     {
         using var dt = new DisposableTrace($"Loading events from {fileInfo.Name}");
 
-        currentFilterEventIndexes.Clear();
         RecordCollection.Clear();
 
         int loadedEvents = 0;
@@ -160,13 +157,8 @@ public class ELog : LogBase<ELRecord>
                 var elr = new ELRecord(ev, this);
                 loadedEvents++;
 
-                // after initial load these are ignored
-                UnfilteredEvents.Add(elr);
-
                 // filtered events are cleared at start of each load events
                 RecordCollection.Add(elr);
-
-                currentFilterEventIndexes.Add(elr.RecordId);
 
                 if (loadedEvents % 1000 == 0)
                 {

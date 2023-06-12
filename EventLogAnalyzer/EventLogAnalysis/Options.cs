@@ -29,6 +29,10 @@ public class Options
     [Category(TestingCategory)]
     public bool IncludeFilterUsesOR { get; set; } = true;
 
+    [Description("Large file mode.")]
+    [Category(TestingCategory)]
+    public bool LargeFileMode { get; set; } = false;
+
     [Description("If an MTA file is present in the LocaleMetaData subfolder then the EventLog APIs perform wildly slower.  This renames the file to avoid the performance penalty while loading then renames it back.")]
     [Category(TestingCategory)]
     public bool RenameMtaDuringLoad { get; set; } = true;
