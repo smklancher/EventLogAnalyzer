@@ -9,6 +9,8 @@ public record ProviderEventIdPair(string Provider, int EventId);
 
 public class ELRecord : LogEntry
 {
+    private string xml = string.Empty;
+
     public ELRecord(EventRecord eventRecord, ELog log)
     {
         Record = eventRecord;
@@ -27,19 +29,37 @@ public class ELRecord : LogEntry
     }
 
     public StandardEventLevel EventLevel { get; }
+
     public ProviderEventIdPair GroupKey { get; init; }
+
     public double GroupSimilarity { get; set; }
+
     public string LogFileName => ParentLog.FileName;
 
     public bool MessageIsLoaded { get; private set; }
+
     public Exception? MessageLoadExeption { get; private set; }
+
     public ELog ParentLog { get; }
+
     public string ProviderName => Record.ProviderName;
 
     [TypeConverter(typeof(ExpandableObjectConverter))]
     public EventRecord Record { get; init; }
 
     public long RecordId { get; private set; }
+
+    public string Xml
+    {
+        get
+        {
+            if (xml == string.Empty)
+            {
+                xml = Record.ToXml();
+            }
+            return xml;
+        }
+    }
 
     public string GetMessage()
     {
