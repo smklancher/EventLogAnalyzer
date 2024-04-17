@@ -18,18 +18,18 @@ public class LineBasedTraitProducer
         {
             var ellt = new EnterpriseLibraryLogText(r.Message);
 
-            // for short message use inner exception or StackTraceTopFrame if available, preferring StackTraceTopFrame
+            // for short message use inner exception or StackTraceTopFrame if exception not available
+            if (!string.IsNullOrWhiteSpace(ellt.StackTraceTopFrame))
+            {
+                // ST top frame will only be used for short msg if there's not an exeption message found to set after this
+                r.ShortMessage = ellt.StackTraceTopFrame;
+                r.AddTrait("StackTraceTopFrame", ellt.StackTraceTopFrame, traits);
+            }
 
             if (!string.IsNullOrWhiteSpace(ellt.InnerException))
             {
                 r.ShortMessage = ellt.InnerException;
                 r.AddTrait("Inner Exception", ellt.InnerException, traits);
-            }
-
-            if (!string.IsNullOrWhiteSpace(ellt.StackTraceTopFrame))
-            {
-                r.ShortMessage = ellt.StackTraceTopFrame;
-                r.AddTrait("StackTraceTopFrame", ellt.StackTraceTopFrame, traits);
             }
 
             if (!string.IsNullOrWhiteSpace(ellt.StackTraceBottomFrame))

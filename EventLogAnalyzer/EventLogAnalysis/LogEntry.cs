@@ -12,7 +12,12 @@ public class LogEntry : IComparable<LogEntry>, IEquatable<LogEntry>
     public string Message { get; protected set; } = string.Empty;
 
     public long MessageCharacterCount => Message.Length;
+
+    /// <summary>
+    /// if set, this is used for similarity matching
+    /// </summary>
     public string ShortMessage { get; set; } = string.Empty;
+
     public virtual DateTime? Timestamp { get; protected set; }
 
     public virtual string UniqueId { get; protected set; } = Guid.NewGuid().ToString();
