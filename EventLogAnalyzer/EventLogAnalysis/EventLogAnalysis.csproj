@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net48;net7.0-windows</TargetFrameworks>
+	  <TargetFrameworks>net48;net9.0-windows</TargetFrameworks>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
 	<ImplicitUsings>false</ImplicitUsings>
@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Fastenshtein" Version="1.0.0.8" />
     <PackageReference Include="Serilog" Version="2.10.0" />
-    <PackageReference Include="System.Diagnostics.EventLog" Version="6.0.0" />
+    <PackageReference Include="System.Diagnostics.EventLog" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
